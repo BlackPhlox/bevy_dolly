@@ -1,6 +1,7 @@
 # 🎥🐑 bevy_dolly
 
-[Dolly](https://github.com/h3r2tic/dolly), now in bevy.
+[Dolly](https://github.com/h3r2tic/dolly), now in bevy.<br/>
+Please do not call `dolly.clone()`, she have already been cloned once.
 
 ## How to run
 
