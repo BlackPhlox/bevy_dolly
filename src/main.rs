@@ -3,7 +3,7 @@ use dolly::glam::Vec3;
 use dolly::prelude::{Arm, CameraRig, Smooth, YawPitch};
 
 struct Dolly {
-    rigs: Vec<CameraRig>,
+    rigs: CameraRig,
 }
 
 struct MainCamera;
@@ -11,7 +11,7 @@ struct MainCamera;
 fn main() {
     App::build()
         .insert_resource(Msaa { samples: 4 })
-        .insert_resource(Dolly { rigs: vec![] })
+        //.insert_resource(Dolly { rigs: vec![] })
         .add_plugins(DefaultPlugins)
         .add_startup_system(setup.system())
         .add_system(update_camera.system())
@@ -22,7 +22,6 @@ fn main() {
 fn setup(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
-    mut rig: ResMut<Dolly>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
     // plane
@@ -47,7 +46,7 @@ fn setup(
         .with(Arm::new(Vec3::Z * 4.0))
         .build();
 
-    commands.spawn().insert(Dolly { rigs: vec![camera] });
+    commands.insert_resource(Dolly { rigs: camera });
 
     commands
         .spawn_bundle(PerspectiveCameraBundle {
@@ -56,6 +55,7 @@ fn setup(
             ..Default::default()
         })
         .insert(MainCamera);
+    
 
     // light
     commands.spawn_bundle(LightBundle {
@@ -69,12 +69,8 @@ fn update_camera(
     mut dolly: ResMut<Dolly>,
     mut query: Query<(&mut Transform, With<MainCamera>)>,
 ) {
-    if dolly.rigs.len() <= 0 {
-        return;
-    };
-    let rig = dolly.rigs.last().unwrap();
     let (mut cam, _) = query.single_mut().unwrap();
-    let camera_driver = rig.driver_mut::<YawPitch>();
+    let camera_driver = dolly.rigs.driver_mut::<YawPitch>();
     if keys.just_pressed(KeyCode::Z) {
         camera_driver.rotate_yaw_pitch(-90.0, 0.0);
     }
@@ -82,7 +78,7 @@ fn update_camera(
         camera_driver.rotate_yaw_pitch(90.0, 0.0);
     }
 
-    let transform = rig.update(0.1);
+    let transform = dolly.rigs.update(0.1);
     let translation = transform.translation;
     let rotation = transform.rotation;
 
