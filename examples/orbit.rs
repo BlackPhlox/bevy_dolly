@@ -11,7 +11,6 @@ struct MainCamera;
 fn main() {
     App::build()
         .insert_resource(Msaa { samples: 4 })
-        //.insert_resource(Dolly { rigs: vec![] })
         .add_plugins(DefaultPlugins)
         .add_startup_system(setup.system())
         .add_system(update_camera.system())
