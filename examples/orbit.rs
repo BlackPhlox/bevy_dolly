@@ -22,6 +22,7 @@ fn setup(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
+    asset_server: Res<AssetServer>
 ) {
     // plane
     commands.spawn_bundle(PbrBundle {
@@ -31,6 +32,20 @@ fn setup(
     });
 
     commands
+        .spawn_bundle((
+            Transform {
+                translation: bevy::math::Vec3::new(0.,0.2,0.),
+                ..Default::default()
+            },
+            GlobalTransform::identity(),
+        ))
+        .with_children(|cell| {
+            cell.spawn_scene(asset_server.load("sheep.gltf#Scene0"));
+        })
+        .id();
+
+    /*
+    commands
         .spawn_bundle(PbrBundle {
             mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
             material: materials.add(Color::rgb(0.8, 0.7, 0.6).into()),
@@ -38,6 +53,7 @@ fn setup(
             ..Default::default()
         })
         .id();
+    */
 
     let camera = CameraRig::builder()
         .with(YawPitch::new().yaw_degrees(45.0).pitch_degrees(-30.0))
