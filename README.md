@@ -1,7 +1,11 @@
-# 🎥🐑 bevy_dolly
+<div align="left">
+<a href="https://github.com/BlackPhlox/bevy_dolly"><img src="https://raw.githubusercontent.com/BlackPhlox/BlackPhlox/master/bevy_dolly_4.svg" alt="bevy_dolly"></a>
+</div><br/>
 
-[Dolly](https://github.com/h3r2tic/dolly), now in bevy.<br/>
-Please do not call `dolly.clone()`, she have already been cloned once.
+
+`bevy_dolly` is [h3r2tic](https://github.com/h3r2tic)'s [dolly](https://github.com/h3r2tic/dolly) implemented in bevy.<br/>
+<br/>
+_Please do not call `dolly.clone()`, she have already been cloned once._
 
 ## How to run
 
