@@ -1,8 +1,7 @@
-use bevy::app::Events;
 use bevy::input::mouse::MouseMotion;
 use bevy::prelude::*;
 use dolly::glam::Vec3;
-use dolly::prelude::{Arm, CameraRig, Positional, Smooth, YawPitch};
+use dolly::prelude::{CameraRig, Positional, Smooth, YawPitch};
 
 struct Dolly {
     rigs: CameraRig,
@@ -46,11 +45,25 @@ fn setup(
         })
         .id();
 
-    let start_pos = Vec3::new(0.,0.,0.);
+    let translation = [-2.0f32, 2.0f32, 5.0f32];
+    let transform =
+        Transform::from_translation(bevy::math::Vec3::from_slice_unaligned(&translation))
+            .looking_at(bevy::math::Vec3::ZERO, bevy::math::Vec3::Y);
+    let rotation = dolly::glam::Quat::from_xyzw(
+        transform.rotation.x,
+        transform.rotation.y,
+        transform.rotation.z,
+        transform.rotation.w,
+    );
+    let mut yaw_pitch = YawPitch::new();
+    yaw_pitch.set_rotation(rotation);
 
     let camera = CameraRig::builder()
-        .with(Positional::new(Vec3::Y))
-        .with(YawPitch::new())
+        .with(Positional {
+            position: Vec3::from_slice(&translation),
+            rotation,
+        })
+        .with(yaw_pitch)
         .with(Smooth::new_move_look(1.0, 1.0))
         .build();
 
@@ -58,8 +71,7 @@ fn setup(
 
     commands
         .spawn_bundle(PerspectiveCameraBundle {
-            transform: Transform::from_xyz(-2.0, 10.0, 5.0)
-                .looking_at(bevy::math::Vec3::ZERO, bevy::math::Vec3::Y),
+            transform,
             ..Default::default()
         })
         .insert(MainCamera);
@@ -101,58 +113,61 @@ fn player_look(
 */
 
 fn update_camera(
+    time: Res<Time>,
     keys: Res<Input<KeyCode>>,
-    windows: Res<Windows>,
     mut mouse_motion_events: EventReader<MouseMotion>,
     mut dolly: ResMut<Dolly>,
     mut query: Query<(&mut Transform, With<MainCamera>)>,
 ) {
     let (mut cam, _) = query.single_mut().unwrap();
-    let time_delta_seconds : f32 = 0.1;
-    let x_sensitivity : f32 = 1.;
-    let y_sensitivity : f32 = 1.;
+    let time_delta_seconds: f32 = time.delta_seconds();
+    let sensitivity = Vec2::splat(1.0);
 
-    let move_right: f32 = if keys.just_pressed(KeyCode::D) {
-        0.
-    } else {
-        1.
-    };
-    let move_up: f32 = if keys.just_pressed(KeyCode::Space) {
-        0.
-    } else {
-        1.
-    };
-    let move_fwd: f32 = if keys.just_pressed(KeyCode::W) {
-        0.
-    } else {
-        1.
-    };
-    let boost: f32 = if keys.just_pressed(KeyCode::LShift) {
-        0.
-    } else {
-        1.
-    };
+    let mut move_vec = Vec3::ZERO;
 
-    let mut delta_x = 1.;
-    let mut delta_y = 1.;
-    for event in mouse_motion_events.iter() {
-        delta_x = event.delta.x;
-        delta_y = event.delta.y;
+    // Q: Is dolly left-handed so z is flipped?
+    if keys.pressed(KeyCode::W) {
+        move_vec.z -= 1.0;
+    }
+    if keys.pressed(KeyCode::S) {
+        move_vec.z += 1.0;
+    }
+    if keys.pressed(KeyCode::A) {
+        move_vec.x -= 1.0;
+    }
+    if keys.pressed(KeyCode::D) {
+        move_vec.x += 1.0;
     }
 
-    let move_vec = dolly.rigs.transform.rotation
-        * Vec3::new(move_right, move_up, -move_fwd).clamp_length_max(1.0)
-        * 10.0f32.powf(boost);
+    if keys.pressed(KeyCode::E) || keys.pressed(KeyCode::Space) {
+        move_vec.y += 1.0;
+    }
+    if keys.pressed(KeyCode::Q) {
+        move_vec.y -= 1.0;
+    }
 
-        
-    dolly.rigs
-        .driver_mut::<YawPitch>()
-        .rotate_yaw_pitch(-0.1 * delta_x * x_sensitivity, -0.1 * delta_y * y_sensitivity);
-        /*
-    dolly.rigs
+    let boost: f32 = if keys.pressed(KeyCode::LShift) {
+        1.
+    } else {
+        0.
+    };
+
+    let mut delta = Vec2::ZERO;
+    for event in mouse_motion_events.iter() {
+        delta += event.delta;
+    }
+
+    let move_vec =
+        dolly.rigs.transform.rotation * move_vec.clamp_length_max(1.0) * 10.0f32.powf(boost);
+
+    dolly.rigs.driver_mut::<YawPitch>().rotate_yaw_pitch(
+        -0.1 * delta.x * sensitivity.x,
+        -0.1 * delta.y * sensitivity.y,
+    );
+    dolly
+        .rigs
         .driver_mut::<Positional>()
         .translate(move_vec * time_delta_seconds * 10.0);
-        */
 
     let transform = dolly.rigs.update(time_delta_seconds);
     let translation = transform.translation;
