@@ -44,17 +44,6 @@ fn setup(
         })
         .id();
 
-    /*
-    commands
-        .spawn_bundle(PbrBundle {
-            mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
-            material: materials.add(Color::rgb(0.8, 0.7, 0.6).into()),
-            transform: Transform::from_xyz(0.0, 0.5, 0.0),
-            ..Default::default()
-        })
-        .id();
-    */
-
     let camera = CameraRig::builder()
         .with(YawPitch::new().yaw_degrees(45.0).pitch_degrees(-30.0))
         .with(Smooth::new_look(1.5))
@@ -85,7 +74,7 @@ fn update_camera(
 ) {
     let (mut cam, _) = query.single_mut().unwrap();
     let camera_driver = dolly.rigs.driver_mut::<YawPitch>();
-    let time_delta_seconds : f32 = 0.1;
+    let time_delta_seconds: f32 = 0.1;
 
     if keys.just_pressed(KeyCode::Z) {
         camera_driver.rotate_yaw_pitch(-90.0, 0.0);

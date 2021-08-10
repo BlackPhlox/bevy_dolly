@@ -14,7 +14,9 @@ fn main() {
         .insert_resource(Msaa { samples: 4 })
         .add_plugins(DefaultPlugins)
         .add_startup_system(setup.system())
+        .add_startup_system(initial_grab_cursor.system())
         .add_system(update_camera.system())
+        .add_system(cursor_grab.system())
         .run();
 }
 
@@ -83,44 +85,35 @@ fn setup(
     });
 }
 
-/*
-fn player_look(
-    settings: Res<MovementSettings>,
-    windows: Res<Windows>,
-    motion: Res<Events<MouseMotion>>,
-    mut state: ResMut<InputState>,
-    mut query: Query<(&FlyCam, &mut Transform)>,
-) {
-    if settings.disable_look {
-        return;
-    }
-    let window = windows.get_primary().unwrap();
-    for (_camera, mut transform) in query.iter_mut() {
-        for ev in state.reader_motion.iter(&motion) {
-            if window.cursor_locked() {
-                state.pitch -= (settings.sensitivity * ev.delta.y * window.height()).to_radians();
-                state.yaw -= (settings.sensitivity * ev.delta.x * window.width()).to_radians();
-            }
+/// Grabs/ungrabs mouse cursor
+fn toggle_grab_cursor(window: &mut Window) {
+    window.set_cursor_lock_mode(!window.cursor_locked());
+    window.set_cursor_visibility(!window.cursor_visible());
+}
 
-            state.pitch = state.pitch.clamp(-1.54, 1.54);
+/// Grabs the cursor when game first starts
+fn initial_grab_cursor(mut windows: ResMut<Windows>) {
+    toggle_grab_cursor(windows.get_primary_mut().unwrap());
+}
 
-            // Order is important to prevent unintended roll
-            transform.rotation = Quat::from_axis_angle(Vec3::Y, state.yaw)
-                * Quat::from_axis_angle(Vec3::X, state.pitch);
-        }
+fn cursor_grab(keys: Res<Input<KeyCode>>, mut windows: ResMut<Windows>) {
+    let window = windows.get_primary_mut().unwrap();
+    if keys.just_pressed(KeyCode::Escape) {
+        toggle_grab_cursor(window);
     }
 }
-*/
 
 fn update_camera(
     time: Res<Time>,
     keys: Res<Input<KeyCode>>,
+    windows: Res<Windows>,
     mut mouse_motion_events: EventReader<MouseMotion>,
     mut dolly: ResMut<Dolly>,
     mut query: Query<(&mut Transform, With<MainCamera>)>,
 ) {
     let (mut cam, _) = query.single_mut().unwrap();
     let time_delta_seconds: f32 = time.delta_seconds();
+    let boost_mult = 5.0f32;
     let sensitivity = Vec2::splat(1.0);
 
     let mut move_vec = Vec3::ZERO;
@@ -158,16 +151,19 @@ fn update_camera(
     }
 
     let move_vec =
-        dolly.rigs.transform.rotation * move_vec.clamp_length_max(1.0) * 10.0f32.powf(boost);
+        dolly.rigs.transform.rotation * move_vec.clamp_length_max(1.0) * boost_mult.powf(boost);
 
-    dolly.rigs.driver_mut::<YawPitch>().rotate_yaw_pitch(
-        -0.1 * delta.x * sensitivity.x,
-        -0.1 * delta.y * sensitivity.y,
-    );
-    dolly
-        .rigs
-        .driver_mut::<Positional>()
-        .translate(move_vec * time_delta_seconds * 10.0);
+    let window = windows.get_primary().unwrap();
+    if window.cursor_locked() {
+        dolly.rigs.driver_mut::<YawPitch>().rotate_yaw_pitch(
+            -0.1 * delta.x * sensitivity.x,
+            -0.1 * delta.y * sensitivity.y,
+        );
+        dolly
+            .rigs
+            .driver_mut::<Positional>()
+            .translate(move_vec * time_delta_seconds * 10.0);
+    }
 
     let transform = dolly.rigs.update(time_delta_seconds);
     let translation = transform.translation;

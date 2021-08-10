@@ -1,3 +1,4 @@
+//Currently not working
 use bevy::prelude::*;
 use dolly::glam::{Quat, Vec3};
 use dolly::prelude::{Arm, CameraRig, LookAt, Positional, Smooth};
@@ -84,7 +85,7 @@ fn update_camera(
     )>,
 ) {
     let (player, _) = query.q1_mut().single_mut().unwrap();
-    let time_delta_seconds : f32 = 0.1;
+    let time_delta_seconds: f32 = 0.1;
 
     let player_translation = Vec3::new(
         player.translation.x,
