@@ -38,8 +38,8 @@ jobs:
     needs: update
     steps:
       - uses: actions/checkout@v2
-      - name: Install libxcb-shape0-dev
-        run: sudo apt install libxcb-shape0-dev libxcb-xfixes0-dev alsa-lib-devel libasound2-dev
+      - name: Install dependencies
+        run: sudo apt install pkg-config libudev-dev libasound2-dev libxcb-shape0-dev libxcb-xfixes0-dev
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
