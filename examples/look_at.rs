@@ -100,10 +100,9 @@ fn update_camera(
     dolly.rigs.driver_mut::<LookAt>().target = player_translation;
 
     let transform = dolly.rigs.update(time_delta_seconds);
-    let translation = transform.translation;
-    let rotation = transform.rotation;
-
     let (mut cam, _) = query.q1_mut().single_mut().unwrap();
+
+    let (translation, rotation) = transform.into_translation_rotation();
     cam.translation = bevy::math::Vec3::new(translation.x, translation.y, translation.z);
     cam.rotation = bevy::math::Quat::from_xyzw(rotation.x, rotation.y, rotation.z, rotation.w);
 }

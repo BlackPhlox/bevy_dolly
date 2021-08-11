@@ -111,7 +111,6 @@ fn update_camera(
     mut dolly: ResMut<Dolly>,
     mut query: Query<(&mut Transform, With<MainCamera>)>,
 ) {
-    let (mut cam, _) = query.single_mut().unwrap();
     let time_delta_seconds: f32 = time.delta_seconds();
     let boost_mult = 5.0f32;
     let sensitivity = Vec2::splat(1.0);
@@ -165,10 +164,10 @@ fn update_camera(
             .translate(move_vec * time_delta_seconds * 10.0);
     }
 
+    let (mut cam, _) = query.single_mut().unwrap();
     let transform = dolly.rigs.update(time_delta_seconds);
-    let translation = transform.translation;
-    let rotation = transform.rotation;
 
+    let (translation, rotation) = transform.into_translation_rotation();
     cam.translation = bevy::math::Vec3::new(translation.x, translation.y, translation.z);
     cam.rotation = bevy::math::Quat::from_xyzw(rotation.x, rotation.y, rotation.z, rotation.w);
 }
