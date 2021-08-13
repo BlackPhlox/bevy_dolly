@@ -4,7 +4,9 @@
 
 
 `bevy_dolly` is [h3r2tic](https://github.com/h3r2tic)'s [dolly](https://github.com/h3r2tic/dolly) implemented in bevy.<br/>
-<br/>
+
+Currently, `lib.rs` is following the [no code principle](https://github.com/kelseyhightower/nocode). So look at the examples for now, the plugin will come later.
+<br/><br/>
 _Please do not call `dolly.clone()`, she have already been cloned once._
 
 ## How to run
