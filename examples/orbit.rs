@@ -1,7 +1,8 @@
 use bevy::prelude::*;
+use bevy_dolly::cone::Cone;
+use bevy_dolly::DollyCamUpdate;
 use dolly::glam::Vec3;
 use dolly::prelude::{Arm, CameraRig, Smooth, YawPitch};
-use bevy_dolly::cone::Cone;
 
 struct Dolly {
     rigs: CameraRig,
@@ -86,7 +87,5 @@ fn update_camera(
     let transform = dolly.rigs.update(time_delta_seconds);
     let (mut cam, _) = query.single_mut().unwrap();
 
-    let (translation, rotation) = transform.into_translation_rotation();
-    cam.translation = bevy::math::Vec3::new(translation.x, translation.y, translation.z);
-    cam.rotation = bevy::math::Quat::from_xyzw(rotation.x, rotation.y, rotation.z, rotation.w);
+    cam.update(transform);
 }

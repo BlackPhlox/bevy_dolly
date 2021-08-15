@@ -1,18 +1,27 @@
-use bevy::{core::Time, ecs::schedule::ShouldRun, input::Input, math::{Mat4, Quat, Vec3}, pbr::PbrBundle, prelude::{AppBuilder, AssetServer, Assets, BuildChildren, Color, Commands, GlobalTransform, IntoSystem, KeyCode, Mesh, Plugin, Query, Res, ResMut, StandardMaterial, SystemSet, Transform}};
+use bevy::{
+    core::Time,
+    ecs::schedule::ShouldRun,
+    input::Input,
+    math::{Quat, Vec3},
+    pbr::PbrBundle,
+    prelude::{
+        AppBuilder, Assets, BuildChildren, Color, Commands, GlobalTransform, IntoSystem, KeyCode,
+        Mesh, Plugin, Query, Res, ResMut, StandardMaterial, SystemSet, Transform,
+    },
+};
 
 use crate::cone::Cone;
 
 pub struct Ctrl;
 impl Plugin for Ctrl {
     fn build(&self, app: &mut AppBuilder) {
-        app
-        .init_resource::<CtrlConfig>()
-        .add_startup_system(ctrl_setup.system())
-        .add_system_set(
-            SystemSet::new()
-                .with_run_criteria(use_ctrl.system())
-                .with_system(ctrl_update.system())
-        );
+        app.init_resource::<CtrlConfig>()
+            .add_startup_system(ctrl_setup.system())
+            .add_system_set(
+                SystemSet::new()
+                    .with_run_criteria(use_ctrl.system())
+                    .with_system(ctrl_update.system()),
+            );
     }
 }
 
@@ -74,10 +83,10 @@ fn ctrl_setup(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
-    config: Res<CtrlConfig>
-){
+    config: Res<CtrlConfig>,
+) {
     if !config.enabled {
-        return
+        return;
     }
 
     let cone_mesh = meshes.add(Mesh::from(Cone {
@@ -99,17 +108,19 @@ fn ctrl_setup(
                 translation: config.position,
                 ..Default::default()
             },
-        GlobalTransform::identity(),
-    ))
-    .with_children(|cell| {
-        cell.spawn_bundle(PbrBundle {
-            mesh: cone_mesh.clone(),
-            material: player_mat.clone(),
-            transform: 
-                Transform::from_rotation(Quat::from_rotation_x(std::f32::consts::FRAC_PI_2)),
-            ..Default::default()
-        });
-    }).insert(CtrlMove);
+            GlobalTransform::identity(),
+        ))
+        .with_children(|cell| {
+            cell.spawn_bundle(PbrBundle {
+                mesh: cone_mesh.clone(),
+                material: player_mat.clone(),
+                transform: Transform::from_rotation(Quat::from_rotation_x(
+                    std::f32::consts::FRAC_PI_2,
+                )),
+                ..Default::default()
+            });
+        })
+        .insert(CtrlMove);
 }
 
 pub fn validate_key<T>(codes: &'static [T], key: &T) -> bool

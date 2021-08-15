@@ -1,9 +1,9 @@
 use bevy::prelude::*;
-use bevy_dolly::Dolly;
+use bevy_dolly::{Dolly, DollyCamUpdate};
 use dolly::glam::Vec3;
 use dolly::prelude::{Arm, CameraRig, Smooth, YawPitch};
 
-struct Dolly2 {
+struct Rigs {
     rigs: CameraRig,
 }
 
@@ -38,7 +38,7 @@ fn setup(
         .with(Arm::new(Vec3::Z * 4.0))
         .build();
 
-    commands.insert_resource(Dolly2 { rigs: camera });
+    commands.insert_resource(Rigs { rigs: camera });
 
     commands
         .spawn_bundle(PerspectiveCameraBundle {
@@ -57,7 +57,7 @@ fn setup(
 
 fn update_camera(
     keys: Res<Input<KeyCode>>,
-    mut dolly: ResMut<Dolly2>,
+    mut dolly: ResMut<Rigs>,
     mut query: Query<(&mut Transform, With<MainCamera>)>,
 ) {
     let camera_driver = dolly.rigs.driver_mut::<YawPitch>();
@@ -73,7 +73,5 @@ fn update_camera(
     let transform = dolly.rigs.update(time_delta_seconds);
     let (mut cam, _) = query.single_mut().unwrap();
 
-    let (translation, rotation) = transform.into_translation_rotation();
-    cam.translation = bevy::math::Vec3::new(translation.x, translation.y, translation.z);
-    cam.rotation = bevy::math::Quat::from_xyzw(rotation.x, rotation.y, rotation.z, rotation.w);
+    cam.update(transform);
 }

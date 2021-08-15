@@ -1,5 +1,6 @@
 //Currently not working
 use bevy::prelude::*;
+use bevy_dolly::DollyCamUpdate;
 use dolly::glam::{Quat, Vec3};
 use dolly::prelude::{Arm, CameraRig, LookAt, Positional, Smooth};
 
@@ -108,9 +109,7 @@ fn update_camera(
     let (mut cam, _) = query.q1_mut().single_mut().unwrap();
     let transform = dolly.rigs.update(time_delta_seconds);
 
-    let (translation, rotation) = transform.into_translation_rotation();
-    cam.translation = bevy::math::Vec3::new(translation.x, translation.y, translation.z);
-    cam.rotation = bevy::math::Quat::from_xyzw(rotation.x, rotation.y, rotation.z, rotation.w);
+    cam.update(transform);
 }
 
 struct Rotates;
