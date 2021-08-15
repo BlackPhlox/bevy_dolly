@@ -1,9 +1,9 @@
 use bevy::prelude::*;
+use bevy_dolly::Dolly;
 use dolly::glam::Vec3;
 use dolly::prelude::{Arm, CameraRig, Smooth, YawPitch};
-use bevy_dolly::cone::Cone;
 
-struct Dolly {
+struct Dolly2 {
     rigs: CameraRig,
 }
 
@@ -13,6 +13,7 @@ fn main() {
     App::build()
         .insert_resource(Msaa { samples: 4 })
         .add_plugins(DefaultPlugins)
+        .add_plugin(Dolly)
         .add_startup_system(setup.system())
         .add_system(update_camera.system())
         .run();
@@ -23,7 +24,6 @@ fn setup(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
-    asset_server: Res<AssetServer>,
 ) {
     // plane
     commands.spawn_bundle(PbrBundle {
@@ -32,26 +32,13 @@ fn setup(
         ..Default::default()
     });
 
-    commands
-        .spawn_bundle((
-            Transform {
-                translation: bevy::math::Vec3::new(0., 0.2, 0.),
-                ..Default::default()
-            },
-            GlobalTransform::identity(),
-        ))
-        .with_children(|cell| {
-            cell.spawn_scene(asset_server.load("sheep.gltf#Scene0"));
-        })
-        .id();
-
     let camera = CameraRig::builder()
         .with(YawPitch::new().yaw_degrees(45.0).pitch_degrees(-30.0))
         .with(Smooth::new_look(1.5))
         .with(Arm::new(Vec3::Z * 4.0))
         .build();
 
-    commands.insert_resource(Dolly { rigs: camera });
+    commands.insert_resource(Dolly2 { rigs: camera });
 
     commands
         .spawn_bundle(PerspectiveCameraBundle {
@@ -70,7 +57,7 @@ fn setup(
 
 fn update_camera(
     keys: Res<Input<KeyCode>>,
-    mut dolly: ResMut<Dolly>,
+    mut dolly: ResMut<Dolly2>,
     mut query: Query<(&mut Transform, With<MainCamera>)>,
 ) {
     let camera_driver = dolly.rigs.driver_mut::<YawPitch>();
