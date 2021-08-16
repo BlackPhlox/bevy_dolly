@@ -58,9 +58,7 @@ fn setup(
             .with(Position {
                 position: Vec3::from_slice(&translation),
             })
-            .with(Rotation {
-                rotation
-            })
+            .with(Rotation { rotation })
             .with(yaw_pitch)
             .with(Smooth::new_position_rotation(1.0, 1.0))
             .build(),
@@ -148,7 +146,8 @@ fn update_camera(
 
     let mut rig = query.q1_mut().single_mut().unwrap();
 
-    let move_vec = rig.final_transform.rotation * move_vec.clamp_length_max(1.0) * boost_mult.powf(boost);
+    let move_vec =
+        rig.final_transform.rotation * move_vec.clamp_length_max(1.0) * boost_mult.powf(boost);
 
     let window = windows.get_primary().unwrap();
     if window.cursor_locked() {
