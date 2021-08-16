@@ -1,5 +1,5 @@
 <div align="left">
-<a href="https://github.com/BlackPhlox/bevy_dolly"><img src="https://raw.githubusercontent.com/BlackPhlox/BlackPhlox/master/bevy_dolly_4.svg" alt="bevy_dolly"></a>
+<a href="https://github.com/BlackPhlox/bevy_dolly"><img src="https://raw.githubusercontent.com/BlackPhlox/BlackPhlox/master/bevy_dolly_6.svg" alt="bevy_dolly"></a>
 </div><br/>
 
 
