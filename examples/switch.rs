@@ -105,7 +105,7 @@ fn follow_player(
 
     rig.driver_mut::<Position>().position = player_dolly.position;
     rig.driver_mut::<Rotation>().rotation = player_dolly.rotation;
-    rig.driver_mut::<LookAt>().target = player_dolly.position + Vec3::Y;
+    rig.driver_mut::<LookAt>().target = player_dolly.position + Vec3::Y + Vec3::new(0., -1., 0.);
 
     let transform = rig.update(time.delta_seconds());
 
