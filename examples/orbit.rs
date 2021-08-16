@@ -1,12 +1,7 @@
 use bevy::prelude::*;
-use bevy_dolly::cone::Cone;
 use bevy_dolly::Transform2Bevy;
 use dolly::glam::Vec3;
 use dolly::prelude::{Arm, CameraRig, Smooth, YawPitch};
-
-struct Dolly {
-    rigs: CameraRig,
-}
 
 struct MainCamera;
 
@@ -46,13 +41,13 @@ fn setup(
         })
         .id();
 
-    let camera = CameraRig::builder()
-        .with(YawPitch::new().yaw_degrees(45.0).pitch_degrees(-30.0))
-        .with(Smooth::new_look(1.5))
-        .with(Arm::new(Vec3::Z * 4.0))
-        .build();
-
-    commands.insert_resource(Dolly { rigs: camera });
+    commands.spawn().insert(
+        CameraRig::builder()
+            .with(YawPitch::new().yaw_degrees(45.0).pitch_degrees(-30.0))
+            .with(Smooth::new_look(1.5))
+            .with(Arm::new(Vec3::Z * 4.0))
+            .build(),
+    );
 
     commands
         .spawn_bundle(PerspectiveCameraBundle {

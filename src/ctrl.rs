@@ -59,7 +59,7 @@ pub struct CtrlConfig {
     pub entity: Option<Entity>,
 }
 
-struct CtrlMove;
+pub struct CtrlMove;
 
 impl Default for CtrlConfig {
     fn default() -> Self {

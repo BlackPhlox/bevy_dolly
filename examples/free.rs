@@ -1,12 +1,8 @@
 use bevy::input::mouse::MouseMotion;
 use bevy::prelude::*;
-use bevy_dolly::Transform2Bevy;
+use bevy_dolly::{Transform2Bevy, Transform2Dolly};
 use dolly::glam::Vec3;
 use dolly::prelude::{CameraRig, Positional, Smooth, YawPitch};
-
-struct Dolly {
-    rigs: CameraRig,
-}
 
 struct MainCamera;
 
@@ -52,25 +48,21 @@ fn setup(
     let transform =
         Transform::from_translation(bevy::math::Vec3::from_slice_unaligned(&translation))
             .looking_at(bevy::math::Vec3::ZERO, bevy::math::Vec3::Y);
-    let rotation = dolly::glam::Quat::from_xyzw(
-        transform.rotation.x,
-        transform.rotation.y,
-        transform.rotation.z,
-        transform.rotation.w,
-    );
+
+    let rotation = transform.transform2dolly().rotation;
     let mut yaw_pitch = YawPitch::new();
     yaw_pitch.set_rotation(rotation);
 
-    let camera = CameraRig::builder()
-        .with(Positional {
-            position: Vec3::from_slice(&translation),
-            rotation,
-        })
-        .with(yaw_pitch)
-        .with(Smooth::new_move_look(1.0, 1.0))
-        .build();
-
-    commands.insert_resource(Dolly { rigs: camera });
+    commands.spawn().insert(
+        CameraRig::builder()
+            .with(Positional {
+                position: Vec3::from_slice(&translation),
+                rotation,
+            })
+            .with(yaw_pitch)
+            .with(Smooth::new_move_look(1.0, 1.0))
+            .build(),
+    );
 
     commands
         .spawn_bundle(PerspectiveCameraBundle {
@@ -109,8 +101,10 @@ fn update_camera(
     keys: Res<Input<KeyCode>>,
     windows: Res<Windows>,
     mut mouse_motion_events: EventReader<MouseMotion>,
-    mut dolly: ResMut<Dolly>,
-    mut query: Query<(&mut Transform, With<MainCamera>)>,
+    mut query: QuerySet<(
+        Query<(&mut Transform, With<MainCamera>)>,
+        Query<&mut CameraRig>,
+    )>,
 ) {
     let time_delta_seconds: f32 = time.delta_seconds();
     let boost_mult = 5.0f32;
@@ -150,23 +144,22 @@ fn update_camera(
         delta += event.delta;
     }
 
-    let move_vec =
-        dolly.rigs.transform.rotation * move_vec.clamp_length_max(1.0) * boost_mult.powf(boost);
+    let mut rig = query.q1_mut().single_mut().unwrap();
+
+    let move_vec = rig.transform.rotation * move_vec.clamp_length_max(1.0) * boost_mult.powf(boost);
 
     let window = windows.get_primary().unwrap();
     if window.cursor_locked() {
-        dolly.rigs.driver_mut::<YawPitch>().rotate_yaw_pitch(
+        rig.driver_mut::<YawPitch>().rotate_yaw_pitch(
             -0.1 * delta.x * sensitivity.x,
             -0.1 * delta.y * sensitivity.y,
         );
-        dolly
-            .rigs
-            .driver_mut::<Positional>()
+        rig.driver_mut::<Positional>()
             .translate(move_vec * time_delta_seconds * 10.0);
     }
 
-    let (mut cam, _) = query.single_mut().unwrap();
-    let transform = dolly.rigs.update(time_delta_seconds);
+    let transform = rig.update(time_delta_seconds);
+    let (mut cam, _) = query.q0_mut().single_mut().unwrap();
 
     cam.transform2bevy(transform);
 }

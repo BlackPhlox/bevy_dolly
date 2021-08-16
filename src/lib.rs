@@ -2,7 +2,7 @@ use bevy::prelude::{AppBuilder, Mut, Plugin, Transform};
 use ctrl::Ctrl;
 use dolly::glam::{Quat, Vec3};
 
-pub mod cone;
+mod cone;
 pub mod ctrl;
 
 pub struct Dolly;
@@ -24,11 +24,26 @@ impl Transform2Bevy for Mut<'_, Transform> {
     }
 }
 
+pub trait Transform2DollyMut {
+    fn transform2dollymut(&self) -> dolly::transform::Transform;
+}
+
+impl Transform2DollyMut for Mut<'_, Transform> {
+    fn transform2dollymut(&self) -> dolly::transform::Transform {
+        let t = self.translation;
+        let q = self.rotation;
+        dolly::transform::Transform {
+            translation: Vec3::new(t.x, t.y, t.z),
+            rotation: Quat::from_xyzw(q.x, q.y, q.z, q.w),
+        }
+    }
+}
+
 pub trait Transform2Dolly {
     fn transform2dolly(&self) -> dolly::transform::Transform;
 }
 
-impl Transform2Dolly for Mut<'_, Transform> {
+impl Transform2Dolly for Transform {
     fn transform2dolly(&self) -> dolly::transform::Transform {
         let t = self.translation;
         let q = self.rotation;
