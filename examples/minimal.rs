@@ -1,5 +1,4 @@
 use bevy::prelude::*;
-use bevy_dolly::ctrl::CtrlConfig;
 use bevy_dolly::{Dolly, Transform2Bevy};
 use dolly::glam::Vec3;
 use dolly::prelude::{Arm, CameraRig, Smooth, YawPitch};

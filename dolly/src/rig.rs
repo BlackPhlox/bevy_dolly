@@ -1,7 +1,7 @@
 use crate::{driver::RigDriver, transform::Transform};
 
 pub struct CameraRig {
-    pub drivers: Vec<Box<dyn RigDriver + Sync + Send + 'static>>,
+    pub drivers: Vec<Box<dyn RigDriver + Sync + Send>>,
     pub transform: Transform,
 }
 
