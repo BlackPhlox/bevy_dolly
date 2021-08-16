@@ -1027,6 +1027,7 @@ dependencies = [
 name = "dolly"
 version = "0.1.0"
 dependencies = [
+ "bevy",
  "glam 0.17.3",
 ]
 

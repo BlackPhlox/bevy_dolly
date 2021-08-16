@@ -1,12 +1,9 @@
 //Currently not working
 use bevy::prelude::*;
-use bevy_dolly::DollyCamUpdate;
+use bevy_dolly::{Transform2Bevy, Transform2Dolly};
 use dolly::glam::{Quat, Vec3};
 use dolly::prelude::{Arm, CameraRig, LookAt, Positional, Smooth};
 
-struct Dolly {
-    rigs: CameraRig,
-}
 struct MainCamera;
 
 fn main() {
@@ -60,12 +57,12 @@ fn setup(
         })
         .insert(Rotates);
 
-    let camera = CameraRig::builder()
-        .with(Positional::new(Vec3::Y * 3.0))
-        .with(LookAt::new(start_pos))
-        .build();
-
-    commands.insert_resource(Dolly { rigs: camera });
+    commands.spawn().insert(
+        CameraRig::builder()
+            .with(Positional::new(Vec3::Y * 3.0))
+            .with(LookAt::new(start_pos))
+            .build(),
+    );
 
     commands
         .spawn_bundle(PerspectiveCameraBundle {
@@ -81,29 +78,31 @@ fn setup(
         ..Default::default()
     });
 }
-//QuerySet<(Query<(&mut Transform, &Camera)>, Query<&Transform>)>,
+
 fn update_camera(
-    mut dolly: ResMut<Dolly>,
+    time: Res<Time>,
     mut query: QuerySet<(
         Query<(&mut Transform, With<MainCamera>)>,
         Query<(&mut Transform, With<Player>)>,
+        Query<&mut CameraRig>,
     )>,
 ) {
     let (player, _) = query.q1_mut().single_mut().unwrap();
-    let time_delta_seconds: f32 = 0.1;
+    query
+        .q2_mut()
+        .single_mut()
+        .unwrap()
+        .driver_mut::<LookAt>()
+        .target = player.transform2dolly().translation;
 
-    let player_translation = Vec3::new(
-        player.translation.x,
-        player.translation.y,
-        player.translation.z,
-    );
+    let transform = query
+        .q2_mut()
+        .single_mut()
+        .unwrap()
+        .update(time.delta_seconds());
+    let (mut cam, _) = query.q0_mut().single_mut().unwrap();
 
-    dolly.rigs.driver_mut::<LookAt>().target = player_translation;
-
-    let transform = dolly.rigs.update(time_delta_seconds);
-    let (mut cam, _) = query.q1_mut().single_mut().unwrap();
-
-    cam.update(transform);
+    cam.transform2bevy(transform);
 }
 
 struct Rotates;

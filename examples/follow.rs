@@ -1,12 +1,7 @@
-//Currently not working
 use bevy::prelude::*;
-use bevy_dolly::DollyCamUpdate;
-use dolly::glam::{Quat, Vec3};
+use bevy_dolly::{Transform2Bevy, Transform2Dolly};
+use dolly::glam::Vec3;
 use dolly::prelude::{Arm, CameraRig, LookAt, Positional, Smooth};
-
-struct Dolly {
-    rigs: CameraRig,
-}
 
 struct MainCamera;
 
@@ -15,8 +10,8 @@ fn main() {
         .insert_resource(Msaa { samples: 4 })
         .add_plugins(DefaultPlugins)
         .add_startup_system(setup.system())
-        .add_system(rotator_system.system().label("rotate"))
-        .add_system(update_camera.system().after("rotate"))
+        .add_system(rotator_system.system())
+        .add_system(update_camera.system())
         .run();
 }
 
@@ -49,19 +44,19 @@ fn setup(
         })
         .insert(Rotates);
 
-    let camera = CameraRig::builder()
-        .with(Positional::new(start_pos))
-        .with(Smooth::new_move(1.25).predictive(1.0))
-        .with(Arm::new(Vec3::new(0.0, 1.5, -3.5)))
-        .with(Smooth::new_move(2.5))
-        .with(
-            LookAt::new(start_pos + Vec3::Y)
-                .smoothness(1.25)
-                .predictive(1.0),
-        )
-        .build();
-
-    commands.insert_resource(Dolly { rigs: camera });
+    commands.spawn().insert(
+        CameraRig::builder()
+            .with(Positional::new(start_pos))
+            .with(Smooth::new_move(1.25).predictive(1.0))
+            .with(Arm::new(Vec3::new(0.0, 1.5, -3.5)))
+            .with(Smooth::new_move(2.5))
+            .with(
+                LookAt::new(start_pos + Vec3::Y)
+                    .smoothness(1.25)
+                    .predictive(1.0),
+            )
+            .build(),
+    );
 
     commands
         .spawn_bundle(PerspectiveCameraBundle {
@@ -77,39 +72,33 @@ fn setup(
         ..Default::default()
     });
 }
-//QuerySet<(Query<(&mut Transform, &Camera)>, Query<&Transform>)>,
+
 fn update_camera(
-    mut dolly: ResMut<Dolly>,
+    time: Res<Time>,
     mut query: QuerySet<(
         Query<(&mut Transform, With<MainCamera>)>,
         Query<(&mut Transform, With<Rotates>)>,
+        Query<&mut CameraRig>,
     )>,
 ) {
-    let (player, _) = query.q1_mut().single_mut().unwrap();
-    let time_delta_seconds: f32 = 0.1;
+    let player = query.q1_mut().single_mut().unwrap().0;
 
-    let player_translation = Vec3::new(
-        player.translation.x,
-        player.translation.y,
-        player.translation.z,
-    );
-    let player_rotation = Quat::from_xyzw(
-        player.rotation.x,
-        player.rotation.y,
-        player.rotation.z,
-        player.rotation.w,
-    );
+    let player_dolly = player.transform2dolly();
 
-    dolly
-        .rigs
-        .driver_mut::<Positional>()
-        .set_position_rotation(player_translation, player_rotation);
-    dolly.rigs.driver_mut::<LookAt>().target = player_translation + Vec3::Y;
+    let mut rig = query.q2_mut().single_mut().unwrap();
 
-    let (mut cam, _) = query.q1_mut().single_mut().unwrap();
-    let transform = dolly.rigs.update(time_delta_seconds);
+    rig.driver_mut::<Positional>()
+        .set_position_rotation(player_dolly.translation, player_dolly.rotation);
+    rig.driver_mut::<LookAt>().target = player_dolly.translation + Vec3::Y;
 
-    cam.update(transform);
+    let transform = rig.update(time.delta_seconds());
+
+    query
+        .q0_mut()
+        .single_mut()
+        .unwrap()
+        .0
+        .transform2bevy(transform);
 }
 
 struct Rotates;

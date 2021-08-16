@@ -1,19 +1,22 @@
 use bevy::prelude::*;
-use bevy_dolly::{Dolly, DollyCamUpdate};
+use bevy_dolly::ctrl::CtrlConfig;
+use bevy_dolly::{Dolly, Transform2Bevy};
 use dolly::glam::Vec3;
 use dolly::prelude::{Arm, CameraRig, Smooth, YawPitch};
 
-struct Rigs {
-    rigs: CameraRig,
-}
-
 struct MainCamera;
+
+struct RotateRig;
 
 fn main() {
     App::build()
         .insert_resource(Msaa { samples: 4 })
         .add_plugins(DefaultPlugins)
         .add_plugin(Dolly)
+        /*.insert_resource(CtrlConfig {
+            enabled: true,
+            ..Default::default()
+        })*/
         .add_startup_system(setup.system())
         .add_system(update_camera.system())
         .run();
@@ -32,13 +35,16 @@ fn setup(
         ..Default::default()
     });
 
-    let camera = CameraRig::builder()
-        .with(YawPitch::new().yaw_degrees(45.0).pitch_degrees(-30.0))
-        .with(Smooth::new_look(1.5))
-        .with(Arm::new(Vec3::Z * 4.0))
-        .build();
-
-    commands.insert_resource(Rigs { rigs: camera });
+    commands
+        .spawn()
+        .insert(
+            CameraRig::builder()
+                .with(YawPitch::new().yaw_degrees(45.0).pitch_degrees(-30.0))
+                .with(Smooth::new_look(1.5))
+                .with(Arm::new(Vec3::Z * 4.0))
+                .build(),
+        )
+        .insert(RotateRig);
 
     commands
         .spawn_bundle(PerspectiveCameraBundle {
@@ -57,11 +63,14 @@ fn setup(
 
 fn update_camera(
     keys: Res<Input<KeyCode>>,
-    mut dolly: ResMut<Rigs>,
-    mut query: Query<(&mut Transform, With<MainCamera>)>,
+    time: Res<Time>,
+    mut query: QuerySet<(
+        Query<(&mut Transform, With<MainCamera>)>,
+        Query<(&mut CameraRig, With<RotateRig>)>,
+    )>,
 ) {
-    let camera_driver = dolly.rigs.driver_mut::<YawPitch>();
-    let time_delta_seconds: f32 = 0.1;
+    let mut rig = query.q1_mut().single_mut().unwrap().0;
+    let camera_driver = rig.driver_mut::<YawPitch>();
 
     if keys.just_pressed(KeyCode::Z) {
         camera_driver.rotate_yaw_pitch(-90.0, 0.0);
@@ -70,8 +79,8 @@ fn update_camera(
         camera_driver.rotate_yaw_pitch(90.0, 0.0);
     }
 
-    let transform = dolly.rigs.update(time_delta_seconds);
-    let (mut cam, _) = query.single_mut().unwrap();
+    let transform = rig.update(time.delta_seconds());
+    let mut cam = query.q0_mut().single_mut().unwrap().0;
 
-    cam.update(transform);
+    cam.transform2bevy(transform);
 }

@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 use bevy_dolly::cone::Cone;
-use bevy_dolly::DollyCamUpdate;
+use bevy_dolly::Transform2Bevy;
 use dolly::glam::Vec3;
 use dolly::prelude::{Arm, CameraRig, Smooth, YawPitch};
 
@@ -71,11 +71,14 @@ fn setup(
 
 fn update_camera(
     keys: Res<Input<KeyCode>>,
-    mut dolly: ResMut<Dolly>,
-    mut query: Query<(&mut Transform, With<MainCamera>)>,
+    time: Res<Time>,
+    mut query: QuerySet<(
+        Query<(&mut Transform, With<MainCamera>)>,
+        Query<&mut CameraRig>,
+    )>,
 ) {
-    let camera_driver = dolly.rigs.driver_mut::<YawPitch>();
-    let time_delta_seconds: f32 = 0.1;
+    let mut rig = query.q1_mut().single_mut().unwrap();
+    let camera_driver = rig.driver_mut::<YawPitch>();
 
     if keys.just_pressed(KeyCode::Z) {
         camera_driver.rotate_yaw_pitch(-90.0, 0.0);
@@ -84,8 +87,8 @@ fn update_camera(
         camera_driver.rotate_yaw_pitch(90.0, 0.0);
     }
 
-    let transform = dolly.rigs.update(time_delta_seconds);
-    let (mut cam, _) = query.single_mut().unwrap();
+    let transform = rig.update(time.delta_seconds());
+    let (mut cam, _) = query.q0_mut().single_mut().unwrap();
 
-    cam.update(transform);
+    cam.transform2bevy(transform);
 }

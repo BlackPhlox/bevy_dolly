@@ -5,8 +5,8 @@ use bevy::{
     math::{Quat, Vec3},
     pbr::PbrBundle,
     prelude::{
-        AppBuilder, Assets, BuildChildren, Color, Commands, GlobalTransform, IntoSystem, KeyCode,
-        Mesh, Plugin, Query, Res, ResMut, StandardMaterial, SystemSet, Transform,
+        AppBuilder, Assets, BuildChildren, Color, Commands, Entity, GlobalTransform, IntoSystem,
+        KeyCode, Mesh, Plugin, Query, Res, ResMut, StandardMaterial, SystemSet, Transform,
     },
 };
 
@@ -51,11 +51,12 @@ impl Default for WASDKeyMap {
     }
 }
 
-struct CtrlConfig {
-    enabled: bool,
-    position: Vec3,
-    speed: f32,
-    map: WASDKeyMap,
+pub struct CtrlConfig {
+    pub enabled: bool,
+    pub position: Vec3,
+    pub speed: f32,
+    pub map: WASDKeyMap,
+    pub entity: Option<Entity>,
 }
 
 struct CtrlMove;
@@ -67,6 +68,7 @@ impl Default for CtrlConfig {
             position: bevy::math::Vec3::new(0., 0.5, 0.),
             speed: 4.,
             map: WASDKeyMap::default(),
+            entity: None,
         }
     }
 }

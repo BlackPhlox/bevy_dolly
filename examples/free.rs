@@ -1,6 +1,6 @@
 use bevy::input::mouse::MouseMotion;
 use bevy::prelude::*;
-use bevy_dolly::DollyCamUpdate;
+use bevy_dolly::Transform2Bevy;
 use dolly::glam::Vec3;
 use dolly::prelude::{CameraRig, Positional, Smooth, YawPitch};
 
@@ -168,5 +168,5 @@ fn update_camera(
     let (mut cam, _) = query.single_mut().unwrap();
     let transform = dolly.rigs.update(time_delta_seconds);
 
-    cam.update(transform);
+    cam.transform2bevy(transform);
 }
