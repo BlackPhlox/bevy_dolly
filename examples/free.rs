@@ -2,7 +2,7 @@ use bevy::input::mouse::MouseMotion;
 use bevy::prelude::*;
 use bevy_dolly::{Transform2Bevy, Transform2Dolly};
 use dolly::glam::Vec3;
-use dolly::prelude::{CameraRig, Positional, Smooth, YawPitch};
+use dolly::prelude::{CameraRig, Position, Rotation, Smooth, YawPitch};
 
 struct MainCamera;
 
@@ -49,18 +49,20 @@ fn setup(
         Transform::from_translation(bevy::math::Vec3::from_slice_unaligned(&translation))
             .looking_at(bevy::math::Vec3::ZERO, bevy::math::Vec3::Y);
 
-    let rotation = transform.transform2dolly().rotation;
+    let rotation = transform.transform_2_dolly().rotation;
     let mut yaw_pitch = YawPitch::new();
-    yaw_pitch.set_rotation(rotation);
+    yaw_pitch.set_rotation_quat(rotation);
 
     commands.spawn().insert(
         CameraRig::builder()
-            .with(Positional {
+            .with(Position {
                 position: Vec3::from_slice(&translation),
-                rotation,
+            })
+            .with(Rotation {
+                rotation
             })
             .with(yaw_pitch)
-            .with(Smooth::new_move_look(1.0, 1.0))
+            .with(Smooth::new_position_rotation(1.0, 1.0))
             .build(),
     );
 
@@ -146,7 +148,7 @@ fn update_camera(
 
     let mut rig = query.q1_mut().single_mut().unwrap();
 
-    let move_vec = rig.transform.rotation * move_vec.clamp_length_max(1.0) * boost_mult.powf(boost);
+    let move_vec = rig.final_transform.rotation * move_vec.clamp_length_max(1.0) * boost_mult.powf(boost);
 
     let window = windows.get_primary().unwrap();
     if window.cursor_locked() {
@@ -154,12 +156,12 @@ fn update_camera(
             -0.1 * delta.x * sensitivity.x,
             -0.1 * delta.y * sensitivity.y,
         );
-        rig.driver_mut::<Positional>()
+        rig.driver_mut::<Position>()
             .translate(move_vec * time_delta_seconds * 10.0);
     }
 
     let transform = rig.update(time_delta_seconds);
     let (mut cam, _) = query.q0_mut().single_mut().unwrap();
 
-    cam.transform2bevy(transform);
+    cam.transform_2_bevy(transform);
 }

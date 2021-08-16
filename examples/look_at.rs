@@ -2,7 +2,7 @@
 use bevy::prelude::*;
 use bevy_dolly::{Transform2Bevy, Transform2Dolly};
 use dolly::glam::Vec3;
-use dolly::prelude::{CameraRig, LookAt, Positional};
+use dolly::prelude::{CameraRig, LookAt, Position};
 
 struct MainCamera;
 
@@ -59,7 +59,7 @@ fn setup(
 
     commands.spawn().insert(
         CameraRig::builder()
-            .with(Positional::new(Vec3::Y * 3.0))
+            .with(Position::new(Vec3::Y * 3.0))
             .with(LookAt::new(start_pos))
             .build(),
     );
@@ -93,7 +93,7 @@ fn update_camera(
         .single_mut()
         .unwrap()
         .driver_mut::<LookAt>()
-        .target = player.transform2dolly().translation;
+        .target = player.transform_2_dolly().position;
 
     let transform = query
         .q2_mut()
@@ -102,7 +102,7 @@ fn update_camera(
         .update(time.delta_seconds());
     let (mut cam, _) = query.q0_mut().single_mut().unwrap();
 
-    cam.transform2bevy(transform);
+    cam.transform_2_bevy(transform);
 }
 
 struct Rotates;

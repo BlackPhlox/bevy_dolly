@@ -39,7 +39,7 @@ fn setup(
         .insert(
             CameraRig::builder()
                 .with(YawPitch::new().yaw_degrees(45.0).pitch_degrees(-30.0))
-                .with(Smooth::new_look(1.5))
+                .with(Smooth::new_position(1.5))
                 .with(Arm::new(Vec3::Z * 4.0))
                 .build(),
         )
@@ -81,5 +81,5 @@ fn update_camera(
     let transform = rig.update(time.delta_seconds());
     let mut cam = query.q0_mut().single_mut().unwrap().0;
 
-    cam.transform2bevy(transform);
+    cam.transform_2_bevy(transform);
 }
