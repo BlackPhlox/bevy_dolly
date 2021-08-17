@@ -1,4 +1,3 @@
-use bevy::ecs::system::Command;
 use bevy::prelude::*;
 use bevy_dolly::ctrl::{CtrlConfig, CtrlMove};
 use bevy_dolly::{Dolly, Transform2Bevy, Transform2Dolly};
@@ -34,8 +33,9 @@ fn setup(
         ..Default::default()
     });
 
-    let start_pos = Transform::from_translation(bevy::math::Vec3::new(0., 0., 0.));
+    let start_pos = Transform::from_translation(bevy::math::Vec3::new(0., 0., 2.));
 
+    /*
     config.entity = Some(
         commands
             .spawn_bundle((
@@ -51,18 +51,24 @@ fn setup(
             .insert(Player)
             .id(),
     );
+    */
 
     commands.spawn().insert(
         CameraRig::builder()
             .with(Position::new(Vec3::Y * 3.0))
-            .with(LookAt::new(start_pos.transform_2_dolly().position))
+            .with(LookAt::new(
+                /*start_pos.transform_2_dolly().position*/
+                dolly::glam::Vec3::new(0., 0., 2.),
+            ))
             .build(),
     );
 
     commands
         .spawn_bundle(PerspectiveCameraBundle {
-            transform: Transform::from_xyz(-2.0, 1., 2.0)
-                .looking_at(start_pos.translation, bevy::math::Vec3::Y),
+            transform: Transform::from_xyz(-2.0, 1., 2.0).looking_at(
+                /*start_pos.translation*/ bevy::math::Vec3::new(0., 0., 0.),
+                bevy::math::Vec3::Y,
+            ),
             ..Default::default()
         })
         .insert(MainCamera);

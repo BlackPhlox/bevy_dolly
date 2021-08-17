@@ -21,7 +21,7 @@ exclude = [
 name = "bevy_dolly"
 
 [dependencies]
-dolly = { path = "dolly" }
+dolly = "0.1.2"
 
 [dependencies.bevy]
 version = "0.5"
