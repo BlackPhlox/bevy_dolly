@@ -1,17 +1,32 @@
 use bevy::prelude::*;
-use bevy_dolly::{Transform2Bevy, Transform2Dolly};
+use bevy_dolly::ctrl::CtrlMove;
+use bevy_dolly::{Dolly, Transform2Bevy, Transform2Dolly};
 use dolly::glam::Vec3;
 use dolly::prelude::{Arm, CameraRig, LookAt, Position, Rotation, Smooth};
 
 struct MainCamera;
 
+#[derive(Clone, Eq, PartialEq, Debug, Hash)]
+enum Camera {
+    FollowPlayer,
+    FollowSheep,
+}
+
 fn main() {
     App::build()
         .insert_resource(Msaa { samples: 4 })
         .add_plugins(DefaultPlugins)
+        .add_plugin(Dolly)
         .add_startup_system(setup.system())
         .add_system(rotator_system.system())
-        .add_system(update_camera.system())
+        .add_state(Camera::FollowSheep)
+        .add_system(switch_camera_rig.system())
+        .add_system_set(
+            SystemSet::on_update(Camera::FollowPlayer).with_system(follow_player.system()),
+        )
+        .add_system_set(
+            SystemSet::on_update(Camera::FollowSheep).with_system(follow_sheep.system()),
+        )
         .run();
 }
 
@@ -74,7 +89,35 @@ fn setup(
     });
 }
 
-fn update_camera(
+fn follow_player(
+    time: Res<Time>,
+    mut query: QuerySet<(
+        Query<(&mut Transform, With<MainCamera>)>,
+        Query<(&mut Transform, With<CtrlMove>)>,
+        Query<&mut CameraRig>,
+    )>,
+) {
+    let player = query.q1_mut().single_mut().unwrap().0;
+
+    let player_dolly = player.transform_2_dolly();
+
+    let mut rig = query.q2_mut().single_mut().unwrap();
+
+    rig.driver_mut::<Position>().position = player_dolly.position;
+    rig.driver_mut::<Rotation>().rotation = player_dolly.rotation;
+    rig.driver_mut::<LookAt>().target = player_dolly.position + Vec3::Y + Vec3::new(0., -1., 0.);
+
+    let transform = rig.update(time.delta_seconds());
+
+    query
+        .q0_mut()
+        .single_mut()
+        .unwrap()
+        .0
+        .transform_2_bevy(transform);
+}
+
+fn follow_sheep(
     time: Res<Time>,
     mut query: QuerySet<(
         Query<(&mut Transform, With<MainCamera>)>,
@@ -109,5 +152,19 @@ fn rotator_system(time: Res<Time>, mut query: Query<&mut Transform, With<Rotates
         *transform = Transform::from_rotation(bevy::math::Quat::from_rotation_y(
             (4.0 * std::f32::consts::PI / 20.0) * time.delta_seconds(),
         )) * *transform;
+    }
+}
+
+#[allow(unused_must_use)]
+fn switch_camera_rig(mut camera: ResMut<State<Camera>>, keyboard_input: Res<Input<KeyCode>>) {
+    if keyboard_input.just_pressed(KeyCode::C) {
+        let result = if camera.current().eq(&Camera::FollowPlayer) {
+            Camera::FollowSheep
+        } else {
+            Camera::FollowPlayer
+        };
+
+        println!("{:?}", result);
+        camera.set(result);
     }
 }

@@ -1,10 +1,7 @@
 use bevy::prelude::*;
+use bevy_dolly::Transform2Bevy;
 use dolly::glam::Vec3;
 use dolly::prelude::{Arm, CameraRig, Smooth, YawPitch};
-
-struct Dolly {
-    rigs: CameraRig,
-}
 
 struct MainCamera;
 
@@ -44,13 +41,13 @@ fn setup(
         })
         .id();
 
-    let camera = CameraRig::builder()
-        .with(YawPitch::new().yaw_degrees(45.0).pitch_degrees(-30.0))
-        .with(Smooth::new_look(1.5))
-        .with(Arm::new(Vec3::Z * 4.0))
-        .build();
-
-    commands.insert_resource(Dolly { rigs: camera });
+    commands.spawn().insert(
+        CameraRig::builder()
+            .with(YawPitch::new().yaw_degrees(45.0).pitch_degrees(-30.0))
+            .with(Smooth::new_rotation(1.5))
+            .with(Arm::new(Vec3::Z * 4.0))
+            .build(),
+    );
 
     commands
         .spawn_bundle(PerspectiveCameraBundle {
@@ -69,11 +66,14 @@ fn setup(
 
 fn update_camera(
     keys: Res<Input<KeyCode>>,
-    mut dolly: ResMut<Dolly>,
-    mut query: Query<(&mut Transform, With<MainCamera>)>,
+    time: Res<Time>,
+    mut query: QuerySet<(
+        Query<(&mut Transform, With<MainCamera>)>,
+        Query<&mut CameraRig>,
+    )>,
 ) {
-    let camera_driver = dolly.rigs.driver_mut::<YawPitch>();
-    let time_delta_seconds: f32 = 0.1;
+    let mut rig = query.q1_mut().single_mut().unwrap();
+    let camera_driver = rig.driver_mut::<YawPitch>();
 
     if keys.just_pressed(KeyCode::Z) {
         camera_driver.rotate_yaw_pitch(-90.0, 0.0);
@@ -82,10 +82,8 @@ fn update_camera(
         camera_driver.rotate_yaw_pitch(90.0, 0.0);
     }
 
-    let transform = dolly.rigs.update(time_delta_seconds);
-    let (mut cam, _) = query.single_mut().unwrap();
+    let transform = rig.update(time.delta_seconds());
+    let (mut cam, _) = query.q0_mut().single_mut().unwrap();
 
-    let (translation, rotation) = transform.into_translation_rotation();
-    cam.translation = bevy::math::Vec3::new(translation.x, translation.y, translation.z);
-    cam.rotation = bevy::math::Quat::from_xyzw(rotation.x, rotation.y, rotation.z, rotation.w);
+    cam.transform_2_bevy(transform);
 }

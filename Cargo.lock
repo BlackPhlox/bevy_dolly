@@ -98,9 +98,9 @@ dependencies = [
 
 [[package]]
 name = "anyhow"
-version = "1.0.42"
+version = "1.0.43"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "595d3cfa7a60d4555cb5067b99f07142a08ea778de5cf993f7b75c7d8fabc486"
+checksum = "28ae2b3dec75a406790005a200b1bd89785afc02517a00ca99ecfe093ee9e6cf"
 
 [[package]]
 name = "approx"
@@ -686,9 +686,9 @@ checksum = "349f9b6a179ed607305526ca489b34ad0a41aed5f7980fa90eb03160b69598fb"
 
 [[package]]
 name = "bitflags"
-version = "1.2.1"
+version = "1.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cf1de2fe8c75bc145a2f577add951f8134889b4795d47466a54a5c846d691693"
+checksum = "bef38d45163c2f1dde094a7dfd33ccf595c92905c8f8f4fdc18d06fb1037718a"
 
 [[package]]
 name = "block"
@@ -1025,7 +1025,9 @@ dependencies = [
 
 [[package]]
 name = "dolly"
-version = "0.1.0"
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "29eb66cf7767bbe1f97f49ec10f691b7b0ca7c7b19d4b27ca94a70ea49d69464"
 dependencies = [
  "glam 0.17.3",
 ]
@@ -1081,9 +1083,9 @@ dependencies = [
 
 [[package]]
 name = "filetime"
-version = "0.2.14"
+version = "0.2.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1d34cfa13a63ae058bfa601fe9e313bbdb3746427c1459185464ce0fcf62e1e8"
+checksum = "975ccf83d8d9d0d84682850a38c8169027be83368805971cc4f238c2b245bc98"
 dependencies = [
  "cfg-if 1.0.0",
  "libc",
@@ -1477,9 +1479,9 @@ dependencies = [
 
 [[package]]
 name = "guillotiere"
-version = "0.6.1"
+version = "0.6.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9253eedea82720b2bc91fe831c9ce3a31299955ed5eb19b9ed600a625b686212"
+checksum = "b62d5865c036cb1393e23c50693df631d3f5d7bcca4c04fe4cc0fd592e74a782"
 dependencies = [
  "euclid",
  "svg_fmt",
@@ -1631,9 +1633,9 @@ checksum = "8eaf4bc02d17cbdd7ff4c7438cafcdf7fb9a4613313ad11b4f8fefe7d3fa0130"
 
 [[package]]
 name = "jobserver"
-version = "0.1.23"
+version = "0.1.24"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f5ca711fd837261e14ec9e674f092cbb931d3fa1482b017ae59328ddc6f3212b"
+checksum = "af25a77299a7f711a01975c35a6a424eb6862092cc2d6c72c4ed6cbc56dfc1fa"
 dependencies = [
  "libc",
 ]
@@ -1681,9 +1683,9 @@ checksum = "830d08ce1d1d941e6b30645f1a0eb5643013d835ce3779a5fc208261dbe10f55"
 
 [[package]]
 name = "libc"
-version = "0.2.98"
+version = "0.2.99"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "320cfe77175da3a483efed4bc0adc1968ca050b098ce4f2f1c13a56626128790"
+checksum = "a7f823d141fe0a24df1e23b4af4e3c7ba9e5966ec514ea068c93024aa7deb765"
 
 [[package]]
 name = "libloading"
@@ -2258,9 +2260,9 @@ checksum = "831eb2fcb5b72b09c72a3f2d24c09a28d79886512827cd4674d9bac10557f16a"
 
 [[package]]
 name = "redox_syscall"
-version = "0.2.9"
+version = "0.2.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5ab49abadf3f9e1c4bc499e8845e152ad87d2ad2d30371841171169e9d75feee"
+checksum = "8383f39639269cde97d255a32bdb68c047337295414940c68bdd30c2e13203ff"
 dependencies = [
  "bitflags",
 ]
@@ -2401,9 +2403,9 @@ dependencies = [
 
 [[package]]
 name = "slab"
-version = "0.4.3"
+version = "0.4.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f173ac3d1a7e3b28003f40de0b5ce7fe2710f9b9dc3fc38664cebee46b3b6527"
+checksum = "c307a32c1c5c437f38c7fd45d753050587732ba8628319fbdf12a7e289ccc590"
 
 [[package]]
 name = "slotmap"
@@ -2467,9 +2469,9 @@ dependencies = [
 
 [[package]]
 name = "spirv-std-macros"
-version = "0.4.0-alpha.11"
+version = "0.4.0-alpha.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bac6631356c87e679fa157c613551e368d28e42fac810d2348e16c5c8ecb6878"
+checksum = "207e8515dfbb48bff03f64bf5f8388d4e0f2f526ee769cc6556df98477098ca5"
 dependencies = [
  "heck",
  "proc-macro2",
@@ -2480,9 +2482,9 @@ dependencies = [
 
 [[package]]
 name = "spirv-types"
-version = "0.4.0-alpha.11"
+version = "0.4.0-alpha.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6beac19227d393ff8d8fa47b9ca7086c1fe96af8821cf5e73f24867464c1056b"
+checksum = "71cc4b8f7ec707459fdeddb4f137109947045592f5b0c139f7bf1360058bac6b"
 
 [[package]]
 name = "spirv_cross"
@@ -2616,9 +2618,9 @@ dependencies = [
 
 [[package]]
 name = "tracing-core"
-version = "0.1.18"
+version = "0.1.19"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a9ff14f98b1a4b289c6248a023c1c2fa1491062964e9fed67ab29c4e4da4a052"
+checksum = "2ca517f43f0fb96e0c3072ed5c275fe5eece87e8cb52f4a77b69226d3b1c9df8"
 dependencies = [
  "lazy_static",
 ]

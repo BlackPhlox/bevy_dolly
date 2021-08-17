@@ -1,19 +1,17 @@
-//Currently not working
 use bevy::prelude::*;
-use dolly::glam::{Quat, Vec3};
-use dolly::prelude::{Arm, CameraRig, LookAt, Positional, Smooth};
+use bevy_dolly::ctrl::{CtrlConfig, CtrlMove};
+use bevy_dolly::{Dolly, Transform2Bevy, Transform2Dolly};
+use dolly::glam::Vec3;
+use dolly::prelude::{CameraRig, LookAt, Position};
 
-struct Dolly {
-    rigs: CameraRig,
-}
 struct MainCamera;
 
 fn main() {
     App::build()
         .insert_resource(Msaa { samples: 4 })
         .add_plugins(DefaultPlugins)
+        .add_plugin(Dolly)
         .add_startup_system(setup.system())
-        .add_system(rotator_system.system())
         .add_system(update_camera.system())
         .run();
 }
@@ -26,50 +24,51 @@ fn setup(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
     asset_server: Res<AssetServer>,
+    mut config: ResMut<CtrlConfig>,
 ) {
     // plane
     commands.spawn_bundle(PbrBundle {
-        mesh: meshes.add(Mesh::from(shape::Plane { size: 5.0 })),
+        mesh: meshes.add(Mesh::from(shape::Plane { size: 20.0 })),
         material: materials.add(Color::rgb(0.3, 0.5, 0.3).into()),
         ..Default::default()
     });
 
-    let start_pos = Vec3::new(0., 0., 2.);
+    let start_pos = Transform::from_translation(bevy::math::Vec3::new(0., 0., 2.));
 
-    commands
-        .spawn_bundle((
-            Transform {
-                translation: bevy::math::Vec3::new(0., 0.2, 0.),
-                ..Default::default()
-            },
-            GlobalTransform::identity(),
-        ))
-        .with_children(|cell| {
-            cell.spawn_bundle((
+    /*
+    config.entity = Some(
+        commands
+            .spawn_bundle((
                 Transform {
-                    translation: bevy::math::Vec3::new(0., 0.0, 2.),
+                    translation: bevy::math::Vec3::new(0., 0.2, 0.),
                     ..Default::default()
                 },
                 GlobalTransform::identity(),
             ))
-            .with_children(|cell2| {
-                cell2.spawn_scene(asset_server.load("sheep.gltf#Scene0"));
+            .with_children(|cell| {
+                cell.spawn_scene(asset_server.load("sheep.gltf#Scene0"));
             })
-            .insert(Player);
-        })
-        .insert(Rotates);
+            .insert(Player)
+            .id(),
+    );
+    */
 
-    let camera = CameraRig::builder()
-        .with(Positional::new(Vec3::Y * 3.0))
-        .with(LookAt::new(start_pos))
-        .build();
-
-    commands.insert_resource(Dolly { rigs: camera });
+    commands.spawn().insert(
+        CameraRig::builder()
+            .with(Position::new(Vec3::Y * 3.0))
+            .with(LookAt::new(
+                /*start_pos.transform_2_dolly().position*/
+                dolly::glam::Vec3::new(0., 0., 2.),
+            ))
+            .build(),
+    );
 
     commands
         .spawn_bundle(PerspectiveCameraBundle {
-            transform: Transform::from_xyz(-2.0, 1., 5.0)
-                .looking_at(bevy::math::Vec3::ZERO, bevy::math::Vec3::Y),
+            transform: Transform::from_xyz(-2.0, 1., 2.0).looking_at(
+                /*start_pos.translation*/ bevy::math::Vec3::new(0., 0., 0.),
+                bevy::math::Vec3::Y,
+            ),
             ..Default::default()
         })
         .insert(MainCamera);
@@ -80,39 +79,29 @@ fn setup(
         ..Default::default()
     });
 }
-//QuerySet<(Query<(&mut Transform, &Camera)>, Query<&Transform>)>,
+
 fn update_camera(
-    mut dolly: ResMut<Dolly>,
+    time: Res<Time>,
     mut query: QuerySet<(
         Query<(&mut Transform, With<MainCamera>)>,
-        Query<(&mut Transform, With<Player>)>,
+        Query<(&mut Transform, With<CtrlMove>)>,
+        Query<&mut CameraRig>,
     )>,
 ) {
     let (player, _) = query.q1_mut().single_mut().unwrap();
-    let time_delta_seconds: f32 = 0.1;
+    query
+        .q2_mut()
+        .single_mut()
+        .unwrap()
+        .driver_mut::<LookAt>()
+        .target = player.transform_2_dolly().position;
 
-    let player_translation = Vec3::new(
-        player.translation.x,
-        player.translation.y,
-        player.translation.z,
-    );
+    let transform = query
+        .q2_mut()
+        .single_mut()
+        .unwrap()
+        .update(time.delta_seconds());
+    let (mut cam, _) = query.q0_mut().single_mut().unwrap();
 
-    dolly.rigs.driver_mut::<LookAt>().target = player_translation;
-
-    let transform = dolly.rigs.update(time_delta_seconds);
-    let (mut cam, _) = query.q1_mut().single_mut().unwrap();
-
-    let (translation, rotation) = transform.into_translation_rotation();
-    cam.translation = bevy::math::Vec3::new(translation.x, translation.y, translation.z);
-    cam.rotation = bevy::math::Quat::from_xyzw(rotation.x, rotation.y, rotation.z, rotation.w);
-}
-
-struct Rotates;
-
-fn rotator_system(time: Res<Time>, mut query: Query<&mut Transform, With<Rotates>>) {
-    for mut transform in query.iter_mut() {
-        *transform = Transform::from_rotation(bevy::math::Quat::from_rotation_y(
-            (4.0 * std::f32::consts::PI / 20.0) * time.delta_seconds(),
-        )) * *transform;
-    }
+    cam.transform_2_bevy(transform);
 }
