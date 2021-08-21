@@ -40,7 +40,7 @@ fn setup(
             GlobalTransform::identity(),
         ))
         .with_children(|cell| {
-            cell.spawn_scene(asset_server.load("sheep.gltf#Scene0"));
+            cell.spawn_scene(asset_server.load("poly_dolly.gltf#Scene0"));
         })
         .insert(Rotates);
 

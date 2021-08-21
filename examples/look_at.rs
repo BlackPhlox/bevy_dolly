@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 use bevy_dolly::ctrl::{CtrlConfig, CtrlMove};
-use bevy_dolly::{Dolly, Transform2Bevy, Transform2Dolly};
+use bevy_dolly::{DollyPlugins, Transform2Bevy, Transform2Dolly};
 use dolly::glam::Vec3;
 use dolly::prelude::{CameraRig, LookAt, Position};
 
@@ -10,7 +10,7 @@ fn main() {
     App::build()
         .insert_resource(Msaa { samples: 4 })
         .add_plugins(DefaultPlugins)
-        .add_plugin(Dolly)
+        .add_plugins(DollyPlugins)
         .add_startup_system(setup.system())
         .add_system(update_camera.system())
         .run();

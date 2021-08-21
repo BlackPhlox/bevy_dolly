@@ -12,8 +12,8 @@ use bevy::{
 
 use crate::cone::Cone;
 
-pub struct Ctrl;
-impl Plugin for Ctrl {
+pub struct DollyCtrl;
+impl Plugin for DollyCtrl {
     fn build(&self, app: &mut AppBuilder) {
         app.init_resource::<CtrlConfig>()
             .add_startup_system(ctrl_setup.system())
@@ -87,10 +87,6 @@ fn ctrl_setup(
     mut materials: ResMut<Assets<StandardMaterial>>,
     config: Res<CtrlConfig>,
 ) {
-    if !config.enabled {
-        return;
-    }
-
     let cone_mesh = meshes.add(Mesh::from(Cone {
         height: 0.2,
         radius: 0.1,

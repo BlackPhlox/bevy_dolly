@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 use bevy_dolly::ctrl::CtrlMove;
-use bevy_dolly::{Dolly, Transform2Bevy, Transform2Dolly};
+use bevy_dolly::{DollyPlugins, Transform2Bevy, Transform2Dolly};
 use dolly::glam::Vec3;
 use dolly::prelude::{Arm, CameraRig, LookAt, Position, Rotation, Smooth};
 
@@ -16,7 +16,7 @@ fn main() {
     App::build()
         .insert_resource(Msaa { samples: 4 })
         .add_plugins(DefaultPlugins)
-        .add_plugin(Dolly)
+        .add_plugins(DollyPlugins)
         .add_startup_system(setup.system())
         .add_system(rotator_system.system())
         .add_state(Camera::FollowSheep)
@@ -55,7 +55,7 @@ fn setup(
             GlobalTransform::identity(),
         ))
         .with_children(|cell| {
-            cell.spawn_scene(asset_server.load("sheep.gltf#Scene0"));
+            cell.spawn_scene(asset_server.load("poly_dolly.gltf#Scene0"));
         })
         .insert(Rotates);
 

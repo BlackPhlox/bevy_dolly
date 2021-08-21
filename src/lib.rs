@@ -1,5 +1,5 @@
-use bevy::prelude::{AppBuilder, Mut, Plugin, Transform};
-use ctrl::Ctrl;
+use bevy::{app::PluginGroupBuilder, prelude::{AppBuilder, Mut, Plugin, PluginGroup, Transform}};
+use ctrl::DollyCtrl;
 use dolly::glam::{Quat, Vec3};
 
 mod cone;
@@ -7,8 +7,15 @@ pub mod ctrl;
 
 pub struct Dolly;
 impl Plugin for Dolly {
-    fn build(&self, app: &mut AppBuilder) {
-        app.add_plugin(Ctrl);
+    fn build(&self, _app: &mut AppBuilder) {
+        ()
+    }
+}
+
+pub struct DollyPlugins;
+impl PluginGroup for DollyPlugins {
+    fn build(&mut self, group: &mut PluginGroupBuilder) {
+        group.add(Dolly).add(DollyCtrl);
     }
 }
 
@@ -31,10 +38,10 @@ pub trait Transform2DollyMut {
 impl Transform2DollyMut for Mut<'_, Transform> {
     fn transform_2_dolly_mut(&self) -> dolly::transform::Transform {
         let t = self.translation;
-        let q = self.rotation;
+        let r = self.rotation;
         dolly::transform::Transform {
             position: Vec3::new(t.x, t.y, t.z),
-            rotation: Quat::from_xyzw(q.x, q.y, q.z, q.w),
+            rotation: Quat::from_xyzw(r.x, r.y, r.z, r.w),
         }
     }
 }
@@ -46,10 +53,10 @@ pub trait Transform2Dolly {
 impl Transform2Dolly for Transform {
     fn transform_2_dolly(&self) -> dolly::transform::Transform {
         let t = self.translation;
-        let q = self.rotation;
+        let r = self.rotation;
         dolly::transform::Transform {
             position: Vec3::new(t.x, t.y, t.z),
-            rotation: Quat::from_xyzw(q.x, q.y, q.z, q.w),
+            rotation: Quat::from_xyzw(r.x, r.y, r.z, r.w),
         }
     }
 }
