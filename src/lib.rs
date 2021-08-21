@@ -1,4 +1,7 @@
-use bevy::{app::PluginGroupBuilder, prelude::{AppBuilder, Mut, Plugin, PluginGroup, Transform}};
+use bevy::{
+    app::PluginGroupBuilder,
+    prelude::{AppBuilder, Mut, Plugin, PluginGroup, Transform},
+};
 use ctrl::DollyCtrl;
 use dolly::glam::{Quat, Vec3};
 
@@ -8,7 +11,6 @@ pub mod ctrl;
 pub struct Dolly;
 impl Plugin for Dolly {
     fn build(&self, _app: &mut AppBuilder) {
-        ()
     }
 }
 
