@@ -10,8 +10,7 @@ pub mod ctrl;
 
 pub struct Dolly;
 impl Plugin for Dolly {
-    fn build(&self, _app: &mut AppBuilder) {
-    }
+    fn build(&self, _app: &mut AppBuilder) {}
 }
 
 pub struct DollyPlugins;
