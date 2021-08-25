@@ -1,3 +1,4 @@
+use bevy::input::mouse::MouseMotion;
 use bevy::prelude::*;
 use bevy_dolly::Transform2Bevy;
 use dolly::glam::Vec3;
@@ -9,9 +10,16 @@ fn main() {
     App::build()
         .insert_resource(Msaa { samples: 4 })
         .add_plugins(DefaultPlugins)
+        .add_state(Pan::Keys)
         .add_startup_system(setup.system())
         .add_system(update_camera.system())
         .run();
+}
+
+#[derive(PartialEq, Eq, Debug, Clone, Copy, Hash)]
+enum Pan {
+    Mouse,
+    Keys,
 }
 
 /// set up a simple 3D scene
@@ -63,9 +71,12 @@ fn setup(
     });
 }
 
+#[allow(unused_must_use)]
 fn update_camera(
     keys: Res<Input<KeyCode>>,
     time: Res<Time>,
+    mut pan: ResMut<State<Pan>>,
+    mut mouse_motion_events: EventReader<MouseMotion>,
     mut query: QuerySet<(
         Query<(&mut Transform, With<MainCamera>)>,
         Query<&mut CameraRig>,
@@ -73,12 +84,35 @@ fn update_camera(
 ) {
     let mut rig = query.q1_mut().single_mut().unwrap();
     let camera_driver = rig.driver_mut::<YawPitch>();
+    let sensitivity = Vec2::splat(2.0);
 
-    if keys.just_pressed(KeyCode::Z) {
-        camera_driver.rotate_yaw_pitch(-90.0, 0.0);
+    let mut delta = Vec2::ZERO;
+    for event in mouse_motion_events.iter() {
+        delta += event.delta;
     }
-    if keys.just_pressed(KeyCode::X) {
-        camera_driver.rotate_yaw_pitch(90.0, 0.0);
+
+    if pan.current().eq(&Pan::Keys) {
+        if keys.just_pressed(KeyCode::Z) {
+            camera_driver.rotate_yaw_pitch(-90.0, 0.0);
+        }
+        if keys.just_pressed(KeyCode::X) {
+            camera_driver.rotate_yaw_pitch(90.0, 0.0);
+        }
+    } else {
+        camera_driver.rotate_yaw_pitch(
+            -0.1 * delta.x * sensitivity.x,
+            -0.1 * delta.y * sensitivity.y,
+        );
+    }
+
+    if keys.just_pressed(KeyCode::E) {
+        let result = if pan.current().eq(&Pan::Keys) {
+            Pan::Mouse
+        } else {
+            Pan::Keys
+        };
+        pan.overwrite_set(result);
+        println!("State:{:?}", result);
     }
 
     let transform = rig.update(time.delta_seconds());
