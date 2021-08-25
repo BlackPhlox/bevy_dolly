@@ -4,8 +4,16 @@
 
 `bevy_dolly` is [h3r2tic](https://github.com/h3r2tic)'s [dolly](https://github.com/h3r2tic/dolly) implemented in bevy.<br/>
 
-The plugin is still in its prototype phase, so look at the examples for now, the plugin will come later.
-<br/><br/>
+It is important to distinguish that dolly is a way to translate the camera and thus, is not the camera itself. </br>
+
+Dolly requires two steps to function:
+1. Setup - Using `CameraRig` we are able to define drivers on which the dolly can enact, these drivers can both be constraints and functionality.
+2. Update - Querying for `CameraRig` allows us to mutate these drivers and update the camera to reflect the mutated changes.
+
+To see how this is done in bevy, please look at this repository's [examples](/examples/).
+
+As this plugin is still in its prototype phase. Currently, the plugin only contains helper methods for converting between bevy and dolly's glam crate. A more standalone plugin will come later.
+
 _Please do not call `dolly.clone()`, she have already been cloned once._
 
 ## How to run
