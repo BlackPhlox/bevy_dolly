@@ -4,11 +4,11 @@
 
 `bevy_dolly` is [h3r2tic](https://github.com/h3r2tic)'s [dolly](https://github.com/h3r2tic/dolly) implemented in bevy.<br/>
 
-It is important to distinguish that dolly is a way to translate the camera and thus, is not the camera itself. </br>
+It is important to note that dolly is a way to translate the camera and thus, not the camera component itself. </br>
 
 Dolly requires two steps to function:
 1. Setup - Using `CameraRig` we are able to define drivers on which the dolly can enact, these drivers can both be constraints and functionality.
-2. Update - Querying for `CameraRig` allows us to mutate these drivers and update the camera to reflect the mutated changes.
+2. Update - Querying for `CameraRig` allows us to mutate its drivers and update the cameras translation to reflect the mutated changes.
 
 To see how this is done in bevy, please look at this repository's [examples](/examples/).
 
