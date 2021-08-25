@@ -51,11 +51,10 @@ fn setup(
 
     let mut camera = OrthographicCameraBundle::new_3d();
     camera.orthographic_projection.scale = 3.0;
-    camera.transform = Transform::from_xyz(5.0, 5.0, 5.0).looking_at(bevy::math::Vec3::ZERO, bevy::math::Vec3::Y);
+    camera.transform =
+        Transform::from_xyz(5.0, 5.0, 5.0).looking_at(bevy::math::Vec3::ZERO, bevy::math::Vec3::Y);
 
-    commands
-        .spawn_bundle(camera)
-        .insert(MainCamera);
+    commands.spawn_bundle(camera).insert(MainCamera);
 
     // light
     commands.spawn_bundle(LightBundle {
