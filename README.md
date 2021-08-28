@@ -2,7 +2,7 @@
 <a href="https://github.com/BlackPhlox/bevy_dolly"><img src="https://raw.githubusercontent.com/BlackPhlox/BlackPhlox/master/bevy_dolly_1.svg" alt="bevy_dolly"></a>
 </div><br/>
 
-`bevy_dolly` is [h3r2tic](https://github.com/h3r2tic)'s [dolly](https://github.com/h3r2tic/dolly) implemented in bevy.<br/>
+`bevy_dolly` is [h3r2tic](https://github.com/h3r2tic)'s powerful crate: [dolly](https://github.com/h3r2tic/dolly), implemented in bevy.<br/>
 
 It is important to note that dolly is a way to translate the camera and thus, not the camera component itself. </br>
 
@@ -25,7 +25,7 @@ _Please do not call `dolly.clone()`, she have already been cloned once._
 
 |bevy|bevy_dolly|
 |---|---|
-|0.5| 0.0.x |
+|0.5| 0.0.X |
 ## Licensing
 The project is under dual license MIT and Apache 2.0, so joink to your hearts content, just remember the license agreements.
 
