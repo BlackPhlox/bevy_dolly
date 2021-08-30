@@ -1,5 +1,6 @@
-use bevy::{input::mouse::MouseMotion, prelude::*};
+use bevy::{ecs::{query::WorldQuery, system::BoxedSystem}, input::mouse::MouseMotion, prelude::*};
 use dolly::prelude::{CameraRig, Position, Rotation, Smooth, YawPitch};
+use bevy::ecs::system::SystemParam;
 
 use crate::{Transform2Bevy, Transform2Dolly, ZeroYRotation};
 
@@ -8,6 +9,8 @@ pub struct MainCamera;
 pub struct Cameras {
     pub cameras: Vec<Box<dyn DollyMouseUpdate + Sync + Send + 'static>>,
 }
+
+
 
 #[allow(clippy::type_complexity)]
 pub trait DollyMouseUpdate {
@@ -18,10 +21,8 @@ pub trait DollyMouseUpdate {
         keys: Res<Input<KeyCode>>,
         windows: Res<Windows>,
         mouse_motion_events: EventReader<MouseMotion>,
-        query: QuerySet<(
-            Query<(&mut Transform, With<MainCamera>)>,
-            Query<&mut CameraRig>,
-        )>,
+        query: Query<(&mut Transform, With<MainCamera>)>,
+        query2: Query<&mut CameraRig>,
     );
 }
 
@@ -56,10 +57,8 @@ impl DollyMouseUpdate for Fps {
         keys: Res<Input<KeyCode>>,
         windows: Res<Windows>,
         mut mouse_motion_events: EventReader<MouseMotion>,
-        mut query: QuerySet<(
-            Query<(&mut Transform, With<MainCamera>)>,
-            Query<&mut CameraRig>,
-        )>,
+        mut query: Query<(&mut Transform, With<MainCamera>)>,
+        mut query2: Query<&mut CameraRig>,
     ) {
         let time_delta_seconds: f32 = time.delta_seconds();
         let boost_mult = 5.0f32;
@@ -99,7 +98,7 @@ impl DollyMouseUpdate for Fps {
             delta += event.delta;
         }
 
-        let mut rig = query.q1_mut().single_mut().unwrap();
+        let mut rig = query2.single_mut().unwrap();
 
         let move_vec = rig.final_transform.rotation.zero_y_rotation()
             * move_vec.clamp_length_max(1.0)
@@ -116,7 +115,7 @@ impl DollyMouseUpdate for Fps {
         }
 
         let transform = rig.update(time_delta_seconds);
-        let (mut cam, _) = query.q0_mut().single_mut().unwrap();
+        let (mut cam, _) = query.single_mut().unwrap();
 
         cam.transform_2_bevy(transform);
     }

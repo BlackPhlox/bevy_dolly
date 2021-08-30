@@ -55,10 +55,8 @@ fn update(
     keys: Res<Input<KeyCode>>,
     windows: Res<Windows>,
     mouse_motion_events: EventReader<MouseMotion>,
-    query: QuerySet<(
-        Query<(&mut Transform, With<MainCamera>)>,
-        Query<&mut CameraRig>,
-    )>,
+    query: Query<(&mut Transform, With<MainCamera>)>,
+    query2: Query<&mut CameraRig>,
 ) {
-    cams.cameras[0].update_camera(time, keys, windows, mouse_motion_events, query);
+    cams.cameras[0].update_camera(time, keys, windows, mouse_motion_events, query, query2);
 }
