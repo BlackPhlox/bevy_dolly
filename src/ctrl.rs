@@ -10,12 +10,12 @@ use bevy::{
     },
 };
 
-use crate::cone::Cone;
+use crate::{cone::Cone, validate_key};
 
-pub struct DollyCtrl;
-impl Plugin for DollyCtrl {
+pub struct DollyDefaultCtrl;
+impl Plugin for DollyDefaultCtrl {
     fn build(&self, app: &mut AppBuilder) {
-        app.init_resource::<CtrlConfig>()
+        app.init_resource::<DollyDefaultCtrlConfig>()
             .add_startup_system(ctrl_setup.system())
             .add_system_set(
                 SystemSet::new()
@@ -25,7 +25,7 @@ impl Plugin for DollyCtrl {
     }
 }
 
-pub struct WASDKeyMap {
+pub struct DefaultControllerMap {
     pub forward: &'static [KeyCode],
     pub backward: &'static [KeyCode],
     pub left: &'static [KeyCode],
@@ -36,44 +36,44 @@ pub struct WASDKeyMap {
     pub rot_right: &'static [KeyCode],
 }
 
-impl Default for WASDKeyMap {
+impl Default for DefaultControllerMap {
     fn default() -> Self {
         Self {
-            forward: &[KeyCode::Up],
-            backward: &[KeyCode::Down],
+            forward: &[KeyCode::Up, KeyCode::W],
+            backward: &[KeyCode::Down, KeyCode::S],
             left: &[KeyCode::Comma],
             right: &[KeyCode::Period],
-            up: &[KeyCode::RShift],
-            down: &[KeyCode::Minus],
-            rot_left: &[KeyCode::Left],
-            rot_right: &[KeyCode::Right],
+            up: &[KeyCode::RShift, KeyCode::Q, KeyCode::Space],
+            down: &[KeyCode::Minus, KeyCode::LShift, KeyCode::LControl],
+            rot_left: &[KeyCode::Left, KeyCode::A],
+            rot_right: &[KeyCode::Right, KeyCode::D],
         }
     }
 }
 
-pub struct CtrlConfig {
+pub struct DollyDefaultCtrlConfig {
     pub enabled: bool,
     pub position: Vec3,
     pub speed: f32,
-    pub map: WASDKeyMap,
+    pub map: DefaultControllerMap,
     pub entity: Option<Entity>,
 }
 
-pub struct CtrlMove;
+pub struct DollyCtrlMove;
 
-impl Default for CtrlConfig {
+impl Default for DollyDefaultCtrlConfig {
     fn default() -> Self {
-        CtrlConfig {
+        DollyDefaultCtrlConfig {
             enabled: true,
             position: bevy::math::Vec3::new(0., 0.5, 0.),
             speed: 4.,
-            map: WASDKeyMap::default(),
+            map: DefaultControllerMap::default(),
             entity: None,
         }
     }
 }
 
-fn use_ctrl(config: Res<CtrlConfig>) -> ShouldRun {
+fn use_ctrl(config: Res<DollyDefaultCtrlConfig>) -> ShouldRun {
     if config.enabled {
         ShouldRun::Yes
     } else {
@@ -85,7 +85,7 @@ fn ctrl_setup(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
-    config: Res<CtrlConfig>,
+    config: Res<DollyDefaultCtrlConfig>,
 ) {
     let cone_mesh = meshes.add(Mesh::from(Cone {
         height: 0.2,
@@ -118,21 +118,14 @@ fn ctrl_setup(
                 ..Default::default()
             });
         })
-        .insert(CtrlMove);
-}
-
-pub fn validate_key<T>(codes: &'static [T], key: &T) -> bool
-where
-    T: PartialEq<T>,
-{
-    codes.iter().any(|m| m == key)
+        .insert(DollyCtrlMove);
 }
 
 fn ctrl_update(
     keys: Res<Input<KeyCode>>,
     time: Res<Time>,
-    config: Res<CtrlConfig>,
-    mut transforms: Query<(&CtrlMove, &mut Transform)>,
+    config: Res<DollyDefaultCtrlConfig>,
+    mut transforms: Query<(&DollyCtrlMove, &mut Transform)>,
 ) {
     for (_player, mut transform) in transforms.iter_mut() {
         let (_, mut rotation) = transform.rotation.to_axis_angle();

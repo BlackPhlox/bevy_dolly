@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use bevy_dolly::ctrl::CtrlMove;
+use bevy_dolly::ctrl::DollyCtrlMove;
 use bevy_dolly::{DollyPlugins, Transform2Bevy, Transform2Dolly};
 use dolly::glam::Vec3;
 use dolly::prelude::{Arm, CameraRig, LookAt, Position, Rotation, Smooth};
@@ -93,7 +93,7 @@ fn follow_player(
     time: Res<Time>,
     mut query: QuerySet<(
         Query<(&mut Transform, With<MainCamera>)>,
-        Query<(&mut Transform, With<CtrlMove>)>,
+        Query<(&mut Transform, With<DollyCtrlMove>)>,
         Query<&mut CameraRig>,
     )>,
 ) {

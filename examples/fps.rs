@@ -1,6 +1,6 @@
 use bevy::input::mouse::MouseMotion;
 use bevy::prelude::*;
-use bevy_dolly::{Transform2Bevy, Transform2Dolly};
+use bevy_dolly::{cam_ctrl::DollyCursorGrab, Transform2Bevy, Transform2Dolly, ZeroYRotation};
 use dolly::glam::Vec3;
 use dolly::prelude::{CameraRig, Position, Rotation, Smooth, YawPitch};
 
@@ -10,10 +10,9 @@ fn main() {
     App::build()
         .insert_resource(Msaa { samples: 4 })
         .add_plugins(DefaultPlugins)
+        .add_plugin(DollyCursorGrab)
         .add_startup_system(setup.system())
-        .add_startup_system(initial_grab_cursor.system())
         .add_system(update_camera.system())
-        .add_system(cursor_grab.system())
         .run();
 }
 
@@ -78,24 +77,6 @@ fn setup(
     });
 }
 
-/// Grabs/ungrabs mouse cursor
-fn toggle_grab_cursor(window: &mut Window) {
-    window.set_cursor_lock_mode(!window.cursor_locked());
-    window.set_cursor_visibility(!window.cursor_visible());
-}
-
-/// Grabs the cursor when game first starts
-fn initial_grab_cursor(mut windows: ResMut<Windows>) {
-    toggle_grab_cursor(windows.get_primary_mut().unwrap());
-}
-
-fn cursor_grab(keys: Res<Input<KeyCode>>, mut windows: ResMut<Windows>) {
-    let window = windows.get_primary_mut().unwrap();
-    if keys.just_pressed(KeyCode::Escape) {
-        toggle_grab_cursor(window);
-    }
-}
-
 fn update_camera(
     time: Res<Time>,
     keys: Res<Input<KeyCode>>,
@@ -146,13 +127,9 @@ fn update_camera(
 
     let mut rig = query.q1_mut().single_mut().unwrap();
 
-    let (mut euler, a) = rig.final_transform.rotation.to_axis_angle();
-    euler.x = 0.;
-    euler.z = 0.;
-    rig.final_transform.rotation = dolly::glam::Quat::from_axis_angle(euler, a);
-
-    let move_vec =
-        rig.final_transform.rotation * move_vec.clamp_length_max(1.0) * boost_mult.powf(boost);
+    let move_vec = rig.final_transform.rotation.zero_y_rotation()
+        * move_vec.clamp_length_max(1.0)
+        * boost_mult.powf(boost);
 
     let window = windows.get_primary().unwrap();
     if window.cursor_locked() {

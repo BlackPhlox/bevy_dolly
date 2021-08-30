@@ -1,12 +1,17 @@
 use bevy::{
     app::PluginGroupBuilder,
-    prelude::{AppBuilder, Mut, Plugin, PluginGroup, Transform},
+    input::Input,
+    prelude::{AppBuilder, KeyCode, Mut, Plugin, PluginGroup, Res, Transform},
 };
-use ctrl::DollyCtrl;
-use dolly::glam::{Quat, Vec3};
+use cam_ctrl::DollyCamCtrl;
+use ctrl::DollyDefaultCtrl;
+use dolly::glam::{Mat3, Quat, Vec3};
 
+pub mod cam_ctrl;
 mod cone;
 pub mod ctrl;
+pub mod cursor_grab;
+pub mod system;
 
 pub struct Dolly;
 impl Plugin for Dolly {
@@ -16,7 +21,7 @@ impl Plugin for Dolly {
 pub struct DollyPlugins;
 impl PluginGroup for DollyPlugins {
     fn build(&mut self, group: &mut PluginGroupBuilder) {
-        group.add(Dolly).add(DollyCtrl);
+        group.add(Dolly).add(DollyCamCtrl).add(DollyDefaultCtrl);
     }
 }
 
@@ -59,5 +64,42 @@ impl Transform2Dolly for Transform {
             position: Vec3::new(t.x, t.y, t.z),
             rotation: Quat::from_xyzw(r.x, r.y, r.z, r.w),
         }
+    }
+}
+
+pub trait ZeroYRotation {
+    fn zero_y_rotation(&self) -> dolly::glam::Quat;
+}
+
+impl ZeroYRotation for dolly::glam::Quat {
+    fn zero_y_rotation(&self) -> dolly::glam::Quat {
+        let mut forward = *self * Vec3::Z;
+        let up = Vec3::Y;
+        let right = up.cross(forward);
+        forward = right.cross(up);
+        let mat = Mat3::from_cols(right, up, forward);
+        Quat::from_mat3(&mat)
+    }
+}
+
+pub fn validate_key<T>(codes: &'static [T], key: &T) -> bool
+where
+    T: PartialEq<T>,
+{
+    codes.iter().any(|m| m == key)
+}
+
+trait JustPressedMany {
+    fn just_pressed_many(&self, codes: &'static [KeyCode]) -> bool;
+}
+
+impl JustPressedMany for Res<'_, Input<KeyCode>> {
+    fn just_pressed_many(&self, codes: &'static [KeyCode]) -> bool {
+        for key in codes {
+            if self.just_pressed(*key) {
+                return true;
+            }
+        }
+        false
     }
 }

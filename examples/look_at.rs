@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use bevy_dolly::ctrl::{CtrlConfig, CtrlMove};
+use bevy_dolly::ctrl::{DollyCtrlMove, DollyDefaultCtrlConfig};
 use bevy_dolly::{DollyPlugins, Transform2Bevy, Transform2Dolly};
 use dolly::glam::Vec3;
 use dolly::prelude::{CameraRig, LookAt, Position};
@@ -24,7 +24,7 @@ fn setup(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
     asset_server: Res<AssetServer>,
-    mut config: ResMut<CtrlConfig>,
+    mut config: ResMut<DollyDefaultCtrlConfig>,
 ) {
     // plane
     commands.spawn_bundle(PbrBundle {
@@ -84,7 +84,7 @@ fn update_camera(
     time: Res<Time>,
     mut query: QuerySet<(
         Query<(&mut Transform, With<MainCamera>)>,
-        Query<(&mut Transform, With<CtrlMove>)>,
+        Query<(&mut Transform, With<DollyCtrlMove>)>,
         Query<&mut CameraRig>,
     )>,
 ) {
