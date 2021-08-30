@@ -1,6 +1,5 @@
-use bevy::{ecs::{query::WorldQuery, system::BoxedSystem}, input::mouse::MouseMotion, prelude::*};
+use bevy::{input::mouse::MouseMotion, prelude::*};
 use dolly::prelude::{CameraRig, Position, Rotation, Smooth, YawPitch};
-use bevy::ecs::system::SystemParam;
 
 use crate::{Transform2Bevy, Transform2Dolly, ZeroYRotation};
 
@@ -9,8 +8,6 @@ pub struct MainCamera;
 pub struct Cameras {
     pub cameras: Vec<Box<dyn DollyMouseUpdate + Sync + Send + 'static>>,
 }
-
-
 
 #[allow(clippy::type_complexity)]
 pub trait DollyMouseUpdate {

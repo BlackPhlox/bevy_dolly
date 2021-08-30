@@ -1,12 +1,12 @@
 use bevy::input::mouse::MouseMotion;
 use bevy::prelude::*;
-use bevy_dolly::DollyPlugins;
+use bevy::{ecs::system::SystemParam, prelude::*};
 use bevy_dolly::system::Fps;
 use bevy_dolly::system2::Cam2;
+use bevy_dolly::DollyPlugins;
 use bevy_dolly::{cam_ctrl::DollyCursorGrab, Transform2Bevy, Transform2Dolly, ZeroYRotation};
 use dolly::glam::Vec3;
 use dolly::prelude::{CameraRig, Position, Rotation, Smooth, YawPitch};
-use bevy::{ecs::system::SystemParam, prelude::*};
 
 struct MainCamera;
 
@@ -39,7 +39,7 @@ impl<'a> PlayerCounter<'a> {
     }
 }
 
-fn update(){
+fn update() {
     println!("Test");
 }
 
