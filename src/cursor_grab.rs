@@ -1,6 +1,6 @@
 use bevy::{ecs::schedule::ShouldRun, prelude::*};
 
-use crate::JustPressedMany;
+use crate::AnyPressed;
 
 pub struct DollyCursorGrab;
 impl Plugin for DollyCursorGrab {
@@ -57,7 +57,7 @@ fn cursor_grab(
     config: Res<DollyCursorGrabConfig>,
 ) {
     let window = windows.get_primary_mut().unwrap();
-    if keys.just_pressed_many(config.grab_keys) {
+    if keys.any_pressed(config.grab_keys) {
         toggle_grab_cursor(window);
     }
 }

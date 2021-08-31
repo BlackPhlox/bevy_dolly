@@ -90,12 +90,12 @@ where
     codes.iter().any(|m| m == key)
 }
 
-trait JustPressedMany {
-    fn just_pressed_many(&self, codes: &'static [KeyCode]) -> bool;
+trait AnyPressed {
+    fn any_pressed(&self, codes: &'static [KeyCode]) -> bool;
 }
 
-impl JustPressedMany for Res<'_, Input<KeyCode>> {
-    fn just_pressed_many(&self, codes: &'static [KeyCode]) -> bool {
+impl AnyPressed for Res<'_, Input<KeyCode>> {
+    fn any_pressed(&self, codes: &'static [KeyCode]) -> bool {
         for key in codes {
             if self.just_pressed(*key) {
                 return true;
