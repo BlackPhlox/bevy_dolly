@@ -1,9 +1,5 @@
 use bevy::input::mouse::MouseMotion;
 use bevy::prelude::*;
-use bevy::{ecs::system::SystemParam, prelude::*};
-use bevy_dolly::system::Fps;
-use bevy_dolly::system2::Cam2;
-use bevy_dolly::DollyPlugins;
 use bevy_dolly::{cam_ctrl::DollyCursorGrab, Transform2Bevy, Transform2Dolly, ZeroYRotation};
 use dolly::glam::Vec3;
 use dolly::prelude::{CameraRig, Position, Rotation, Smooth, YawPitch};
@@ -14,37 +10,10 @@ fn main() {
     App::build()
         .insert_resource(Msaa { samples: 4 })
         .add_plugins(DefaultPlugins)
-        .add_plugins(DollyPlugins)
-        .insert_resource(Cam2 {
-            cameras: vec![Box::new(update.system())],
-        })
-        .add_startup_system(update_test.exclusive_system())
+        .add_plugin(DollyCursorGrab)
         .add_startup_system(setup.system())
         .add_system(update_camera.system())
         .run();
-}
-
-pub struct Player;
-pub struct PlayerCount(usize);
-
-#[derive(SystemParam)]
-pub struct PlayerCounter<'a> {
-    players: Query<'a, &'static Player>,
-    count: ResMut<'a, PlayerCount>,
-}
-
-impl<'a> PlayerCounter<'a> {
-    fn count(&mut self) {
-        self.count.0 = self.players.iter().len();
-    }
-}
-
-fn update() {
-    println!("Test");
-}
-
-fn update_test(world: &mut World) {
-    //cs.cameras[0].run((), world);
 }
 
 /// set up a simple 3D scene

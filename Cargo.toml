@@ -21,7 +21,7 @@ exclude = [
 name = "bevy_dolly"
 
 [dependencies]
-dolly = "0.1.2"
+dolly = { path = "dolly" } #"0.1.2"
 
 [dependencies.bevy]
 version = "0.5"
@@ -37,3 +37,37 @@ default-features = false
 version = "0.5"
 features = ["x11", "wayland"]
 default-features = false
+
+
+[[example]]
+name = "custom_follow"
+path = "examples/custom/follow.rs"
+
+[[example]]
+name = "custom_fps"
+path = "examples/custom/fps.rs"
+
+[[example]]
+name = "custom_free"
+path = "examples/custom/free.rs"
+
+[[example]]
+name = "custom_look_at"
+path = "examples/custom/look_at.rs"
+
+[[example]]
+name = "custom_minimal"
+path = "examples/custom/minimal.rs"
+
+[[example]]
+name = "custom_orbit_iso"
+path = "examples/custom/orbit_iso.rs"
+
+[[example]]
+name = "custom_orbit"
+path = "examples/custom/orbit.rs"
+
+[[example]]
+name = "custom_switch"
+path = "examples/custom/switch.rs"
+

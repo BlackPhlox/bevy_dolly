@@ -1,7 +1,7 @@
 use bevy::prelude::*;
-use bevy_dolly::drivers::follow::Follow;
 use bevy_dolly::{Transform2Bevy, Transform2Dolly};
 use dolly::glam::Vec3;
+use dolly::prelude::{Arm, CameraRig, LookAt, Position, Rotation, Smooth};
 
 struct MainCamera;
 
@@ -44,12 +44,20 @@ fn setup(
         })
         .insert(Rotates);
 
-    commands
-        .spawn()
-        .insert(Follow::init(dolly::transform::Transform {
-            position: start_pos,
-            rotation: dolly::glam::Quat::IDENTITY,
-        }));
+    commands.spawn().insert(
+        CameraRig::builder()
+            .with(Position::new(start_pos))
+            .with(Rotation::new(dolly::glam::Quat::IDENTITY))
+            .with(Smooth::new_position(1.25).predictive(true))
+            .with(Arm::new(Vec3::new(0.0, 1.5, -3.5)))
+            .with(Smooth::new_position(2.5))
+            .with(
+                LookAt::new(start_pos + Vec3::Y)
+                    .tracking_smoothness(1.25)
+                    .tracking_predictive(true),
+            )
+            .build(),
+    );
 
     commands
         .spawn_bundle(PerspectiveCameraBundle {
@@ -71,22 +79,20 @@ fn update_camera(
     mut query: QuerySet<(
         Query<(&mut Transform, With<MainCamera>)>,
         Query<(&mut Transform, With<Rotates>)>,
-        Query<&mut Follow>,
+        Query<&mut CameraRig>,
     )>,
 ) {
     let player = query.q1_mut().single_mut().unwrap().0;
 
     let player_dolly = player.transform_2_dolly();
 
-    let mut follow = query.q2_mut().single_mut().unwrap();
+    let mut rig = query.q2_mut().single_mut().unwrap();
 
-    follow.update(
-        player_dolly.position,
-        player_dolly.rotation,
-        player_dolly.position + Vec3::Y,
-    );
+    rig.driver_mut::<Position>().position = player_dolly.position;
+    rig.driver_mut::<Rotation>().rotation = player_dolly.rotation;
+    rig.driver_mut::<LookAt>().target = player_dolly.position + Vec3::Y;
 
-    let transform = follow.rig.update(time.delta_seconds());
+    let transform = rig.update(time.delta_seconds());
 
     query
         .q0_mut()

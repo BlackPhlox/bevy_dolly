@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use bevy_dolly::ctrl::DollyCtrlMove;
+use bevy_dolly::ctrl::{DollyCtrlMove, DollyDefaultCtrlConfig};
 use bevy_dolly::{DollyPlugins, Transform2Bevy, Transform2Dolly};
 use dolly::glam::Vec3;
 use dolly::prelude::{Arm, CameraRig, LookAt, Position, Rotation, Smooth};
@@ -17,6 +17,11 @@ fn main() {
         .insert_resource(Msaa { samples: 4 })
         .add_plugins(DefaultPlugins)
         .add_plugins(DollyPlugins)
+        .insert_resource(DollyDefaultCtrlConfig {
+            enabled: false,
+            position: bevy::math::Vec3::new(2.0, 0.5, 0.),
+            ..Default::default()
+        })
         .add_startup_system(setup.system())
         .add_system(rotator_system.system())
         .add_state(Camera::FollowSheep)
@@ -156,11 +161,17 @@ fn rotator_system(time: Res<Time>, mut query: Query<&mut Transform, With<Rotates
 }
 
 #[allow(unused_must_use)]
-fn switch_camera_rig(mut camera: ResMut<State<Camera>>, keyboard_input: Res<Input<KeyCode>>) {
+fn switch_camera_rig(
+    mut camera: ResMut<State<Camera>>,
+    keyboard_input: Res<Input<KeyCode>>,
+    mut dolly_ctrl_config: ResMut<DollyDefaultCtrlConfig>,
+) {
     if keyboard_input.just_pressed(KeyCode::C) {
         let result = if camera.current().eq(&Camera::FollowPlayer) {
+            dolly_ctrl_config.enabled = false;
             Camera::FollowSheep
         } else {
+            dolly_ctrl_config.enabled = true;
             Camera::FollowPlayer
         };
 

@@ -1,8 +1,10 @@
 use bevy::input::mouse::MouseMotion;
 use bevy::prelude::*;
-use bevy_dolly::{cam_ctrl::DollyCursorGrab, Transform2Bevy, Transform2Dolly, ZeroYRotation};
+use bevy_dolly::drivers::fps::{Fps, Vec3KeyMapWithBoost};
+use bevy_dolly::{cam_ctrl::DollyCursorGrab, Transform2Bevy, Transform2Dolly};
+
 use dolly::glam::Vec3;
-use dolly::prelude::{CameraRig, Position, Rotation, Smooth, YawPitch};
+use dolly::prelude::{CameraRig, Smooth};
 
 struct MainCamera;
 
@@ -49,16 +51,13 @@ fn setup(
             .looking_at(bevy::math::Vec3::ZERO, bevy::math::Vec3::Y);
 
     let rotation = transform.transform_2_dolly().rotation;
-    let mut yaw_pitch = YawPitch::new();
-    yaw_pitch.set_rotation_quat(rotation);
 
     commands.spawn().insert(
         CameraRig::builder()
-            .with(Position {
+            .with(Fps::init(dolly::transform::Transform {
                 position: Vec3::from_slice(&translation),
-            })
-            .with(Rotation { rotation })
-            .with(yaw_pitch)
+                rotation,
+            }))
             .with(Smooth::new_position_rotation(1.0, 0.1))
             .build(),
     );
@@ -81,65 +80,24 @@ fn update_camera(
     time: Res<Time>,
     keys: Res<Input<KeyCode>>,
     windows: Res<Windows>,
-    mut mouse_motion_events: EventReader<MouseMotion>,
+    mouse_motion_events: EventReader<MouseMotion>,
     mut query: QuerySet<(
         Query<(&mut Transform, With<MainCamera>)>,
         Query<&mut CameraRig>,
     )>,
 ) {
     let time_delta_seconds: f32 = time.delta_seconds();
-    let boost_mult = 5.0f32;
     let sensitivity = Vec2::splat(1.0);
 
-    let mut move_vec = Vec3::ZERO;
-
-    // Q: Is dolly left-handed so z is flipped?
-    if keys.pressed(KeyCode::W) {
-        move_vec.z -= 1.0;
-    }
-    if keys.pressed(KeyCode::S) {
-        move_vec.z += 1.0;
-    }
-    if keys.pressed(KeyCode::A) {
-        move_vec.x -= 1.0;
-    }
-    if keys.pressed(KeyCode::D) {
-        move_vec.x += 1.0;
-    }
-
-    if keys.pressed(KeyCode::E) || keys.pressed(KeyCode::Space) {
-        move_vec.y += 1.0;
-    }
-    if keys.pressed(KeyCode::Q) {
-        move_vec.y -= 1.0;
-    }
-
-    let boost: f32 = if keys.pressed(KeyCode::LShift) {
-        1.
-    } else {
-        0.
-    };
-
-    let mut delta = Vec2::ZERO;
-    for event in mouse_motion_events.iter() {
-        delta += event.delta;
-    }
-
     let mut rig = query.q1_mut().single_mut().unwrap();
-
-    let move_vec = rig.final_transform.rotation.zero_y_rotation()
-        * move_vec.clamp_length_max(1.0)
-        * boost_mult.powf(boost);
-
-    let window = windows.get_primary().unwrap();
-    if window.cursor_locked() {
-        rig.driver_mut::<YawPitch>().rotate_yaw_pitch(
-            -0.1 * delta.x * sensitivity.x,
-            -0.1 * delta.y * sensitivity.y,
-        );
-        rig.driver_mut::<Position>()
-            .translate(move_vec * time_delta_seconds * 10.0);
-    }
+    rig.driver_mut::<Fps>().update(
+        time,
+        keys,
+        windows,
+        mouse_motion_events,
+        sensitivity,
+        Vec3KeyMapWithBoost::default(),
+    );
 
     let transform = rig.update(time_delta_seconds);
     let (mut cam, _) = query.q0_mut().single_mut().unwrap();

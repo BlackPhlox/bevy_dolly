@@ -5,14 +5,17 @@ use bevy::{
 };
 use cam_ctrl::DollyCamCtrl;
 use ctrl::DollyDefaultCtrl;
-use dolly::glam::{Mat3, Quat, Vec3};
+use dolly::{
+    glam::{EulerRot, Quat, Vec3},
+    prelude::YawPitch,
+    rig::CameraRigBuilder,
+};
 
 pub mod cam_ctrl;
 mod cone;
 pub mod ctrl;
 pub mod cursor_grab;
-pub mod system;
-pub mod system2;
+pub mod drivers;
 
 pub struct Dolly;
 impl Plugin for Dolly {
@@ -68,18 +71,39 @@ impl Transform2Dolly for Transform {
     }
 }
 
+pub trait UpdateYawPitch {
+    fn update_rotation(&mut self, yp: &YawPitch);
+}
+
+impl UpdateYawPitch for dolly::drivers::Rotation {
+    fn update_rotation(&mut self, yp: &YawPitch) {
+        self.rotation = dolly::glam::Quat::from_euler(
+            EulerRot::YXZ,
+            yp.yaw_degrees.to_radians(),
+            yp.pitch_degrees.to_radians(),
+            0.0,
+        )
+    }
+}
+
 pub trait ZeroYRotation {
     fn zero_y_rotation(&self) -> dolly::glam::Quat;
 }
 
 impl ZeroYRotation for dolly::glam::Quat {
     fn zero_y_rotation(&self) -> dolly::glam::Quat {
+        let (mut euler, a) = self.to_axis_angle();
+        euler.x = 0.;
+        euler.z = 0.;
+        dolly::glam::Quat::from_axis_angle(euler, a)
+        /*
+        Don't work as intended
         let mut forward = *self * Vec3::Z;
         let up = Vec3::Y;
         let right = up.cross(forward);
         forward = right.cross(up);
         let mat = Mat3::from_cols(right, up, forward);
-        Quat::from_mat3(&mat)
+        Quat::from_mat3(&mat)*/
     }
 }
 
@@ -90,7 +114,17 @@ where
     codes.iter().any(|m| m == key)
 }
 
-trait AnyPressed {
+pub trait IterAnyPressed {
+    fn is_being_pressed(&self, key: &KeyCode) -> bool;
+}
+
+impl IterAnyPressed for &'static [KeyCode] {
+    fn is_being_pressed(&self, key: &KeyCode) -> bool {
+        self.iter().any(|m| m == key)
+    }
+}
+
+pub trait AnyPressed {
     fn any_pressed(&self, codes: &'static [KeyCode]) -> bool;
 }
 
@@ -103,4 +137,8 @@ impl AnyPressed for Res<'_, Input<KeyCode>> {
         }
         false
     }
+}
+
+pub trait DollyExtension {
+    fn init(&self) -> CameraRigBuilder;
 }

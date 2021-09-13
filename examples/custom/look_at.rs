@@ -3,6 +3,7 @@ use bevy_dolly::ctrl::{DollyCtrlMove, DollyDefaultCtrlConfig};
 use bevy_dolly::{DollyPlugins, Transform2Bevy, Transform2Dolly};
 use dolly::glam::Vec3;
 use dolly::prelude::{CameraRig, LookAt, Position};
+use dolly::{driver, drivers};
 
 struct MainCamera;
 

@@ -9,10 +9,13 @@ impl Plugin for DollyCamCtrl {
             .add_plugin(DollyCursorGrab);
     }
 }
+
+#[derive(Default)]
 pub struct DollyCamCtrlConfig {}
 
+/*
 impl Default for DollyCamCtrlConfig {
     fn default() -> Self {
         DollyCamCtrlConfig {}
     }
-}
+}*/
