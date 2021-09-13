@@ -1026,8 +1026,9 @@ dependencies = [
 [[package]]
 name = "dolly"
 version = "0.1.2"
+source = "git+https://github.com/BlackPhlox/dolly.git#e1fd67254236a9deceda66a28fd67772cc37782f"
 dependencies = [
- "glam 0.15.2",
+ "glam 0.17.3",
 ]
 
 [[package]]
@@ -1369,6 +1370,12 @@ name = "glam"
 version = "0.15.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3abb554f8ee44336b72d522e0a7fe86a29e09f839a36022fa869a7dfe941a54b"
+
+[[package]]
+name = "glam"
+version = "0.17.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e01732b97afd8508eee3333a541b9f7610f454bb818669e66e90f5f57c93a776"
 
 [[package]]
 name = "glow"
