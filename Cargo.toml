@@ -21,7 +21,7 @@ exclude = [
 name = "bevy_dolly"
 
 [dependencies]
-dolly = { git = "https://github.com/BlackPhlox/dolly.git" } #"0.1.2"
+dolly = { git = "https://github.com/BlackPhlox/dolly.git" } #{ path = "dolly" } #{ git = "https://github.com/BlackPhlox/dolly.git" } # { path = "dolly" } "0.1.2"
 
 [dependencies.bevy]
 version = "0.5"

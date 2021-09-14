@@ -2,6 +2,7 @@ use bevy::prelude::*;
 use bevy_dolly::drivers::follow::Follow;
 use bevy_dolly::{Transform2Bevy, Transform2Dolly};
 use dolly::glam::Vec3;
+use dolly::prelude::CameraRig;
 
 struct MainCamera;
 
@@ -44,12 +45,14 @@ fn setup(
         })
         .insert(Rotates);
 
-    commands
-        .spawn()
-        .insert(Follow::init(dolly::transform::Transform {
-            position: start_pos,
-            rotation: dolly::glam::Quat::IDENTITY,
-        }));
+    commands.spawn().insert(
+        CameraRig::builder()
+            .with(Follow::init(dolly::transform::Transform {
+                position: start_pos,
+                rotation: dolly::glam::Quat::IDENTITY,
+            }))
+            .build(),
+    );
 
     commands
         .spawn_bundle(PerspectiveCameraBundle {
@@ -71,22 +74,22 @@ fn update_camera(
     mut query: QuerySet<(
         Query<(&mut Transform, With<MainCamera>)>,
         Query<(&mut Transform, With<Rotates>)>,
-        Query<&mut Follow>,
+        Query<&mut CameraRig>,
     )>,
 ) {
     let player = query.q1_mut().single_mut().unwrap().0;
 
     let player_dolly = player.transform_2_dolly();
 
-    let mut follow = query.q2_mut().single_mut().unwrap();
+    let mut rig = query.q2_mut().single_mut().unwrap();
 
-    follow.update(
+    rig.driver_mut::<Follow>().update(
         player_dolly.position,
         player_dolly.rotation,
         player_dolly.position + Vec3::Y,
     );
 
-    let transform = follow.rig.update(time.delta_seconds());
+    let transform = rig.update(time.delta_seconds());
 
     query
         .q0_mut()
