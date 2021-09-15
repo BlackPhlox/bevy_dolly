@@ -20,6 +20,23 @@ _Please do not call `dolly.clone()`, she have already been cloned once._
 
 `cargo run --release --example orbit`
 
+## Crate usage
+
+3 different types of implementations, all can be seen in [examples](/examples/):
+
+- Plugin (`cargo r --release --example plugin_x`)
+  - (+) Easy to implement
+  - (-) Hard to modify
+  - Good for beginners/see crates functionality
+- Drivers (`cargo r --release --example x`)
+  - (+) Good abstraction layer
+  - (+) Modifiable at runtime
+  - Logic abstracted away, not hard to understand nor modify
+- Custom (`cargo r --release --example custom_x`)
+  - (+) Full control of every aspect
+  - (-) No abstraction
+  - Useful if you want to implement your own tightly integrated stuff 
+
 ## Support
 [![Bevy tracking](https://img.shields.io/badge/Bevy%20tracking-released%20version-lightblue)](https://github.com/bevyengine/bevy/blob/main/docs/plugins_guidelines.md#main-branch-tracking)
 
