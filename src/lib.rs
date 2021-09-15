@@ -164,10 +164,10 @@ where
         self
     }
 }
-impl<T: InitSubRig<S>, S> InitSubRig<S> for SubRig<T> {
-    fn init2(settings: S) -> Self {
+impl<T: WithRigSettings<S>, S> WithRigSettings<S> for SubRig<T> {
+    fn init(settings: S) -> Self {
         SubRig {
-            driver: T::init2(settings),
+            driver: T::init(settings),
             rig: CameraRig::builder().build(),
         }
     }
@@ -176,6 +176,8 @@ impl<T: InitSubRig<S>, S> InitSubRig<S> for SubRig<T> {
 pub trait WithRigSettings<S> {
     fn init(settings: S) -> Self;
 }
+
+//V1
 pub trait CustomBuild {
     fn with_rig<T, S>(self, settings: S) -> CameraRigBuilder
     where
@@ -189,21 +191,18 @@ impl CustomBuild for CameraRigBuilder {
         self.with(T::init(settings))
     }
 }
-
-pub trait InitSubRig<S> {
-    fn init2(settings: S) -> Self;
-}
-
-pub trait InitDriver<S> {
-    fn init_driver(settings: S) -> dyn RigDriver;
-}
+//V2
 pub trait SubRigBuild<S> {
-    fn with_sub_rig<T>(self, settings: S) -> CameraRigBuilder where T: 'static +  Debug + InitSubRig<S> + Sync + Send;
+    fn with_sub_rig<T>(self, settings: S) -> CameraRigBuilder
+    where
+        T: 'static + Debug + WithRigSettings<S> + Sync + Send;
 }
 
-impl<S> SubRigBuild<S> for CameraRigBuilder
-{
-    fn with_sub_rig<T>(self, settings: S) -> CameraRigBuilder where T: 'static + Debug + InitSubRig<S> + Sync + Send {
-        self.with(SubRig::<T>::init2(settings))
+impl<S> SubRigBuild<S> for CameraRigBuilder {
+    fn with_sub_rig<T>(self, settings: S) -> CameraRigBuilder
+    where
+        T: 'static + Debug + WithRigSettings<S> + Sync + Send,
+    {
+        self.with(SubRig::<T>::init(settings))
     }
 }

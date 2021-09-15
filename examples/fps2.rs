@@ -1,9 +1,9 @@
 use bevy::input::mouse::MouseMotion;
 use bevy::prelude::*;
-use bevy_dolly::drivers::fps::{Vec3KeyMapWithBoost};
+use bevy_dolly::drivers::fps::Vec3KeyMapWithBoost;
 use bevy_dolly::{cam_ctrl::DollyCursorGrab, Transform2Bevy, Transform2Dolly};
-use bevy_dolly::{InitSubRig, IterAnyPressed, SubRig, SubRigBuild, ZeroYRotation};
-use dolly::{glam::Vec3};
+use bevy_dolly::{IterAnyPressed, SubRig, SubRigBuild, WithRigSettings, ZeroYRotation};
+use dolly::glam::Vec3;
 use dolly::prelude::{CameraRig, Position, Rotation, Smooth, YawPitch};
 
 struct MainCamera;
@@ -19,7 +19,9 @@ fn main() {
 }
 
 #[derive(Debug)]
-struct FpsTest {rig: CameraRig}
+struct FpsTest {
+    rig: CameraRig,
+}
 
 impl FpsTest {
     pub fn custom_update(
@@ -92,8 +94,8 @@ struct FpsTestSettings {
     transform: dolly::transform::Transform,
 }
 
-impl InitSubRig<FpsTestSettings> for FpsTest {
-    fn init2(settings: FpsTestSettings) -> Self {
+impl WithRigSettings<FpsTestSettings> for FpsTest {
+    fn init(settings: FpsTestSettings) -> Self {
         let mut yp = YawPitch::new();
         yp.set_rotation_quat(settings.transform.rotation);
         FpsTest {
