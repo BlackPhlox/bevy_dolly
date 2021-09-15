@@ -45,7 +45,7 @@ impl Fps {
         windows: Res<bevy::window::Windows>,
         mut mouse_motion_events: EventReader<MouseMotion>,
         sensitivity: Vec2,
-        map: Vec3KeyMapWithBoost,
+        map: &Vec3KeyMapWithBoost,
     ) {
         let time_delta_seconds: f32 = time.delta_seconds();
         let mut move_vec = Vec3::ZERO;

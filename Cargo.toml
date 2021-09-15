@@ -48,6 +48,10 @@ name = "custom_fps"
 path = "examples/custom/fps.rs"
 
 [[example]]
+name = "plugin_fps"
+path = "examples/plugin/fps.rs"
+
+[[example]]
 name = "custom_free"
 path = "examples/custom/free.rs"
 

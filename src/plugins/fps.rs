@@ -1,51 +1,53 @@
+use bevy::ecs::schedule::ShouldRun;
 use bevy::input::mouse::MouseMotion;
 use bevy::prelude::*;
-use bevy_dolly::drivers::fps::{Fps, FpsSettings, Vec3KeyMapWithBoost};
-use bevy_dolly::CustomBuild;
-use bevy_dolly::{cam_ctrl::DollyCursorGrab, Transform2Bevy, Transform2Dolly};
 
 use dolly::glam::Vec3;
-use dolly::prelude::{CameraRig, Smooth};
+use dolly::prelude::CameraRig;
+
+use crate::cam_ctrl::DollyCursorGrab;
+use crate::drivers::fps::{Fps, FpsSettings, Vec3KeyMapWithBoost};
+use crate::{CustomBuild, Transform2Bevy, Transform2Dolly};
+
+pub struct DollyFps;
+impl Plugin for DollyFps {
+    fn build(&self, app: &mut AppBuilder) {
+        app.init_resource::<DollyFpsConfig>()
+            .add_plugin(DollyCursorGrab)
+            .add_startup_system(setup.system())
+            .add_system_set(
+                SystemSet::new()
+                    .with_run_criteria(use_fps.system())
+                    .with_system(update_camera.system()),
+            );
+    }
+}
+
+fn use_fps(config: Res<DollyFpsConfig>) -> ShouldRun {
+    if config.enabled {
+        ShouldRun::Yes
+    } else {
+        ShouldRun::No
+    }
+}
+
+pub struct DollyFpsConfig {
+    pub enabled: bool,
+    pub map: Vec3KeyMapWithBoost,
+}
+
+impl Default for DollyFpsConfig {
+    fn default() -> Self {
+        DollyFpsConfig {
+            enabled: true,
+            map: Vec3KeyMapWithBoost::default(),
+        }
+    }
+}
 
 struct MainCamera;
 
-fn main() {
-    App::build()
-        .insert_resource(Msaa { samples: 4 })
-        .add_plugins(DefaultPlugins)
-        .add_plugin(DollyCursorGrab)
-        .add_startup_system(setup.system())
-        .add_system(update_camera.system())
-        .run();
-}
-
-/// set up a simple 3D scene
-fn setup(
-    mut commands: Commands,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
-    asset_server: Res<AssetServer>,
-) {
-    // plane
-    commands.spawn_bundle(PbrBundle {
-        mesh: meshes.add(Mesh::from(shape::Plane { size: 5.0 })),
-        material: materials.add(Color::rgb(0.3, 0.5, 0.3).into()),
-        ..Default::default()
-    });
-
-    commands
-        .spawn_bundle((
-            Transform {
-                translation: bevy::math::Vec3::new(0., 0.2, 0.),
-                ..Default::default()
-            },
-            GlobalTransform::identity(),
-        ))
-        .with_children(|cell| {
-            cell.spawn_scene(asset_server.load("poly_dolly.gltf#Scene0"));
-        })
-        .id();
-
+fn setup(mut commands: Commands) {
     let translation = [-2.0f32, 2.0f32, 5.0f32];
     let transform =
         Transform::from_translation(bevy::math::Vec3::from_slice_unaligned(&translation))
@@ -70,15 +72,11 @@ fn setup(
             ..Default::default()
         })
         .insert(MainCamera);
-
-    // light
-    commands.spawn_bundle(LightBundle {
-        transform: Transform::from_xyz(4.0, 8.0, 4.0),
-        ..Default::default()
-    });
 }
 
+#[allow(clippy::type_complexity)]
 fn update_camera(
+    config: Res<DollyFpsConfig>,
     time: Res<Time>,
     keys: Res<Input<KeyCode>>,
     windows: Res<Windows>,
@@ -98,7 +96,7 @@ fn update_camera(
         windows,
         mouse_motion_events,
         sensitivity,
-        &Vec3KeyMapWithBoost::default(),
+        &config.map,
     );
 
     let transform = rig.update(time_delta_seconds);

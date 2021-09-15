@@ -19,6 +19,7 @@ mod cone;
 pub mod ctrl;
 pub mod cursor_grab;
 pub mod drivers;
+pub mod plugins;
 
 pub struct Dolly;
 impl Plugin for Dolly {
