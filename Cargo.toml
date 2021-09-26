@@ -75,3 +75,6 @@ path = "examples/custom/orbit.rs"
 name = "custom_switch"
 path = "examples/custom/switch.rs"
 
+[[example]]
+name = "custom_turret"
+path = "examples/custom/turret.rs"

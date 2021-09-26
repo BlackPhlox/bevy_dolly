@@ -28,7 +28,7 @@ _Please do not call `dolly.clone()`, she have already been cloned once._
   - (+) Easy to implement
   - (-) Hard to modify
   - Good for beginners/see crates functionality
-- Drivers (Recommended)(`cargo r --release --example fps`)
+- Drivers (Recommended) (`cargo r --release --example fps`)
   - (+) Good abstraction layer
   - (+) Modifiable at runtime
   - Logic abstracted away, not hard to understand nor modify
