@@ -1,7 +1,6 @@
 use bevy::input::mouse::MouseMotion;
 use bevy::prelude::*;
-use bevy_dolly::drivers::fps::{Fps, FpsSettings, Vec3KeyMapWithBoost};
-use bevy_dolly::CustomBuild;
+use bevy_dolly::drivers::fps::{Fps, Vec3KeyMapWithBoost};
 use bevy_dolly::{cam_ctrl::DollyCursorGrab, Transform2Bevy, Transform2Dolly};
 
 use dolly::glam::Vec3;
@@ -55,12 +54,10 @@ fn setup(
 
     commands.spawn().insert(
         CameraRig::builder()
-            .with_rig::<Fps, FpsSettings>(FpsSettings {
-                transform: dolly::transform::Transform {
-                    position: Vec3::from_slice(&translation),
-                    rotation,
-                },
-            })
+            .with(Fps::init(dolly::transform::Transform {
+                position: Vec3::from_slice(&translation),
+                rotation,
+            }))
             .build(),
     );
 

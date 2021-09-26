@@ -18,24 +18,24 @@ _Please do not call `dolly.clone()`, she have already been cloned once._
 
 ## How to run
 
-`cargo run --release --example orbit`
+`cargo run --release --example fps`
 
 ## Crate usage
 
 3 different types of implementations, all can be seen in [examples](/examples/):
 
-- Plugin (`cargo r --release --example plugin_x`)
+- Plugin (`cargo r --release --example plugin_fps`)
   - (+) Easy to implement
   - (-) Hard to modify
   - Good for beginners/see crates functionality
-- Drivers (`cargo r --release --example x`)
+- Drivers (Recommended)(`cargo r --release --example fps`)
   - (+) Good abstraction layer
   - (+) Modifiable at runtime
   - Logic abstracted away, not hard to understand nor modify
-- Custom (`cargo r --release --example custom_x`)
+- Custom (`cargo r --release --example custom_fps`)
   - (+) Full control of every aspect
   - (-) No abstraction
-  - Useful if you want to implement your own tightly integrated stuff 
+  - Useful if you want to implement your own tightly integrated functionality/plugin 
 
 ## Support
 [![Bevy tracking](https://img.shields.io/badge/Bevy%20tracking-released%20version-lightblue)](https://github.com/bevyengine/bevy/blob/main/docs/plugins_guidelines.md#main-branch-tracking)

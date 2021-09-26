@@ -6,8 +6,8 @@ use dolly::glam::Vec3;
 use dolly::prelude::CameraRig;
 
 use crate::cam_ctrl::DollyCursorGrab;
-use crate::drivers::fps::{Fps, FpsSettings, Vec3KeyMapWithBoost};
-use crate::{CustomBuild, Transform2Bevy, Transform2Dolly};
+use crate::drivers::fps::{Fps, Vec3KeyMapWithBoost};
+use crate::{Transform2Bevy, Transform2Dolly};
 
 pub struct DollyFps;
 impl Plugin for DollyFps {
@@ -57,12 +57,10 @@ fn setup(mut commands: Commands) {
 
     commands.spawn().insert(
         CameraRig::builder()
-            .with_rig::<Fps, FpsSettings>(FpsSettings {
-                transform: dolly::transform::Transform {
-                    position: Vec3::from_slice(&translation),
-                    rotation,
-                },
-            })
+            .with(Fps::init(dolly::transform::Transform {
+                position: Vec3::from_slice(&translation),
+                rotation,
+            }))
             .build(),
     );
 

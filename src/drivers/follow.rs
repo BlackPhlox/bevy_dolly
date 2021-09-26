@@ -3,9 +3,10 @@ use dolly::{
     glam::Vec3,
     prelude::{Arm, CameraRig, LookAt, Position, Rotation, Smooth},
     rig::RigUpdateParams,
+    DollyDriver,
 };
 
-#[derive(Debug)]
+#[derive(Debug, DollyDriver)]
 pub struct Follow {
     pub rig: CameraRig,
 }
@@ -32,19 +33,5 @@ impl Follow {
         self.rig.driver_mut::<Position>().position = position;
         self.rig.driver_mut::<Rotation>().rotation = rotation;
         self.rig.driver_mut::<LookAt>().target = target;
-    }
-}
-
-impl RigDriver for Follow {
-    fn update(&mut self, params: RigUpdateParams) -> dolly::transform::Transform {
-        let t = self.rig.update(params.delta_time_seconds);
-        dolly::transform::Transform {
-            position: t.position,
-            rotation: t.rotation,
-        }
-    }
-
-    fn as_any_mut(&mut self) -> &mut dyn std::any::Any {
-        self
     }
 }

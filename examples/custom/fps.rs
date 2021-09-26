@@ -1,6 +1,6 @@
 use bevy::input::mouse::MouseMotion;
 use bevy::prelude::*;
-use bevy_dolly::{cam_ctrl::DollyCursorGrab, Transform2Bevy, Transform2Dolly, ZeroYRotation};
+use bevy_dolly::{cam_ctrl::DollyCursorGrab, Transform2Bevy, Transform2Dolly, ZeroedYRotation};
 use dolly::glam::Vec3;
 use dolly::prelude::{CameraRig, Position, Rotation, Smooth, YawPitch};
 
@@ -127,7 +127,7 @@ fn update_camera(
 
     let mut rig = query.q1_mut().single_mut().unwrap();
 
-    let move_vec = rig.final_transform.rotation.zero_y_rotation()
+    let move_vec = rig.final_transform.rotation.zeroed_y_rotation()
         * move_vec.clamp_length_max(1.0)
         * boost_mult.powf(boost);
 

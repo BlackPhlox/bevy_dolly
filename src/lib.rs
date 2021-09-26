@@ -1,5 +1,3 @@
-use std::fmt::Debug;
-
 use bevy::{
     app::PluginGroupBuilder,
     input::Input,
@@ -8,10 +6,8 @@ use bevy::{
 use cam_ctrl::DollyCamCtrl;
 use ctrl::DollyDefaultCtrl;
 use dolly::{
-    driver::RigDriver,
     glam::{EulerRot, Quat, Vec3},
-    prelude::{CameraRig, YawPitch},
-    rig::{CameraRigBuilder, RigUpdateParams},
+    prelude::YawPitch,
 };
 
 pub mod cam_ctrl;
@@ -90,12 +86,12 @@ impl UpdateYawPitch for dolly::drivers::Rotation {
     }
 }
 
-pub trait ZeroYRotation {
-    fn zero_y_rotation(&self) -> dolly::glam::Quat;
+pub trait ZeroedYRotation {
+    fn zeroed_y_rotation(&self) -> dolly::glam::Quat;
 }
 
-impl ZeroYRotation for dolly::glam::Quat {
-    fn zero_y_rotation(&self) -> dolly::glam::Quat {
+impl ZeroedYRotation for dolly::glam::Quat {
+    fn zeroed_y_rotation(&self) -> dolly::glam::Quat {
         let (mut euler, a) = self.to_axis_angle();
         euler.x = 0.;
         euler.z = 0.;
@@ -140,70 +136,5 @@ impl AnyPressed for Res<'_, Input<KeyCode>> {
             }
         }
         false
-    }
-}
-
-#[derive(Debug)]
-pub struct SubRig<T> {
-    pub driver: T,
-    pub rig: CameraRig,
-}
-
-impl<T> RigDriver for SubRig<T>
-where
-    T: 'static + Debug,
-{
-    fn update(&mut self, params: RigUpdateParams) -> dolly::transform::Transform {
-        let t = self.rig.update(params.delta_time_seconds);
-        dolly::transform::Transform {
-            position: t.position,
-            rotation: t.rotation,
-        }
-    }
-
-    fn as_any_mut(&mut self) -> &mut dyn std::any::Any {
-        self
-    }
-}
-impl<T: WithRigSettings<S>, S> WithRigSettings<S> for SubRig<T> {
-    fn init(settings: S) -> Self {
-        SubRig {
-            driver: T::init(settings),
-            rig: CameraRig::builder().build(),
-        }
-    }
-}
-
-pub trait WithRigSettings<S> {
-    fn init(settings: S) -> Self;
-}
-
-//V1
-pub trait CustomBuild {
-    fn with_rig<T, S>(self, settings: S) -> CameraRigBuilder
-    where
-        T: RigDriver + WithRigSettings<S> + Sync + Send;
-}
-impl CustomBuild for CameraRigBuilder {
-    fn with_rig<T, S>(self, settings: S) -> CameraRigBuilder
-    where
-        T: RigDriver + WithRigSettings<S> + Sync + Send,
-    {
-        self.with(T::init(settings))
-    }
-}
-//V2
-pub trait SubRigBuild<S> {
-    fn with_sub_rig<T>(self, settings: S) -> CameraRigBuilder
-    where
-        T: 'static + Debug + WithRigSettings<S> + Sync + Send;
-}
-
-impl<S> SubRigBuild<S> for CameraRigBuilder {
-    fn with_sub_rig<T>(self, settings: S) -> CameraRigBuilder
-    where
-        T: 'static + Debug + WithRigSettings<S> + Sync + Send,
-    {
-        self.with(SubRig::<T>::init(settings))
     }
 }
