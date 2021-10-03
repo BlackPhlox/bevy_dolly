@@ -21,7 +21,7 @@ exclude = [
 name = "bevy_dolly"
 
 [dependencies]
-dolly = { git = "https://github.com/BlackPhlox/dolly.git" } #{ path = "dolly" } #{ git = "https://github.com/BlackPhlox/dolly.git" } # { path = "dolly" } "0.1.2"
+dolly = { git = "https://github.com/BlackPhlox/dolly.git" } #{ git = "https://github.com/BlackPhlox/dolly.git" } # { path = "dolly" } "0.1.2"
 
 [dependencies.bevy]
 version = "0.5"
@@ -78,3 +78,7 @@ path = "examples/custom/switch.rs"
 [[example]]
 name = "custom_turret"
 path = "examples/custom/turret.rs"
+
+[[example]]
+name = "custom_turret_follow"
+path = "examples/custom/turret_follow.rs"

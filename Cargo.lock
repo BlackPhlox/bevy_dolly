@@ -1026,16 +1026,16 @@ dependencies = [
 [[package]]
 name = "dolly"
 version = "0.1.2"
-source = "git+https://github.com/BlackPhlox/dolly.git#819d943734d629d1d55c90fb953e92ec439c6c27"
+source = "git+https://github.com/BlackPhlox/dolly.git#eb2a002b03faf91a3b0bba56dd34059a9a614d60"
 dependencies = [
  "dolly_derive",
- "glam 0.17.3",
+ "glam 0.15.2",
 ]
 
 [[package]]
 name = "dolly_derive"
 version = "0.1.0"
-source = "git+https://github.com/BlackPhlox/dolly.git#819d943734d629d1d55c90fb953e92ec439c6c27"
+source = "git+https://github.com/BlackPhlox/dolly.git#eb2a002b03faf91a3b0bba56dd34059a9a614d60"
 dependencies = [
  "quote",
  "syn",
@@ -1380,12 +1380,6 @@ name = "glam"
 version = "0.15.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3abb554f8ee44336b72d522e0a7fe86a29e09f839a36022fa869a7dfe941a54b"
-
-[[package]]
-name = "glam"
-version = "0.17.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e01732b97afd8508eee3333a541b9f7610f454bb818669e66e90f5f57c93a776"
 
 [[package]]
 name = "glow"
