@@ -1,9 +1,10 @@
 use bevy::prelude::*;
 use bevy_dolly::ctrl::CtrlMove;
-use bevy_dolly::{DollyPlugins, Transform2Bevy, Transform2Dolly};
+use bevy_dolly::{CameraRigComponent, DollyPlugins, Transform2Bevy, Transform2Dolly};
 use dolly::glam::Vec3;
 use dolly::prelude::{Arm, CameraRig, LookAt, Position, Rotation, Smooth};
 
+#[derive(Component)]
 struct MainCamera;
 
 #[derive(Clone, Eq, PartialEq, Debug, Hash)]
@@ -13,19 +14,19 @@ enum Camera {
 }
 
 fn main() {
-    App::build()
+    App::new()
         .insert_resource(Msaa { samples: 4 })
         .add_plugins(DefaultPlugins)
         .add_plugins(DollyPlugins)
-        .add_startup_system(setup.system())
-        .add_system(rotator_system.system())
+        .add_startup_system(setup)
+        .add_system(rotator_system)
         .add_state(Camera::FollowSheep)
-        .add_system(switch_camera_rig.system())
+        .add_system(switch_camera_rig_system)
         .add_system_set(
-            SystemSet::on_update(Camera::FollowPlayer).with_system(follow_player.system()),
+            SystemSet::on_update(Camera::FollowPlayer).with_system(follow_player_system),
         )
         .add_system_set(
-            SystemSet::on_update(Camera::FollowSheep).with_system(follow_sheep.system()),
+            SystemSet::on_update(Camera::FollowSheep).with_system(follow_sheep_system),
         )
         .run();
 }
@@ -60,7 +61,7 @@ fn setup(
         .insert(Rotates);
 
     commands.spawn().insert(
-        CameraRig::builder()
+        CameraRigComponent(CameraRig::builder()
             .with(Position::new(start_pos))
             .with(Rotation::new(dolly::glam::Quat::IDENTITY))
             .with(Smooth::new_position(1.25).predictive(true))
@@ -71,7 +72,7 @@ fn setup(
                     .tracking_smoothness(1.25)
                     .tracking_predictive(true),
             )
-            .build(),
+            .build()) ,
     );
 
     commands
@@ -83,68 +84,71 @@ fn setup(
         .insert(MainCamera);
 
     // light
-    commands.spawn_bundle(LightBundle {
+    commands.spawn_bundle(PointLightBundle {
         transform: Transform::from_xyz(4.0, 8.0, 4.0),
         ..Default::default()
     });
 }
 
-fn follow_player(
+#[allow(clippy::type_complexity)]
+fn follow_player_system(
     time: Res<Time>,
     mut query: QuerySet<(
-        Query<(&mut Transform, With<MainCamera>)>,
-        Query<(&mut Transform, With<CtrlMove>)>,
-        Query<&mut CameraRig>,
+        QueryState<&mut Transform, With<MainCamera>>,
+        QueryState<&mut Transform, With<CtrlMove>>,
+        QueryState<&mut CameraRigComponent>,
     )>,
 ) {
-    let player = query.q1_mut().single_mut().unwrap().0;
+    let mut q1 = query.q1();
+    let player = q1.single_mut();
 
     let player_dolly = player.transform_2_dolly();
 
-    let mut rig = query.q2_mut().single_mut().unwrap();
+    let mut q2 = query.q2();
+    let mut rig = q2.single_mut();
 
-    rig.driver_mut::<Position>().position = player_dolly.position;
-    rig.driver_mut::<Rotation>().rotation = player_dolly.rotation;
-    rig.driver_mut::<LookAt>().target = player_dolly.position + Vec3::Y + Vec3::new(0., -1., 0.);
+    rig.0.driver_mut::<Position>().position = player_dolly.position;
+    rig.0.driver_mut::<Rotation>().rotation = player_dolly.rotation;
+    rig.0.driver_mut::<LookAt>().target = player_dolly.position + Vec3::Y + Vec3::new(0., -1., 0.);
 
-    let transform = rig.update(time.delta_seconds());
+    let transform = rig.0.update(time.delta_seconds());
 
     query
-        .q0_mut()
+        .q0()
         .single_mut()
-        .unwrap()
-        .0
         .transform_2_bevy(transform);
 }
 
-fn follow_sheep(
+#[allow(clippy::type_complexity)]
+fn follow_sheep_system(
     time: Res<Time>,
     mut query: QuerySet<(
-        Query<(&mut Transform, With<MainCamera>)>,
-        Query<(&mut Transform, With<Rotates>)>,
-        Query<&mut CameraRig>,
+        QueryState<&mut Transform, With<MainCamera>>,
+        QueryState<&mut Transform, With<Rotates>>,
+        QueryState<&mut CameraRigComponent>,
     )>,
 ) {
-    let player = query.q1_mut().single_mut().unwrap().0;
+    let mut q1 = query.q1();
+    let player = q1.single_mut();
 
     let player_dolly = player.transform_2_dolly();
 
-    let mut rig = query.q2_mut().single_mut().unwrap();
+    let mut q2 = query.q2();
+    let mut rig = q2.single_mut();
 
-    rig.driver_mut::<Position>().position = player_dolly.position;
-    rig.driver_mut::<Rotation>().rotation = player_dolly.rotation;
-    rig.driver_mut::<LookAt>().target = player_dolly.position + Vec3::Y;
+    rig.0.driver_mut::<Position>().position = player_dolly.position;
+    rig.0.driver_mut::<Rotation>().rotation = player_dolly.rotation;
+    rig.0.driver_mut::<LookAt>().target = player_dolly.position + Vec3::Y;
 
-    let transform = rig.update(time.delta_seconds());
+    let transform = rig.0.update(time.delta_seconds());
 
     query
-        .q0_mut()
+        .q0()
         .single_mut()
-        .unwrap()
-        .0
         .transform_2_bevy(transform);
 }
 
+#[derive(Component)]
 struct Rotates;
 
 fn rotator_system(time: Res<Time>, mut query: Query<&mut Transform, With<Rotates>>) {
@@ -156,7 +160,7 @@ fn rotator_system(time: Res<Time>, mut query: Query<&mut Transform, With<Rotates
 }
 
 #[allow(unused_must_use)]
-fn switch_camera_rig(mut camera: ResMut<State<Camera>>, keyboard_input: Res<Input<KeyCode>>) {
+fn switch_camera_rig_system(mut camera: ResMut<State<Camera>>, keyboard_input: Res<Input<KeyCode>>) {
     if keyboard_input.just_pressed(KeyCode::C) {
         let result = if camera.current().eq(&Camera::FollowPlayer) {
             Camera::FollowSheep

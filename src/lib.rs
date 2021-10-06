@@ -1,16 +1,13 @@
-use bevy::{
-    app::PluginGroupBuilder,
-    prelude::{AppBuilder, Mut, Plugin, PluginGroup, Transform},
-};
+use bevy::{app::PluginGroupBuilder, prelude::{App, Component, Mut, Plugin, PluginGroup, Transform}};
 use ctrl::DollyCtrl;
-use dolly::glam::{Quat, Vec3};
+use dolly::{glam::{Quat, Vec3}, prelude::CameraRig};
 
 mod cone;
 pub mod ctrl;
 
 pub struct Dolly;
 impl Plugin for Dolly {
-    fn build(&self, _app: &mut AppBuilder) {}
+    fn build(&self, _app: &mut App) {}
 }
 
 pub struct DollyPlugins;
@@ -61,3 +58,7 @@ impl Transform2Dolly for Transform {
         }
     }
 }
+
+/// Wrapper for CameraRig so we can derive Component
+#[derive(Component)]
+pub struct CameraRigComponent(pub CameraRig);
