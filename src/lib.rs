@@ -5,9 +5,7 @@ mod util;
 
 pub use ctrl::*;
 pub use drivers::*;
-
 use bevy::prelude::*;
-
 
 pub struct DollyPlugin;
 impl Plugin for DollyPlugin {
@@ -17,19 +15,15 @@ impl Plugin for DollyPlugin {
 }
 
 /// A chain of drivers, calculating displacements, and animating in succession.
-#[derive(Component)]
+#[derive(Component, Default)]
 pub struct CameraRig {
     pub drivers: Vec<Box<dyn RigDriver + Send + Sync + 'static>>,
     pub final_transform: Transform,
 }
 
-// Prevents user calls to `RigDriver::update`. All updates must come from `CameraRig::update`.
-
-///
+/// Prevents user calls to `RigDriver::update`. All updates must come from `CameraRig::update`.
 pub struct RigUpdateParams<'a> {
-    ///
     pub parent: &'a Transform,
-    ///
     pub delta_time_seconds: f32,
 }
 
@@ -78,7 +72,7 @@ impl CameraRig {
     }
 }
 
-///
+/// Lets you describe the Camera behavior
 pub struct CameraRigBuilder {
     drivers: Vec<Box<dyn RigDriver + Sync + Send>>,
 }

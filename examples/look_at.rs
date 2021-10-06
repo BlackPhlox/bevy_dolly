@@ -1,9 +1,6 @@
 use bevy::prelude::*;
 use bevy_dolly::*;
 
-#[derive(Component)]
-struct MainCamera;
-
 fn main() {
     App::new()
         .insert_resource(Msaa { samples: 4 })
@@ -23,7 +20,6 @@ fn setup(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
-    
 ) {
     // plane
     commands.spawn_bundle(PbrBundle {
@@ -32,45 +28,32 @@ fn setup(
         ..Default::default()
     });
 
-    let _start_pos = Transform::from_translation(Vec3::new(0., 0., 2.));
-
-    /*
-    config.entity = Some(
-        commands
-            .spawn_bundle((
-                Transform {
-                    translation: Vec3::new(0., 0.2, 0.),
-                    ..Default::default()
-                },
-                GlobalTransform::identity(),
-            ))
-            .with_children(|cell| {
-                cell.spawn_scene(asset_server.load("sheep.gltf#Scene0"));
-            })
-            .insert(Player)
-            .id(),
-    );
-    */
-
-    commands.spawn().insert(
-        CameraRig::builder()
-            .with(Position::new(Vec3::Y * 3.0))
-            .with(LookAt::new(
-                /*start_pos.transform_2_dolly().position*/
-                Vec3::new(0., 0., 2.),
-            ))
-            .build(),
-    );
+    config.entity = commands
+        .spawn_bundle((
+            Transform {
+                translation: Vec3::new(0., 0.2, 0.),
+                ..Default::default()
+            },
+            GlobalTransform::identity(),
+        ))
+        .with_children(|cell| {
+            cell.spawn_scene(asset_server.load("sheep.gltf#Scene0"));
+        })
+        .insert(Player)
+        .id();
 
     commands
         .spawn_bundle(PerspectiveCameraBundle {
-            transform: Transform::from_xyz(-2.0, 1., 2.0).looking_at(
-                /*start_pos.translation*/ Vec3::new(0., 0., 0.),
-                Vec3::Y,
-            ),
+            transform: Transform::from_xyz(-2.0, 1., 2.0)
+                .looking_at(Vec3::new(0., 0., 0.), Vec3::Y),
             ..Default::default()
         })
-        .insert(MainCamera);
+        .insert(
+            CameraRig::builder()
+                .with(Position::new(Vec3::Y * 3.0))
+                .with(LookAt::new(Vec3::new(0., 0., 2.)))
+                .build(),
+        );
 
     // light
     commands.spawn_bundle(PointLightBundle {
@@ -82,7 +65,7 @@ fn setup(
 fn update_camera_system(
     time: Res<Time>,
     mut query: QuerySet<(
-        QueryState<&mut Transform, With<MainCamera>>,
+        QueryState<(&mut Transform, CameraRig)>,
         QueryState<&mut Transform, With<CtrlMove>>,
         QueryState<&mut CameraRig>,
     )>,

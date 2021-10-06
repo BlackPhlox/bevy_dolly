@@ -75,10 +75,9 @@ impl Default for CtrlConfig {
 }
 
 fn use_ctrl(config: Res<CtrlConfig>) -> ShouldRun {
-    if config.enabled {
-        ShouldRun::Yes
-    } else {
-        ShouldRun::No
+    match config.enabled {
+        true => ShouldRun::Yes,
+        false => ShouldRun::No
     }
 }
 
@@ -88,11 +87,6 @@ fn ctrl_setup(
     mut materials: ResMut<Assets<StandardMaterial>>,
     config: Res<CtrlConfig>,
 ) {
-    let cone_mesh = meshes.add(Mesh::from(Cone {
-        height: 0.2,
-        radius: 0.1,
-        subdivisions: 5,
-    }));
 
     let player_mat = materials.add(StandardMaterial {
         base_color: Color::rgba(1.0, 0.0, 0.0, 0.5),
@@ -111,7 +105,11 @@ fn ctrl_setup(
         ))
         .with_children(|cell| {
             cell.spawn_bundle(PbrBundle {
-                mesh: cone_mesh.clone(),
+                mesh: meshes.add(Mesh::from(Cone {
+                    height: 0.2,
+                    radius: 0.1,
+                    subdivisions: 5,
+                })),
                 material: player_mat.clone(),
                 transform: Transform::from_rotation(Quat::from_rotation_x(
                     std::f32::consts::FRAC_PI_2,
