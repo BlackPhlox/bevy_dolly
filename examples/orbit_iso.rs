@@ -50,13 +50,13 @@ fn setup(
         })
         .id();
 
-    commands.spawn().insert(
-        CameraRigComponent(CameraRig::builder()
+    commands.spawn().insert(CameraRigComponent(
+        CameraRig::builder()
             .with(YawPitch::new().yaw_degrees(45.0).pitch_degrees(-30.0))
             .with(Smooth::new_rotation(1.5))
             .with(Arm::new(Vec3::Z * 4.0))
-            .build()),
-    );
+            .build(),
+    ));
 
     let mut camera = OrthographicCameraBundle::new_3d();
     camera.orthographic_projection.scale = 3.0;
@@ -120,7 +120,7 @@ fn update_camera_system(
     }
 
     let transform = rig.0.update(time.delta_seconds());
-    
+
     let mut q0 = query.q0();
     let mut cam = q0.single_mut();
 

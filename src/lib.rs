@@ -1,73 +1,104 @@
 mod cone;
 pub mod ctrl;
+pub mod drivers;
+mod util;
 
-use bevy::{app::PluginGroupBuilder, prelude::{App, Component, Mut, Plugin, PluginGroup, Transform}};
+use drivers::*;
+
+use bevy::prelude::*;
 use ctrl::DollyCtrl;
-pub use dolly::prelude::*;
-use dolly::glam::{Quat, Vec3};
 
-pub struct Dolly;
-impl Plugin for Dolly {
-    fn build(&self, _app: &mut App) {}
-}
-
-pub struct DollyPlugins;
-impl PluginGroup for DollyPlugins {
-    fn build(&mut self, group: &mut PluginGroupBuilder) {
-        group.add(Dolly).add(DollyCtrl);
+pub struct DollyPlugin;
+impl Plugin for DollyPlugin {
+    fn build(&self, app: &mut App) {
+        app.add_plugin(DollyCtrl);
     }
 }
 
-pub trait Transform2Bevy {
-    fn transform_2_bevy(&mut self, transform: dolly::transform::Transform);
-}
-
-impl Transform2Bevy for Mut<'_, Transform> {
-    fn transform_2_bevy(&mut self, transform: dolly::transform::Transform) {
-        let (translation, rotation) = transform.into_position_rotation();
-        self.translation = bevy::math::Vec3::new(translation.x, translation.y, translation.z);
-        self.rotation = bevy::math::Quat::from_xyzw(rotation.x, rotation.y, rotation.z, rotation.w);
-    }
-}
-
-impl Transform2Bevy for Transform {
-    fn transform_2_bevy(&mut self, transform: dolly::transform::Transform) {
-        let (translation, rotation) = transform.into_position_rotation();
-        self.translation = bevy::math::Vec3::new(translation.x, translation.y, translation.z);
-        self.rotation = bevy::math::Quat::from_xyzw(rotation.x, rotation.y, rotation.z, rotation.w);
-    }
-}
-
-pub trait Transform2DollyMut {
-    fn transform_2_dolly_mut(&self) -> dolly::transform::Transform;
-}
-
-impl Transform2DollyMut for Mut<'_, Transform> {
-    fn transform_2_dolly_mut(&self) -> dolly::transform::Transform {
-        let t = self.translation;
-        let r = self.rotation;
-        dolly::transform::Transform {
-            position: Vec3::new(t.x, t.y, t.z),
-            rotation: Quat::from_xyzw(r.x, r.y, r.z, r.w),
-        }
-    }
-}
-
-pub trait Transform2Dolly {
-    fn transform_2_dolly(&self) -> dolly::transform::Transform;
-}
-
-impl Transform2Dolly for Transform {
-    fn transform_2_dolly(&self) -> dolly::transform::Transform {
-        let t = self.translation;
-        let r = self.rotation;
-        dolly::transform::Transform {
-            position: Vec3::new(t.x, t.y, t.z),
-            rotation: Quat::from_xyzw(r.x, r.y, r.z, r.w),
-        }
-    }
-}
-
-/// Wrapper for CameraRig so we can derive Component
+/// A chain of drivers, calculating displacements, and animating in succession.
 #[derive(Component)]
-pub struct CameraRigComponent(pub CameraRig);
+pub struct CameraRig {
+    pub drivers: Vec<Box<dyn RigDriver + Send + Sync + 'static>>,
+    pub final_transform: Transform,
+}
+
+// Prevents user calls to `RigDriver::update`. All updates must come from `CameraRig::update`.
+
+///
+pub struct RigUpdateParams<'a> {
+    ///
+    pub parent: &'a Transform,
+    ///
+    pub delta_time_seconds: f32,
+}
+
+impl CameraRig {
+    /// Returns the first driver of the matching type. Panics if no such driver is present.
+    pub fn driver_mut<T: RigDriver>(&mut self) -> &mut T {
+        self.try_driver_mut::<T>().unwrap_or_else(|| {
+            panic!(
+                "No {} driver found in the CameraRig",
+                std::any::type_name::<T>()
+            )
+        })
+    }
+
+    /// Returns the Some with the first driver of the matching type, or `None` if no such driver is present.
+    pub fn try_driver_mut<T: RigDriver>(&mut self) -> Option<&mut T> {
+        self.drivers
+            .iter_mut()
+            .find_map(|driver| driver.as_mut().as_any_mut().downcast_mut::<T>())
+    }
+
+    /// Runs all the drivers in sequence, animating the rig, and producing a final transform of the camera.
+    ///
+    /// Camera rigs are approximately framerate independent, so `update` can be called at any frequency.
+    pub fn update(&mut self, delta_time_seconds: f32) -> Transform {
+        let mut parent_transform = Transform::default();
+
+        for driver in self.drivers.iter_mut() {
+            let transform = driver.update(RigUpdateParams {
+                parent: &parent_transform,
+                delta_time_seconds,
+            });
+
+            parent_transform = transform;
+        }
+
+        self.final_transform = parent_transform;
+        self.final_transform
+    }
+
+    /// Use this to make a new rig
+    pub fn builder() -> CameraRigBuilder {
+        CameraRigBuilder {
+            drivers: Default::default(),
+        }
+    }
+}
+
+///
+pub struct CameraRigBuilder {
+    drivers: Vec<Box<dyn RigDriver + Sync + Send>>,
+}
+
+impl CameraRigBuilder {
+    ///
+    pub fn with(mut self, driver: impl RigDriver + Sync + Send) -> Self {
+        self.drivers.push(Box::new(driver));
+        self
+    }
+
+    ///
+    pub fn build(self) -> CameraRig {
+        let mut rig = CameraRig {
+            drivers: self.drivers,
+            // Initialize with a dummy identity transform. Will be overridden in a moment.
+            final_transform: Transform::default(),
+        };
+
+        // Update once to find the final transform
+        rig.update(0.0);
+        rig
+    }
+}

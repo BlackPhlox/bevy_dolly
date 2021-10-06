@@ -1,4 +1,14 @@
-use bevy::{core::Time, ecs::schedule::ShouldRun, input::Input, math::{Quat, Vec3}, pbr::PbrBundle, prelude::{App, Assets, BuildChildren, Color, Commands, Component, Entity, GlobalTransform, KeyCode, Mesh, Plugin, Query, Res, ResMut, StandardMaterial, SystemSet, Transform, With}};
+use bevy::{
+    core::Time,
+    ecs::schedule::ShouldRun,
+    input::Input,
+    math::{Quat, Vec3},
+    pbr::PbrBundle,
+    prelude::{
+        App, Assets, BuildChildren, Color, Commands, Component, Entity, GlobalTransform, KeyCode,
+        Mesh, Plugin, Query, Res, ResMut, StandardMaterial, SystemSet, Transform, With,
+    },
+};
 
 use crate::cone::Cone;
 
@@ -56,7 +66,7 @@ impl Default for CtrlConfig {
     fn default() -> Self {
         CtrlConfig {
             enabled: true,
-            position: bevy::math::Vec3::new(0., 0.5, 0.),
+            position: Vec3::new(0., 0.5, 0.),
             speed: 4.,
             map: WASDKeyMap::default(),
             entity: None,

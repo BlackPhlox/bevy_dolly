@@ -55,15 +55,15 @@ fn setup(
     );
     */
 
-    commands.spawn().insert(
-        CameraRigComponent( CameraRig::builder()
+    commands.spawn().insert(CameraRigComponent(
+        CameraRig::builder()
             .with(Position::new(Vec3::Y * 3.0))
             .with(LookAt::new(
                 /*start_pos.transform_2_dolly().position*/
                 dolly::glam::Vec3::new(0., 0., 2.),
             ))
-            .build()),
-    );
+            .build(),
+    ));
 
     commands
         .spawn_bundle(PerspectiveCameraBundle {
@@ -92,18 +92,9 @@ fn update_camera_system(
 ) {
     let mut q1 = query.q1();
     let player = q1.single_mut();
-    query
-        .q2()
-        .single_mut()
-        .0
-        .driver_mut::<LookAt>()
-        .target = player.transform_2_dolly().position;
+    query.q2().single_mut().0.driver_mut::<LookAt>().target = player.transform_2_dolly().position;
 
-    let transform = query
-        .q2()
-        .single_mut()
-        .0
-        .update(time.delta_seconds());
+    let transform = query.q2().single_mut().0.update(time.delta_seconds());
 
     let mut q0 = query.q0();
     let mut cam = q0.single_mut();

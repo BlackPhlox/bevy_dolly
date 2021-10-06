@@ -42,13 +42,13 @@ fn setup(
         })
         .id();
 
-    commands.spawn().insert(
-        CameraRigComponent(CameraRig::builder()
+    commands.spawn().insert(CameraRigComponent(
+        CameraRig::builder()
             .with(YawPitch::new().yaw_degrees(45.0).pitch_degrees(-30.0))
             .with(Smooth::new_rotation(1.5))
             .with(Arm::new(Vec3::Z * 4.0))
-            .build()),
-    );
+            .build(),
+    ));
 
     commands
         .spawn_bundle(PerspectiveCameraBundle {
@@ -75,7 +75,7 @@ fn update_camera_system(
 ) {
     let mut q1 = query.q1();
     let mut rig = q1.single_mut();
-    
+
     let camera_driver = rig.0.driver_mut::<YawPitch>();
 
     if keys.just_pressed(KeyCode::Z) {

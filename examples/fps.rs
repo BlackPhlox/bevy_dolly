@@ -46,24 +46,23 @@ fn setup(
         .id();
 
     let translation = [-2.0f32, 2.0f32, 5.0f32];
-    let transform =
-        Transform::from_translation(bevy::math::Vec3::from_slice(&translation))
-            .looking_at(bevy::math::Vec3::ZERO, bevy::math::Vec3::Y);
+    let transform = Transform::from_translation(bevy::math::Vec3::from_slice(&translation))
+        .looking_at(bevy::math::Vec3::ZERO, bevy::math::Vec3::Y);
 
     let rotation = transform.transform_2_dolly().rotation;
     let mut yaw_pitch = YawPitch::new();
     yaw_pitch.set_rotation_quat(rotation);
 
-    commands.spawn().insert(
-        CameraRigComponent(CameraRig::builder()
+    commands.spawn().insert(CameraRigComponent(
+        CameraRig::builder()
             .with(Position {
                 position: Vec3::from_slice(&translation),
             })
             .with(Rotation { rotation })
             .with(yaw_pitch)
             .with(Smooth::new_position_rotation(1.0, 0.1))
-            .build()),
-    );
+            .build(),
+    ));
 
     commands
         .spawn_bundle(PerspectiveCameraBundle {
@@ -163,7 +162,8 @@ fn update_camera_system(
             -0.1 * delta.x * sensitivity.x,
             -0.1 * delta.y * sensitivity.y,
         );
-        rig.0.driver_mut::<Position>()
+        rig.0
+            .driver_mut::<Position>()
             .translate(move_vec * time_delta_seconds * 10.0);
     }
 

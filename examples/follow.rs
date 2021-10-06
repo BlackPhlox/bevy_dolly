@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use bevy_dolly::{Transform2Bevy, Transform2Dolly, CameraRigComponent};
+use bevy_dolly::{CameraRigComponent, Transform2Bevy, Transform2Dolly};
 use dolly::glam::Vec3;
 use dolly::prelude::{Arm, CameraRig, LookAt, Position, Rotation, Smooth};
 
@@ -45,8 +45,8 @@ fn setup(
         })
         .insert(Rotates);
 
-    commands.spawn().insert(
-        CameraRigComponent(CameraRig::builder()
+    commands.spawn().insert(CameraRigComponent(
+        CameraRig::builder()
             .with(Position::new(start_pos))
             .with(Rotation::new(dolly::glam::Quat::IDENTITY))
             .with(Smooth::new_position(1.25).predictive(true))
@@ -57,8 +57,8 @@ fn setup(
                     .tracking_smoothness(1.25)
                     .tracking_predictive(true),
             )
-            .build()),
-    );
+            .build(),
+    ));
 
     commands
         .spawn_bundle(PerspectiveCameraBundle {
@@ -84,7 +84,6 @@ fn update_camera_system(
         QueryState<&mut CameraRigComponent>,
     )>,
 ) {
-
     let mut q1 = query.q1();
     let player = q1.single_mut();
 
@@ -98,9 +97,7 @@ fn update_camera_system(
 
     let transform = rig.0.update(time.delta_seconds());
 
-    query.q0()
-        .single_mut()
-        .transform_2_bevy(transform);
+    query.q0().single_mut().transform_2_bevy(transform);
 }
 
 #[derive(Component)]
