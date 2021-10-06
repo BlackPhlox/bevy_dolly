@@ -1,7 +1,12 @@
 use bevy::{app::PluginGroupBuilder, prelude::{App, Component, Mut, Plugin, PluginGroup, Transform}};
 use ctrl::DollyCtrl;
-use dolly::{glam::{Quat, Vec3} };
-pub use dolly::prelude::*;
+use dolly::{glam::{Quat, Vec3}, prelude::CameraRig};
+
+pub mod prelude {
+    #[doc(hidden)]
+    pub use dolly::prelude::*;
+    pub use crate::{*};
+}
 
 mod cone;
 pub mod ctrl;
@@ -23,6 +28,14 @@ pub trait Transform2Bevy {
 }
 
 impl Transform2Bevy for Mut<'_, Transform> {
+    fn transform_2_bevy(&mut self, transform: dolly::transform::Transform) {
+        let (translation, rotation) = transform.into_position_rotation();
+        self.translation = bevy::math::Vec3::new(translation.x, translation.y, translation.z);
+        self.rotation = bevy::math::Quat::from_xyzw(rotation.x, rotation.y, rotation.z, rotation.w);
+    }
+}
+
+impl Transform2Bevy for Transform {
     fn transform_2_bevy(&mut self, transform: dolly::transform::Transform) {
         let (translation, rotation) = transform.into_position_rotation();
         self.translation = bevy::math::Vec3::new(translation.x, translation.y, translation.z);
