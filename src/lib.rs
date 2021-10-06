@@ -3,13 +3,8 @@ pub mod ctrl;
 
 use bevy::{app::PluginGroupBuilder, prelude::{App, Component, Mut, Plugin, PluginGroup, Transform}};
 use ctrl::DollyCtrl;
-use dolly::{glam::{Quat, Vec3}, prelude::CameraRig};
-
-pub mod prelude {
-    pub use dolly::prelude::*;
-    pub use crate::{*, ctrl::*};
-}
-
+pub use dolly::prelude::*;
+use dolly::glam::{Quat, Vec3};
 
 pub struct Dolly;
 impl Plugin for Dolly {
