@@ -3,9 +3,8 @@ use ctrl::DollyCtrl;
 use dolly::{glam::{Quat, Vec3}, prelude::CameraRig};
 
 pub mod prelude {
-    #[doc(hidden)]
     pub use dolly::prelude::*;
-    pub use crate::{*};
+    pub use crate::{*, ctrl::*};
 }
 
 mod cone;
