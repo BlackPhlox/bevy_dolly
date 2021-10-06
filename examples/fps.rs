@@ -2,9 +2,6 @@ use bevy::input::mouse::MouseMotion;
 use bevy::prelude::*;
 use bevy_dolly::*;
 
-#[derive(Component)]
-struct MainCamera;
-
 fn main() {
     App::new()
         .insert_resource(Msaa { samples: 4 })
@@ -43,10 +40,10 @@ fn setup(
         })
         .id();
 
-    let translation = [-2.0f32, 2.0f32, 5.0f32];
-    let transform = Transform::from_translation(Vec3::from_slice(&translation))
+    let transform = Transform::from_xyz(-2.0f32, 2.0f32, 5.0f32)
         .looking_at(Vec3::ZERO, Vec3::Y);
 
+    let translation = transform.translation;
     let rotation = transform.rotation;
     let mut yaw_pitch = YawPitch::new();
     yaw_pitch.set_rotation_quat(rotation);
@@ -59,14 +56,13 @@ fn setup(
         .insert(
             CameraRig::builder()
                 .with(Position {
-                    position: Vec3::from_slice(&translation),
+                    position: translation,
                 })
                 .with(Rotation { rotation })
                 .with(yaw_pitch)
                 .with(Smooth::new_position_rotation(1.0, 0.1))
                 .build(),
-        )
-        .insert(MainCamera);
+        );
 
     // light
     commands.spawn_bundle(PointLightBundle {
@@ -99,10 +95,7 @@ fn update_camera_system(
     keys: Res<Input<KeyCode>>,
     windows: Res<Windows>,
     mut mouse_motion_events: EventReader<MouseMotion>,
-    mut query: QuerySet<(
-        QueryState<&mut Transform, With<MainCamera>>,
-        QueryState<&mut CameraRig>,
-    )>,
+    mut query: Query<(&mut Transform, &mut CameraRig)>,
 ) {
     let time_delta_seconds: f32 = time.delta_seconds();
     let boost_mult = 5.0f32;
@@ -131,10 +124,9 @@ fn update_camera_system(
         move_vec.y -= 1.0;
     }
 
-    let boost: f32 = if keys.pressed(KeyCode::LShift) {
-        1.
-    } else {
-        0.
+    let boost: f32 = match keys.pressed(KeyCode::LShift) {
+        true => 1.,
+        false => 0.,
     };
 
     let mut delta = Vec2::ZERO;
@@ -142,29 +134,24 @@ fn update_camera_system(
         delta += event.delta;
     }
 
-    let mut q1 = query.q1();
-    let mut rig = q1.single_mut();
+    for (mut t, mut rig) in query.iter_mut() {
+        let (mut euler, a) = rig.final_transform.rotation.to_axis_angle();
+        euler.x = 0.;
+        euler.z = 0.;
+        rig.final_transform.rotation = Quat::from_axis_angle(euler, a);
 
-    let (mut euler, a) = rig.final_transform.rotation.to_axis_angle();
-    euler.x = 0.;
-    euler.z = 0.;
-    rig.final_transform.rotation = Quat::from_axis_angle(euler, a);
+        let move_vec =
+            rig.final_transform.rotation * move_vec.clamp_length_max(1.0) * boost_mult.powf(boost);
 
-    let move_vec =
-        rig.final_transform.rotation * move_vec.clamp_length_max(1.0) * boost_mult.powf(boost);
-
-    let window = windows.get_primary().unwrap();
-    if window.cursor_locked() {
-        rig.driver_mut::<YawPitch>().rotate_yaw_pitch(
-            -0.1 * delta.x * sensitivity.x,
-            -0.1 * delta.y * sensitivity.y,
-        );
-        rig.driver_mut::<Position>()
-            .translate(move_vec * time_delta_seconds * 10.0);
+        let window = windows.get_primary().unwrap();
+        if window.cursor_locked() {
+            rig.driver_mut::<YawPitch>().rotate_yaw_pitch(
+                -0.1 * delta.x * sensitivity.x,
+                -0.1 * delta.y * sensitivity.y,
+            );
+            rig.driver_mut::<Position>()
+                .translate(move_vec * time_delta_seconds * 10.0);
+        }
+        *t = rig.update(time_delta_seconds);
     }
-
-    let transform = rig.update(time_delta_seconds);
-    let mut q0 = query.q0();
-    let mut cam = q0.single_mut();
-    *cam = transform;
 }
