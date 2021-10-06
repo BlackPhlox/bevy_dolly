@@ -73,6 +73,7 @@ fn setup(
 }
 
 #[allow(unused_must_use)]
+#[allow(clippy::type_complexity)]
 fn update_camera_system(
     keys: Res<Input<KeyCode>>,
     time: Res<Time>,

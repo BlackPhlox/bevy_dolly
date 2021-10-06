@@ -92,7 +92,6 @@ fn update_camera_system(
 
     let mut q2 = query.q2();
     let mut rig = q2.single_mut();
-
     rig.0.driver_mut::<Position>().position = player_dolly.position;
     rig.0.driver_mut::<Rotation>().rotation = player_dolly.rotation;
     rig.0.driver_mut::<LookAt>().target = player_dolly.position + Vec3::Y;

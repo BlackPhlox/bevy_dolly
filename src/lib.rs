@@ -1,6 +1,7 @@
 use bevy::{app::PluginGroupBuilder, prelude::{App, Component, Mut, Plugin, PluginGroup, Transform}};
 use ctrl::DollyCtrl;
-use dolly::{glam::{Quat, Vec3}, prelude::CameraRig};
+use dolly::{glam::{Quat, Vec3} };
+pub use dolly::prelude::*;
 
 mod cone;
 pub mod ctrl;
