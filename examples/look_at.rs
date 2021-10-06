@@ -32,14 +32,14 @@ fn setup(
         ..Default::default()
     });
 
-    let _start_pos = Transform::from_translation(bevy::math::Vec3::new(0., 0., 2.));
+    let _start_pos = Transform::from_translation(Vec3::new(0., 0., 2.));
 
     /*
     config.entity = Some(
         commands
             .spawn_bundle((
                 Transform {
-                    translation: bevy::math::Vec3::new(0., 0.2, 0.),
+                    translation: Vec3::new(0., 0.2, 0.),
                     ..Default::default()
                 },
                 GlobalTransform::identity(),
@@ -65,8 +65,8 @@ fn setup(
     commands
         .spawn_bundle(PerspectiveCameraBundle {
             transform: Transform::from_xyz(-2.0, 1., 2.0).looking_at(
-                /*start_pos.translation*/ bevy::math::Vec3::new(0., 0., 0.),
-                bevy::math::Vec3::Y,
+                /*start_pos.translation*/ Vec3::new(0., 0., 0.),
+                Vec3::Y,
             ),
             ..Default::default()
         })

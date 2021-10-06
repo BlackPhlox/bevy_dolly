@@ -38,7 +38,7 @@ fn setup(
     commands
         .spawn_bundle((
             Transform {
-                translation: bevy::math::Vec3::new(0., 0.2, 0.),
+                translation: Vec3::new(0., 0.2, 0.),
                 ..Default::default()
             },
             GlobalTransform::identity(),
@@ -59,7 +59,7 @@ fn setup(
     let mut camera = OrthographicCameraBundle::new_3d();
     camera.orthographic_projection.scale = 3.0;
     camera.transform =
-        Transform::from_xyz(5.0, 5.0, 5.0).looking_at(bevy::math::Vec3::ZERO, bevy::math::Vec3::Y);
+        Transform::from_xyz(5.0, 5.0, 5.0).looking_at(Vec3::ZERO, Vec3::Y);
 
     commands.spawn_bundle(camera).insert(MainCamera);
 

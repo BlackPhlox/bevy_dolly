@@ -1,5 +1,6 @@
 use crate::{RigDriver, RigUpdateParams};
 use bevy::prelude::*;
+use bevy::math::*;
 
 /// Calculate camera rotation based on yaw and pitch angles.
 ///

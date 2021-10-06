@@ -44,29 +44,28 @@ fn setup(
         .id();
 
     let translation = [-2.0f32, 2.0f32, 5.0f32];
-    let transform = Transform::from_translation(bevy::math::Vec3::from_slice(&translation))
-        .looking_at(bevy::math::Vec3::ZERO, bevy::math::Vec3::Y);
+    let transform = Transform::from_translation(Vec3::from_slice(&translation))
+        .looking_at(Vec3::ZERO, Vec3::Y);
 
     let rotation = transform.rotation;
     let mut yaw_pitch = YawPitch::new();
     yaw_pitch.set_rotation_quat(rotation);
-
-    commands.spawn().insert(
-        CameraRig::builder()
-            .with(Position {
-                position: Vec3::from_slice(&translation),
-            })
-            .with(Rotation { rotation })
-            .with(yaw_pitch)
-            .with(Smooth::new_position_rotation(1.0, 0.1))
-            .build(),
-    );
 
     commands
         .spawn_bundle(PerspectiveCameraBundle {
             transform,
             ..Default::default()
         })
+        .insert(
+            CameraRig::builder()
+                .with(Position {
+                    position: Vec3::from_slice(&translation),
+                })
+                .with(Rotation { rotation })
+                .with(yaw_pitch)
+                .with(Smooth::new_position_rotation(1.0, 0.1))
+                .build(),
+        )
         .insert(MainCamera);
 
     // light
@@ -160,8 +159,7 @@ fn update_camera_system(
             -0.1 * delta.x * sensitivity.x,
             -0.1 * delta.y * sensitivity.y,
         );
-        rig
-            .driver_mut::<Position>()
+        rig.driver_mut::<Position>()
             .translate(move_vec * time_delta_seconds * 10.0);
     }
 

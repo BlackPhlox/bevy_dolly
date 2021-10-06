@@ -32,7 +32,7 @@ fn setup(
     commands
         .spawn_bundle((
             Transform {
-                translation: bevy::math::Vec3::new(0., 0.2, 0.),
+                translation: Vec3::new(0., 0.2, 0.),
                 ..Default::default()
             },
             GlobalTransform::identity(),
@@ -45,10 +45,11 @@ fn setup(
     commands
         .spawn_bundle(PerspectiveCameraBundle {
             transform: Transform::from_xyz(-2.0, 1., 5.0)
-                .looking_at(bevy::math::Vec3::ZERO, Vec3::Y),
+                .looking_at(Vec3::ZERO, Vec3::Y),
             ..Default::default()
         })
         .insert(
+                // TODO: can we have two smooths?
             CameraRig::builder()
                 .with(Position::new(start_pos))
                 .with(Rotation::new(Quat::IDENTITY))
@@ -62,6 +63,14 @@ fn setup(
                 )
                 .build(),
         );
+
+    commands.spawn_bundle(PbrBundle {
+        transform: Transform::from_xyz(0.0, -1.0, 0.0),
+        mesh: meshes.add(Mesh::from(shape::Capsule {
+            ..Default::default()
+        })),
+        ..Default::default()
+    });
 
     // light
     commands.spawn_bundle(PointLightBundle {
@@ -103,7 +112,7 @@ struct Rotates;
 
 fn rotator_system(time: Res<Time>, mut query: Query<&mut Transform, With<Rotates>>) {
     for mut transform in query.iter_mut() {
-        *transform = Transform::from_rotation(bevy::math::Quat::from_rotation_y(
+        *transform = Transform::from_rotation(Quat::from_rotation_y(
             (4.0 * std::f32::consts::PI / 20.0) * time.delta_seconds(),
         )) * *transform;
     }

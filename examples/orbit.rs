@@ -30,7 +30,7 @@ fn setup(
     commands
         .spawn_bundle((
             Transform {
-                translation: bevy::math::Vec3::new(0., 0.2, 0.),
+                translation: Vec3::new(0., 0.2, 0.),
                 ..Default::default()
             },
             GlobalTransform::identity(),
@@ -40,20 +40,19 @@ fn setup(
         })
         .id();
 
-    commands.spawn().insert(
-        CameraRig::builder()
-            .with(YawPitch::new().yaw_degrees(45.0).pitch_degrees(-30.0))
-            .with(Smooth::new_rotation(1.5))
-            .with(Arm::new(Vec3::Z * 4.0))
-            .build(),
-    );
-
     commands
         .spawn_bundle(PerspectiveCameraBundle {
             transform: Transform::from_xyz(-2.0, 10.0, 5.0)
-                .looking_at(bevy::math::Vec3::ZERO, bevy::math::Vec3::Y),
+                .looking_at(Vec3::ZERO, Vec3::Y),
             ..Default::default()
         })
+        .insert(
+            CameraRig::builder()
+                .with(YawPitch::new().yaw_degrees(45.0).pitch_degrees(-30.0))
+                .with(Smooth::new_rotation(1.5))
+                .with(Arm::new(Vec3::Z * 4.0))
+                .build(),
+        )
         .insert(MainCamera);
 
     // light
