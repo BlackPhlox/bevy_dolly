@@ -1,8 +1,5 @@
 use bevy::prelude::*;
-use bevy_dolly::{CameraRigComponent, Transform2Bevy, Transform2Dolly};
-use dolly::glam::Vec3;
-use dolly::prelude::{Arm, CameraRig, LookAt, Position, Rotation, Smooth};
-
+use bevy_dolly::*;
 #[derive(Component)]
 struct MainCamera;
 
@@ -45,28 +42,26 @@ fn setup(
         })
         .insert(Rotates);
 
-    commands.spawn().insert(CameraRigComponent(
-        CameraRig::builder()
-            .with(Position::new(start_pos))
-            .with(Rotation::new(dolly::glam::Quat::IDENTITY))
-            .with(Smooth::new_position(1.25).predictive(true))
-            .with(Arm::new(Vec3::new(0.0, 1.5, -3.5)))
-            .with(Smooth::new_position(2.5))
-            .with(
-                LookAt::new(start_pos + Vec3::Y)
-                    .tracking_smoothness(1.25)
-                    .tracking_predictive(true),
-            )
-            .build(),
-    ));
-
     commands
         .spawn_bundle(PerspectiveCameraBundle {
             transform: Transform::from_xyz(-2.0, 1., 5.0)
-                .looking_at(bevy::math::Vec3::ZERO, bevy::math::Vec3::Y),
+                .looking_at(bevy::math::Vec3::ZERO, Vec3::Y),
             ..Default::default()
         })
-        .insert(MainCamera);
+        .insert(
+            CameraRig::builder()
+                .with(Position::new(start_pos))
+                .with(Rotation::new(Quat::IDENTITY))
+                .with(Smooth::new_position(1.25).predictive(true))
+                .with(Arm::new(Vec3::new(0.0, 1.5, -3.5)))
+                .with(Smooth::new_position(2.5))
+                .with(
+                    LookAt::new(start_pos + Vec3::Y)
+                        .tracking_smoothness(1.25)
+                        .tracking_predictive(true),
+                )
+                .build(),
+        );
 
     // light
     commands.spawn_bundle(PointLightBundle {
@@ -79,25 +74,28 @@ fn setup(
 fn update_camera_system(
     time: Res<Time>,
     mut query: QuerySet<(
-        QueryState<&mut Transform, With<MainCamera>>,
-        QueryState<&mut Transform, With<Rotates>>,
-        QueryState<&mut CameraRigComponent>,
+        QueryState<&Transform, With<Rotates>>,
+        QueryState<(&mut Transform, &mut CameraRig)>,
     )>,
 ) {
-    let mut q1 = query.q1();
-    let player = q1.single_mut();
+    // TODO: Find cleaner way
+    let mut target_pos = Vec3::default();
+    let mut target_rotation = Quat::default();
+    let mut found = false;
+    for target in query.q0().iter() {
+        target_pos = target.translation;
+        target_rotation = target.rotation;
+        found = true;
+    }
 
-    let player_dolly = player.transform_2_dolly();
-
-    let mut q2 = query.q2();
-    let mut rig = q2.single_mut();
-    rig.0.driver_mut::<Position>().position = player_dolly.position;
-    rig.0.driver_mut::<Rotation>().rotation = player_dolly.rotation;
-    rig.0.driver_mut::<LookAt>().target = player_dolly.position + Vec3::Y;
-
-    let transform = rig.0.update(time.delta_seconds());
-
-    query.q0().single_mut().transform_2_bevy(transform);
+    if found {
+        for (mut cam, mut rig) in query.q1().iter_mut() {
+            rig.driver_mut::<Position>().position = target_pos;
+            rig.driver_mut::<Rotation>().rotation = target_rotation;
+            rig.driver_mut::<LookAt>().target = target_pos + Vec3::Y;
+            *cam = rig.update(time.delta_seconds());
+        }
+    }
 }
 
 #[derive(Component)]

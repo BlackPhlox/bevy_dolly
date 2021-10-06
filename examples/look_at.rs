@@ -1,8 +1,5 @@
 use bevy::prelude::*;
-use bevy_dolly::ctrl::{CtrlConfig, CtrlMove};
-use bevy_dolly::{CameraRigComponent, DollyPlugins, Transform2Bevy, Transform2Dolly};
-use dolly::glam::Vec3;
-use dolly::prelude::{CameraRig, LookAt, Position};
+use bevy_dolly::*;
 
 #[derive(Component)]
 struct MainCamera;
@@ -11,7 +8,7 @@ fn main() {
     App::new()
         .insert_resource(Msaa { samples: 4 })
         .add_plugins(DefaultPlugins)
-        .add_plugins(DollyPlugins)
+        .add_plugin(DollyPlugin)
         .add_startup_system(setup)
         .add_system(update_camera_system)
         .run();
@@ -20,13 +17,13 @@ fn main() {
 #[derive(Component)]
 struct Player;
 
+// TODO: Come back and fix this example
 /// set up a simple 3D scene
 fn setup(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
-    _asset_server: Res<AssetServer>,
-    mut _config: ResMut<CtrlConfig>,
+    
 ) {
     // plane
     commands.spawn_bundle(PbrBundle {
@@ -55,15 +52,15 @@ fn setup(
     );
     */
 
-    commands.spawn().insert(CameraRigComponent(
+    commands.spawn().insert(
         CameraRig::builder()
             .with(Position::new(Vec3::Y * 3.0))
             .with(LookAt::new(
                 /*start_pos.transform_2_dolly().position*/
-                dolly::glam::Vec3::new(0., 0., 2.),
+                Vec3::new(0., 0., 2.),
             ))
             .build(),
-    ));
+    );
 
     commands
         .spawn_bundle(PerspectiveCameraBundle {
@@ -87,17 +84,17 @@ fn update_camera_system(
     mut query: QuerySet<(
         QueryState<&mut Transform, With<MainCamera>>,
         QueryState<&mut Transform, With<CtrlMove>>,
-        QueryState<&mut CameraRigComponent>,
+        QueryState<&mut CameraRig>,
     )>,
 ) {
     let mut q1 = query.q1();
     let player = q1.single_mut();
-    query.q2().single_mut().0.driver_mut::<LookAt>().target = player.transform_2_dolly().position;
+    query.q2().single_mut().driver_mut::<LookAt>().target = player.translation;
 
-    let transform = query.q2().single_mut().0.update(time.delta_seconds());
+    let transform = query.q2().single_mut().update(time.delta_seconds());
 
     let mut q0 = query.q0();
     let mut cam = q0.single_mut();
 
-    cam.transform_2_bevy(transform);
+    *cam = transform;
 }

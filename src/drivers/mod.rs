@@ -8,7 +8,14 @@ mod yaw_pitch;
 use crate::RigUpdateParams;
 use bevy::prelude::*;
 
-pub use {arm::*, look_at::*, position::*, rotation::*, smooth::*, yaw_pitch::*};
+pub use {
+    arm::*,
+    look_at::*,
+    position::*,
+    rotation::*,
+    smooth::*,
+    yaw_pitch::*
+};
 
 pub trait RigDriver: std::any::Any {
     /// Calculates the transform of this driver component based on the parent

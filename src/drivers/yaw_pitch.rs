@@ -65,7 +65,7 @@ impl YawPitch {
     /// Set the yaw and pitch angles from a quaternion.
     /// Any roll rotation will be ignored.
     pub fn set_rotation_quat(&mut self, rotation: Quat) {
-        let (yaw, pitch, _) = rotation.to_euler(EulerRot::YXZ);
+        let (yaw, pitch, _) = rotation.to_euler(bevy::math::EulerRot::XYZ);
         self.yaw_degrees = yaw.to_degrees();
         self.pitch_degrees = pitch.to_degrees();
     }
@@ -76,7 +76,7 @@ impl RigDriver for YawPitch {
         Transform {
             translation: params.parent.translation,
             rotation: Quat::from_euler(
-                EulerRot::YXZ,
+                bevy::math::EulerRot::YXZ,
                 self.yaw_degrees.to_radians(),
                 self.pitch_degrees.to_radians(),
                 0.0,

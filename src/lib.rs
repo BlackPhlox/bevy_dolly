@@ -3,10 +3,11 @@ pub mod ctrl;
 pub mod drivers;
 mod util;
 
-use drivers::*;
+pub use ctrl::*;
+pub use drivers::*;
 
 use bevy::prelude::*;
-use ctrl::DollyCtrl;
+
 
 pub struct DollyPlugin;
 impl Plugin for DollyPlugin {

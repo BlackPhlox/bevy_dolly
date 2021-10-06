@@ -1,8 +1,6 @@
 use bevy::input::mouse::MouseMotion;
 use bevy::prelude::*;
-use bevy_dolly::{CameraRigComponent, Transform2Bevy};
-use dolly::glam::Vec3;
-use dolly::prelude::{Arm, CameraRig, Smooth, YawPitch};
+use bevy_dolly::*;
 
 #[derive(Component)]
 struct MainCamera;
@@ -50,13 +48,13 @@ fn setup(
         })
         .id();
 
-    commands.spawn().insert(CameraRigComponent(
+    commands.spawn().insert(
         CameraRig::builder()
             .with(YawPitch::new().yaw_degrees(45.0).pitch_degrees(-30.0))
             .with(Smooth::new_rotation(1.5))
             .with(Arm::new(Vec3::Z * 4.0))
             .build(),
-    ));
+    );
 
     let mut camera = OrthographicCameraBundle::new_3d();
     camera.orthographic_projection.scale = 3.0;
@@ -81,13 +79,13 @@ fn update_camera_system(
     mut mouse_motion_events: EventReader<MouseMotion>,
     mut query: QuerySet<(
         QueryState<&mut Transform, With<MainCamera>>,
-        QueryState<&mut CameraRigComponent>,
+        QueryState<&mut CameraRig>,
     )>,
 ) {
     let mut q1 = query.q1();
     let mut rig = q1.single_mut();
 
-    let camera_driver = rig.0.driver_mut::<YawPitch>();
+    let camera_driver = rig.driver_mut::<YawPitch>();
     let sensitivity = Vec2::splat(2.0);
 
     let mut delta = Vec2::ZERO;
@@ -119,10 +117,10 @@ fn update_camera_system(
         println!("State:{:?}", result);
     }
 
-    let transform = rig.0.update(time.delta_seconds());
+    let transform = rig.update(time.delta_seconds());
 
     let mut q0 = query.q0();
     let mut cam = q0.single_mut();
 
-    cam.transform_2_bevy(transform);
+    *cam = transform;
 }

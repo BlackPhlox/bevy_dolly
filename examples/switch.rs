@@ -1,8 +1,6 @@
 use bevy::prelude::*;
-use bevy_dolly::ctrl::CtrlMove;
-use bevy_dolly::{CameraRigComponent, DollyPlugins, Transform2Bevy, Transform2Dolly};
-use dolly::glam::Vec3;
-use dolly::prelude::{Arm, CameraRig, LookAt, Position, Rotation, Smooth};
+use bevy_dolly::*;
+
 
 #[derive(Component)]
 struct MainCamera;
@@ -17,7 +15,7 @@ fn main() {
     App::new()
         .insert_resource(Msaa { samples: 4 })
         .add_plugins(DefaultPlugins)
-        .add_plugins(DollyPlugins)
+        .add_plugin(DollyPlugin)
         .add_startup_system(setup)
         .add_system(rotator_system)
         .add_state(Camera::FollowSheep)
@@ -58,10 +56,10 @@ fn setup(
         })
         .insert(Rotates);
 
-    commands.spawn().insert(CameraRigComponent(
+    commands.spawn().insert(
         CameraRig::builder()
             .with(Position::new(start_pos))
-            .with(Rotation::new(dolly::glam::Quat::IDENTITY))
+            .with(Rotation::new(Quat::IDENTITY))
             .with(Smooth::new_position(1.25).predictive(true))
             .with(Arm::new(Vec3::new(0.0, 1.5, -3.5)))
             .with(Smooth::new_position(2.5))
@@ -71,7 +69,7 @@ fn setup(
                     .tracking_predictive(true),
             )
             .build(),
-    ));
+    );
 
     commands
         .spawn_bundle(PerspectiveCameraBundle {
@@ -94,24 +92,24 @@ fn follow_player_system(
     mut query: QuerySet<(
         QueryState<&mut Transform, With<MainCamera>>,
         QueryState<&mut Transform, With<CtrlMove>>,
-        QueryState<&mut CameraRigComponent>,
+        QueryState<&mut CameraRig>,
     )>,
 ) {
     let mut q1 = query.q1();
     let player = q1.single_mut();
-
-    let player_dolly = player.transform_2_dolly();
+    
 
     let mut q2 = query.q2();
     let mut rig = q2.single_mut();
 
-    rig.0.driver_mut::<Position>().position = player_dolly.position;
-    rig.0.driver_mut::<Rotation>().rotation = player_dolly.rotation;
-    rig.0.driver_mut::<LookAt>().target = player_dolly.position + Vec3::Y + Vec3::new(0., -1., 0.);
+    rig.driver_mut::<Position>().position = player.translation;
+    rig.driver_mut::<Rotation>().rotation = player.rotation;
+    rig.driver_mut::<LookAt>().target = player.translation + Vec3::Y + Vec3::new(0., -1., 0.);
 
-    let transform = rig.0.update(time.delta_seconds());
+    let transform = rig.update(time.delta_seconds());
 
-    query.q0().single_mut().transform_2_bevy(transform);
+    let cam = query.q0().single_mut();
+    *cam = transform;
 }
 
 #[allow(clippy::type_complexity)]
@@ -120,24 +118,24 @@ fn follow_sheep_system(
     mut query: QuerySet<(
         QueryState<&mut Transform, With<MainCamera>>,
         QueryState<&mut Transform, With<Rotates>>,
-        QueryState<&mut CameraRigComponent>,
+        QueryState<&mut CameraRig>,
     )>,
 ) {
-    let mut q1 = query.q1();
-    let player = q1.single_mut();
-
-    let player_dolly = player.transform_2_dolly();
+    
+    
+    let mut player = query.q0().single_mut();
 
     let mut q2 = query.q2();
     let mut rig = q2.single_mut();
 
-    rig.0.driver_mut::<Position>().position = player_dolly.position;
-    rig.0.driver_mut::<Rotation>().rotation = player_dolly.rotation;
-    rig.0.driver_mut::<LookAt>().target = player_dolly.position + Vec3::Y;
+    rig.driver_mut::<Position>().position = player.translation;
+    rig.driver_mut::<Rotation>().rotation = player.rotation;
+    rig.driver_mut::<LookAt>().target = player.translation + Vec3::Y;
 
-    let transform = rig.0.update(time.delta_seconds());
+    let transform = rig.update(time.delta_seconds());
 
-    query.q0().single_mut().transform_2_bevy(transform);
+    let mut cam = query.q0().single_mut();
+    *cam = transform;
 }
 
 #[derive(Component)]
@@ -145,7 +143,7 @@ struct Rotates;
 
 fn rotator_system(time: Res<Time>, mut query: Query<&mut Transform, With<Rotates>>) {
     for mut transform in query.iter_mut() {
-        *transform = Transform::from_rotation(bevy::math::Quat::from_rotation_y(
+        *transform = Transform::from_rotation(Quat::from_rotation_y(
             (4.0 * std::f32::consts::PI / 20.0) * time.delta_seconds(),
         )) * *transform;
     }
