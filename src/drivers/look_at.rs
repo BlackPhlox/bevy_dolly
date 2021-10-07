@@ -1,7 +1,7 @@
 
 use crate::ExpSmoothed;
 
-use super::{RigDriver, RigUpdateParams, ExpSmoothingParams};
+use super::{RigDriver, ExpSmoothingParams};
 use bevy::prelude::*;
 
 /// Rotates the camera to point at a world-space position.
@@ -50,17 +50,17 @@ impl LookAt {
 }
 
 impl RigDriver for LookAt {
-    fn update(&mut self, params: RigUpdateParams) -> Transform {
+    fn update(&mut self, transform: &mut Transform, delta_time_seconds: f32) {
         let target = self.smoothed_target.exp_smooth_towards(
             &self.target,
             ExpSmoothingParams {
                 smoothness: self.smoothness,
                 output_offset_scale: self.output_offset_scale,
-                delta_time_seconds: params.delta_time_seconds,
+                delta_time_seconds: delta_time_seconds,
             },
         );
 
-        let rotation = (target - params.parent.translation)
+        let rotation = (target - transform.translation)
             .try_normalize()
             .and_then(|forward| {
                 let right = forward.cross(Vec3::Y).try_normalize()?;
@@ -68,12 +68,6 @@ impl RigDriver for LookAt {
                 Some(Quat::from_mat3(&Mat3::from_cols(right, up, -forward)))
             })
             .unwrap_or_default();
-
-        Transform {
-            translation: params.parent.translation,
-            rotation,
-            ..Default::default()
-        }
     }
 
     fn as_any_mut(&mut self) -> &mut dyn std::any::Any {

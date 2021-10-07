@@ -15,19 +15,13 @@ pub use {
     yaw_pitch::*
 };
 
-pub trait RigDriver: std::any::Any + Sync + Send {
+pub trait RigDriver: Sync + Send + 'static {
     /// Calculates the transform of this driver component based on the parent
     /// provided in `params`.
-    fn update(&mut self, params: RigUpdateParams) -> Transform;
+    fn update(&mut self, transform: &mut Transform, delta_time_seconds: f32);
 
     /// Returns `self` as `&mut dyn Any`
     fn as_any_mut(&mut self) -> &mut dyn std::any::Any;
-}
-
-/// Prevents user calls to `RigDriver::update`. All updates must come from `CameraRig::update`.
-pub struct RigUpdateParams<'a> {
-    pub parent: &'a Transform,
-    pub delta_time_seconds: f32,
 }
 
 pub(crate) trait Interpolate {

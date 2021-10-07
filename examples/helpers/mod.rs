@@ -1,5 +1,8 @@
 use bevy::prelude::*;
 
+#[derive(Component)]
+pub struct Sheep;
+
 /// Spawn a few basic things
 pub fn spawn_example_scene(
     mut commands: Commands,
@@ -17,6 +20,7 @@ pub fn spawn_example_scene(
         .with_children(|parent| {
             parent.spawn_scene(asset_server.load("poly_dolly.gltf#Scene0"));
         })
+        .insert(Sheep)
         .id();
 
     // Spawn some ground for it to stand on

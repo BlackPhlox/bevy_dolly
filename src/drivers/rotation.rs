@@ -1,4 +1,4 @@
-use super::{RigDriver, RigUpdateParams};
+use super::{RigDriver};
 use bevy::prelude::*;
 
 /// Directly sets the rotation of the camera
@@ -14,12 +14,8 @@ impl Rotation {
 }
 
 impl RigDriver for Rotation {
-    fn update(&mut self, params: RigUpdateParams) -> Transform {
-        Transform {
-            translation: params.parent.translation,
-            rotation: self.rotation,
-            ..Default::default()
-        }
+    fn update(&mut self, transform: &mut Transform, delta_time_seconds: f32) {
+        transform.rotation = self.rotation;
     }
 
     fn as_any_mut(&mut self) -> &mut dyn std::any::Any {

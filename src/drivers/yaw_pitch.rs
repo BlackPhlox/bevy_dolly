@@ -1,6 +1,6 @@
-use super::{RigDriver, RigUpdateParams};
-use bevy::prelude::*;
+use super::{RigDriver};
 use bevy::math::*;
+use bevy::prelude::*;
 
 /// Calculate camera rotation based on yaw and pitch angles.
 ///
@@ -73,17 +73,13 @@ impl YawPitch {
 }
 
 impl RigDriver for YawPitch {
-    fn update(&mut self, params: RigUpdateParams) -> Transform {
-        Transform {
-            translation: params.parent.translation,
-            rotation: Quat::from_euler(
-                bevy::math::EulerRot::YXZ,
-                self.yaw_degrees.to_radians(),
-                self.pitch_degrees.to_radians(),
-                0.0,
-            ),
-            ..Default::default()
-        }
+    fn update(&mut self, transform: &mut Transform, delta_time_seconds: f32) {
+        transform.rotation = Quat::from_euler(
+            bevy::math::EulerRot::YXZ,
+            self.yaw_degrees.to_radians(),
+            self.pitch_degrees.to_radians(),
+            0.0,
+        );
     }
 
     fn as_any_mut(&mut self) -> &mut dyn std::any::Any {

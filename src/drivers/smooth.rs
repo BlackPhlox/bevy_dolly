@@ -1,4 +1,4 @@
-use super::{RigDriver, RigUpdateParams, ExpSmoothed, ExpSmoothingParams};
+use super::{RigDriver, ExpSmoothed, ExpSmoothingParams};
 use bevy::prelude::*;
 
 /// Smooths the parent transformation.
@@ -71,30 +71,24 @@ impl Smooth {
 }
 
 impl RigDriver for Smooth {
-    fn update(&mut self, params: RigUpdateParams) -> Transform {
-        let position = self.smoothed_position.exp_smooth_towards(
-            &params.parent.translation,
+    fn update(&mut self, transform: &mut Transform, delta_time_seconds: f32) {
+        transform.translation = self.smoothed_position.exp_smooth_towards(
+            &transform.translation,
             ExpSmoothingParams {
                 smoothness: self.position_smoothness,
                 output_offset_scale: self.output_offset_scale,
-                delta_time_seconds: params.delta_time_seconds,
+                delta_time_seconds: delta_time_seconds,
             },
         );
 
-        let rotation = self.smoothed_rotation.exp_smooth_towards(
-            &params.parent.rotation,
+        transform.rotation = self.smoothed_rotation.exp_smooth_towards(
+            &transform.rotation,
             ExpSmoothingParams {
                 smoothness: self.rotation_smoothness,
                 output_offset_scale: self.output_offset_scale,
-                delta_time_seconds: params.delta_time_seconds,
+                delta_time_seconds: delta_time_seconds,
             },
         );
-
-        Transform {
-            translation: position,
-            rotation,
-            ..Default::default()
-        }
     }
 
     fn as_any_mut(&mut self) -> &mut dyn std::any::Any {

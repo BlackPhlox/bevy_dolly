@@ -1,4 +1,4 @@
-use super::{RigDriver, RigUpdateParams};
+use super::{RigDriver};
 use bevy::prelude::*;
 
 /// Offsets the camera along a vector, in the coordinate space of the parent.
@@ -14,12 +14,8 @@ impl Arm {
 }
 
 impl RigDriver for Arm {
-    fn update(&mut self, params: RigUpdateParams) -> Transform {
-        Transform {
-            rotation: params.parent.rotation,
-            translation: params.parent.translation + params.parent.rotation * self.offset,
-            ..Default::default()
-        }
+    fn update(&mut self, transform: &mut Transform, _delta_time_seconds: f32) {
+        transform.translation += transform.rotation * self.offset;
     }
 
     fn as_any_mut(&mut self) -> &mut dyn std::any::Any {

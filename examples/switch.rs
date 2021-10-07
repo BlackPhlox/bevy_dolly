@@ -58,7 +58,7 @@ fn setup(
         .insert(Rotates);
 
     commands.spawn().insert(
-        CameraRig::builder()
+        CameraRig::new()
             .with(Position::new(start_pos))
             .with(Rotation::new(Quat::IDENTITY))
             .with(Smooth::new_position(1.25).predictive(true))

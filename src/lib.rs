@@ -1,24 +1,25 @@
 pub mod bundle;
-pub mod camera_rig;
+pub mod rig;
 pub mod drivers;
 
 use bevy::{input::mouse::MouseMotion, prelude::*};
-use camera_rig::*;
+use rig::*;
 use drivers::*;
 use bundle::*;
 
 pub mod prelude {
-    pub use crate::{bundle::*, camera_rig::*, drivers::*, *};
+    pub use crate::{bundle::*, rig::*, drivers::*, *};
 }
 
 pub struct DollyPlugin;
 impl Plugin for DollyPlugin {
     fn build(&self, app: &mut App) {
-        app.init_resource::<DollyConfig>();
-            //.add_system(init_listen_system);
-            //.add_system(update_camera_system);
+        app.init_resource::<DollyConfig>()
+            .add_system(init_listen_system)
+            .add_system(update_camera_system);
     }
 }
+
 
 pub struct DollyConfig {
     pub speed: f32,
@@ -28,7 +29,7 @@ pub struct DollyConfig {
 impl Default for DollyConfig {
     fn default() -> Self {
         Self {
-            speed: 4.,
+            speed: 10.0,
             target: None,
         }
     }
@@ -60,13 +61,13 @@ fn init_listen_system(
 fn update_camera_system(
     time: Res<Time>,
     keys: Res<Input<KeyCode>>,
-    windows: Res<Windows>,
-    //config: Res<DollyConfig>,
+    config: Res<DollyConfig>,
     mut mouse_motion_events: EventReader<MouseMotion>,
     mut query: Query<(&mut Transform, &mut CameraRig, &CameraActionMap )>,
 ) {
-    for (mut t, mut rig, camera_keys) in query.iter_mut() {
-        let time_delta_seconds: f32 = time.delta_seconds();
+
+    for (mut t, mut rig, camera_keys) in query.iter_mut() {        
+
         let boost_mult: f32 = 5.0;
         let sensitivity = Vec2::splat(1.0);
 
@@ -101,20 +102,19 @@ fn update_camera_system(
             delta += event.delta;
         }
 
-        let move_vec =
-            rig.final_transform.rotation * move_vec.clamp_length_max(1.0) * boost_mult.powf(boost);
+        let move_vec = rig.final_transform.rotation * move_vec.clamp_length_max(1.0) * boost_mult.powf(boost);
 
-        let window = windows.get_primary().unwrap();
-        if window.cursor_locked() {
-            rig.driver_mut::<YawPitch>().rotate_yaw_pitch(
-                -0.1 * delta.x * sensitivity.x,
-                -0.1 * delta.y * sensitivity.y,
+        // Update drivers
+        if let Some(d) = rig.driver_mut::<Position>() {
+            d.translate(move_vec * time.delta_seconds() * config.speed);
+        }
+        if let Some(d) = rig.driver_mut::<YawPitch>() {
+            d.rotate_yaw_pitch(
+             -0.1 * delta.x * sensitivity.x,
+             -0.1 * delta.y * sensitivity.y,
             );
-            rig.driver_mut::<Position>()
-                .translate(move_vec * time_delta_seconds * 10.0);
         }
 
-        *t = rig.update(time_delta_seconds);
-        info!("update rig");
+        *t = rig.process(&mut t, time.delta_seconds());
     }
 }
