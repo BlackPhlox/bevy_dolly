@@ -1,11 +1,12 @@
 use bevy::{prelude::*, render::{camera::*, render_graph::base}, utils::HashMap};
 
-use crate::{drivers::*, CameraRig};
+use crate::{CameraRig, drivers::*, rig::RigBuilder};
+
 
 #[derive(Bundle)]
 pub struct DollyCameraBundle {
     pub camera_rig: CameraRig,
-    pub camera_keys: CameraActionMap,
+    pub camera_rig_builder: RigBuilder,
     pub camera: Camera,
     pub perspective_projection: PerspectiveProjection,
     pub visible_entities: VisibleEntities,
@@ -16,9 +17,8 @@ pub struct DollyCameraBundle {
 impl Default for DollyCameraBundle {
     fn default() -> Self {
         Self {
-            camera_rig: CameraRig::default()
-                 .with(Smooth::new_position_rotation(1.0, 1.0)),
-            camera_keys: CameraActionMap::default(),
+            camera_rig: CameraRig::default(),
+            camera_rig_builder: RigBuilder::default(),
             camera: Camera {
                 name: Some(base::camera::CAMERA_3D.to_string()),
                 ..Default::default()
@@ -31,12 +31,46 @@ impl Default for DollyCameraBundle {
     }
 }
 
-impl DollyCameraBundle {
+/// These are DollyCamera with and additional CameraActions
+/// and system that listens for those actions
+/// By default no smoothing is enabled
+#[derive(Bundle)]
+pub struct DollyControlledCameraBundle {
+    pub camera_rig: CameraRig,
+    pub camera_rig_builder: RigBuilder,
+    pub camera_actions: CameraActions,
+    pub camera: Camera,
+    pub perspective_projection: PerspectiveProjection,
+    pub visible_entities: VisibleEntities,
+    pub transform: Transform,
+    pub global_transform: GlobalTransform,
+}
+
+impl Default for DollyControlledCameraBundle {
+    fn default() -> Self {
+        Self {
+            camera_rig: CameraRig::default(),
+            camera_rig_builder: RigBuilder::default(),
+            camera_actions: CameraActions::default(),
+            camera: Camera {
+                name: Some(base::camera::CAMERA_3D.to_string()),
+                ..Default::default()
+            },
+            perspective_projection: Default::default(),
+            visible_entities: Default::default(),
+            transform: Default::default(),
+            global_transform: Default::default(),
+        }
+    }
+}
+
+impl DollyControlledCameraBundle {
     pub fn new_fps() -> Self {
         Self {
-            // camera_keys: CameraActionMap::new_fps(),
-            // camera_rig: CameraRig::default()
-            //     .with(Smooth::new_position_rotation(1.0, 1.0)),
+            camera_rig: CameraRig::default(),
+            camera_rig_builder: RigBuilder::default()
+                .add(Smooth::new_position_rotation(1.0, 1.0)),
+            camera_actions: CameraActions::new_fps(),
             camera: Camera {
                 name: Some(base::camera::CAMERA_3D.to_string()),
                 ..Default::default()
@@ -60,14 +94,13 @@ pub enum CameraAction {
     Boost,
 }
 
-
 #[derive(Component)]
 /// Hashmap of actions and keycodes
-pub struct CameraActionMap {
+pub struct CameraActions {
     pub map: HashMap<CameraAction, Vec<KeyCode>>,
 }
 
-impl Default for CameraActionMap {
+impl Default for CameraActions {
     fn default() -> Self {
         let mut keys: HashMap<CameraAction, Vec<KeyCode>> = HashMap::default();
 
@@ -85,7 +118,29 @@ impl Default for CameraActionMap {
     }
 }
 
-impl CameraActionMap {
+impl CameraActions {
+
+    pub fn new_rotate() -> Self {
+        let mut keys: HashMap<CameraAction, Vec<KeyCode>> = HashMap::default();
+
+        keys.insert(CameraAction::RotateLeft, vec![KeyCode::A, KeyCode::Left]);
+        keys.insert(CameraAction::RotateRight, vec![KeyCode::D, KeyCode::Right]);
+
+        Self { map: keys }
+    }
+
+    pub fn new_fps() -> Self {
+        let mut keys: HashMap<CameraAction, Vec<KeyCode>> = HashMap::default();
+
+        keys.insert(CameraAction::Forward, vec![KeyCode::Up, KeyCode::W]);
+        keys.insert(CameraAction::Backward, vec![KeyCode::Down, KeyCode::S]);
+        keys.insert(CameraAction::Left, vec![KeyCode::Left, KeyCode::A]);
+        keys.insert(CameraAction::Right, vec![KeyCode::Right, KeyCode::D]);
+        keys.insert(CameraAction::RotateLeft, vec![KeyCode::Q]);
+        keys.insert(CameraAction::RotateRight, vec![KeyCode::R]);
+
+        Self { map: keys }
+    }
 
     pub fn pressed(&self, action: CameraAction, input: &Input<KeyCode>) -> bool {
         match self.map.get(&action) {
@@ -101,18 +156,5 @@ impl CameraActionMap {
             },
             None => false,
         }
-    }
-
-    pub fn new_fps() -> Self {
-        let mut keys: HashMap<CameraAction, Vec<KeyCode>> = HashMap::default();
-
-        keys.insert(CameraAction::Forward, vec![KeyCode::Up, KeyCode::W]);
-        keys.insert(CameraAction::Backward, vec![KeyCode::Down, KeyCode::S]);
-        keys.insert(CameraAction::Left, vec![KeyCode::Left, KeyCode::A]);
-        keys.insert(CameraAction::Right, vec![KeyCode::Right, KeyCode::D]);
-        keys.insert(CameraAction::RotateLeft, vec![KeyCode::Q]);
-        keys.insert(CameraAction::RotateRight, vec![KeyCode::R]);
-
-        Self { map: keys }
     }
 }

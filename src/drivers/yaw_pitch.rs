@@ -1,3 +1,5 @@
+use std::any::Any;
+
 use super::{RigDriver};
 use bevy::math::*;
 use bevy::prelude::*;
@@ -73,7 +75,7 @@ impl YawPitch {
 }
 
 impl RigDriver for YawPitch {
-    fn update(&mut self, transform: &mut Transform, delta_time_seconds: f32) {
+    fn update(&mut self, transform: &mut Transform, _delta_time_seconds: f32) {
         transform.rotation = Quat::from_euler(
             bevy::math::EulerRot::YXZ,
             self.yaw_degrees.to_radians(),
@@ -82,6 +84,9 @@ impl RigDriver for YawPitch {
         );
     }
 
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
     fn as_any_mut(&mut self) -> &mut dyn std::any::Any {
         self
     }

@@ -4,7 +4,7 @@ use bevy::prelude::*;
 pub struct Sheep;
 
 /// Spawn a few basic things
-pub fn spawn_example_scene(
+pub fn setup_example_scene(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,

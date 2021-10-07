@@ -1,4 +1,6 @@
 
+use std::any::Any;
+
 use crate::ExpSmoothed;
 
 use super::{RigDriver, ExpSmoothingParams};
@@ -60,7 +62,7 @@ impl RigDriver for LookAt {
             },
         );
 
-        let rotation = (target - transform.translation)
+        transform.rotation = (target - transform.translation)
             .try_normalize()
             .and_then(|forward| {
                 let right = forward.cross(Vec3::Y).try_normalize()?;
@@ -70,6 +72,9 @@ impl RigDriver for LookAt {
             .unwrap_or_default();
     }
 
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
     fn as_any_mut(&mut self) -> &mut dyn std::any::Any {
         self
     }

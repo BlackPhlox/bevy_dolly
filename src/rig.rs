@@ -1,43 +1,52 @@
+use std::{any::TypeId, slice::{Iter, IterMut}};
+
 use crate::drivers::*;
 use bevy::prelude::*;
 
 /// A chain of drivers, calculating displacements, and animating in succession.
-#[derive(Component, Default)]
+#[derive(Default, Component)]
 pub struct CameraRig {
-    pub (crate) drivers: Vec<Box<dyn RigDriver>>,
+    pub drivers: Vec<Box<dyn RigDriver>>,
     pub final_transform: Transform,
 }
 
 impl CameraRig {
 
-    /// Returns the first driver of the matching type. Panics if no such driver is present.
-    pub fn driver_mut<T: RigDriver>(&mut self) -> Option<&mut T> {
-        // TODO: Look for clearer type check
-        self.drivers
-            .iter_mut()
-            .find_map(|driver| {
-                driver.as_mut().as_any_mut().downcast_mut::<T>()
-            })
+    /// Returns the first driver of the matching type
+    pub fn get_driver_mut<T: RigDriver>(&mut self) -> Option<&mut T> {
+         for driver in  self.drivers.iter_mut() {
+             match driver.as_any_mut().downcast_mut::<T>() {
+                    Some(a) => return Some(a),
+                    None => continue,
+            }
+         }
+         None
     }
 
-    pub fn with(mut self, driver: impl RigDriver) -> Self {
+    pub fn add<T : RigDriver>(&mut self, driver: T) {
+        self.drivers.push( Box::new(driver) );
+    }
+
+    /// Runs all the drivers in sequence, animating the rig, and producing a final transform of the camera.
+    /// Camera rigs are approximately framerate independent, so `update` can be called at any frequency.
+    pub fn update(&mut self, delta_time_seconds: f32) -> Transform {
+        let mut result = Transform::default();
+
+        for driver in self.drivers.iter_mut() {
+             driver.update(&mut result, delta_time_seconds);
+        }
+        result
+    }
+}
+#[derive(Default, Component)]
+pub struct RigBuilder {
+    pub drivers: Vec<Box<dyn RigDriver>>,
+   
+}
+impl RigBuilder {
+    pub fn add(mut self, driver: impl RigDriver) -> Self {
         self.drivers.push(Box::new(driver));
         self
     }
 
-    /// Runs all the drivers in sequence, animating the rig, and producing a final transform of the camera.
-    ///
-    /// Camera rigs are approximately framerate independent, so `update` can be called at any frequency.
-    pub fn process(&mut self,  current: &mut Transform, delta_time_seconds: f32) -> Transform {
-        let mut parent_transform = Transform::default();
-
-        for driver in self.drivers.iter_mut() {
-            driver.update(&mut parent_transform, delta_time_seconds);
-        }
-
-        self.final_transform = parent_transform;
-        self.final_transform
-    }
-
 }
-

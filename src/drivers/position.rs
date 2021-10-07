@@ -1,4 +1,6 @@
-use super::{RigDriver};
+use std::any::Any;
+
+use super::RigDriver;
 use bevy::prelude::*;
 
 /// Directly sets the position of the camera
@@ -20,10 +22,13 @@ impl Position {
 }
 
 impl RigDriver for Position {
-    fn update(&mut self, transform: &mut Transform, delta_time_seconds: f32) {
+    fn update(&mut self, transform: &mut Transform, _delta_time_seconds: f32) {
         transform.translation = self.position.clone();
     }
 
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
     fn as_any_mut(&mut self) -> &mut dyn std::any::Any {
         self
     }
