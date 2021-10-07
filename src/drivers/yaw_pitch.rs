@@ -1,4 +1,4 @@
-use crate::{RigDriver, RigUpdateParams};
+use super::{RigDriver, RigUpdateParams};
 use bevy::prelude::*;
 use bevy::math::*;
 

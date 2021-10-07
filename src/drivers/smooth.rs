@@ -1,7 +1,4 @@
-use crate::{
-    util::{ExpSmoothed, ExpSmoothingParams},
-    RigDriver, RigUpdateParams,
-};
+use super::{RigDriver, RigUpdateParams, ExpSmoothed, ExpSmoothingParams};
 use bevy::prelude::*;
 
 /// Smooths the parent transformation.

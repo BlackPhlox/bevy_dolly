@@ -1,99 +1,120 @@
-mod cone;
-pub mod ctrl;
+pub mod bundle;
+pub mod camera_rig;
 pub mod drivers;
-mod util;
 
-pub use ctrl::*;
-pub use drivers::*;
-use bevy::prelude::*;
+use bevy::{input::mouse::MouseMotion, prelude::*};
+use camera_rig::*;
+use drivers::*;
+use bundle::*;
+
+pub mod prelude {
+    pub use crate::{bundle::*, camera_rig::*, drivers::*, *};
+}
 
 pub struct DollyPlugin;
 impl Plugin for DollyPlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugin(DollyCtrl);
+        app.init_resource::<DollyConfig>();
+            //.add_system(init_listen_system);
+            //.add_system(update_camera_system);
     }
 }
 
-/// A chain of drivers, calculating displacements, and animating in succession.
-#[derive(Component, Default)]
-pub struct CameraRig {
-    pub drivers: Vec<Box<dyn RigDriver + Send + Sync + 'static>>,
-    pub final_transform: Transform,
+pub struct DollyConfig {
+    pub speed: f32,
+    pub target: Option<Entity>,
 }
 
-/// Prevents user calls to `RigDriver::update`. All updates must come from `CameraRig::update`.
-pub struct RigUpdateParams<'a> {
-    pub parent: &'a Transform,
-    pub delta_time_seconds: f32,
-}
-
-impl CameraRig {
-    /// Returns the first driver of the matching type. Panics if no such driver is present.
-    pub fn driver_mut<T: RigDriver>(&mut self) -> &mut T {
-        self.try_driver_mut::<T>().unwrap_or_else(|| {
-            panic!(
-                "No {} driver found in the CameraRig",
-                std::any::type_name::<T>()
-            )
-        })
-    }
-
-    /// Returns the Some with the first driver of the matching type, or `None` if no such driver is present.
-    pub fn try_driver_mut<T: RigDriver>(&mut self) -> Option<&mut T> {
-        self.drivers
-            .iter_mut()
-            .find_map(|driver| driver.as_mut().as_any_mut().downcast_mut::<T>())
-    }
-
-    /// Runs all the drivers in sequence, animating the rig, and producing a final transform of the camera.
-    ///
-    /// Camera rigs are approximately framerate independent, so `update` can be called at any frequency.
-    pub fn update(&mut self, delta_time_seconds: f32) -> Transform {
-        let mut parent_transform = Transform::default();
-
-        for driver in self.drivers.iter_mut() {
-            let transform = driver.update(RigUpdateParams {
-                parent: &parent_transform,
-                delta_time_seconds,
-            });
-
-            parent_transform = transform;
-        }
-
-        self.final_transform = parent_transform;
-        self.final_transform
-    }
-
-    /// Use this to make a new rig
-    pub fn builder() -> CameraRigBuilder {
-        CameraRigBuilder {
-            drivers: Default::default(),
+impl Default for DollyConfig {
+    fn default() -> Self {
+        Self {
+            speed: 4.,
+            target: None,
         }
     }
 }
 
-/// Lets you describe the Camera behavior
-pub struct CameraRigBuilder {
-    drivers: Vec<Box<dyn RigDriver + Sync + Send>>,
+// TODO: Could filter by Bundle, but this may make it more usable later
+fn init_listen_system(
+    mut query: Query<(&mut Transform, &mut CameraRig), Added<CameraRig>>, )
+{
+    for (t, mut rig) in query.iter_mut() {
+
+        // TODO: these will be going away, just keeping things going as I refactor
+        let mut yaw_pitch = YawPitch::new();
+        yaw_pitch.set_rotation_quat(t.rotation);
+
+        rig.drivers.push(Box::new(Position {
+            position: t.translation,
+        }));
+        rig.drivers.push(Box::new(Rotation {
+            rotation: t.rotation,
+        }));
+        rig.drivers.push(Box::new(yaw_pitch));
+
+        info!("rig created");
+    }
 }
 
-impl CameraRigBuilder {
-    ///
-    pub fn with(mut self, driver: impl RigDriver + Sync + Send) -> Self {
-        self.drivers.push(Box::new(driver));
-        self
-    }
 
-    ///
-    pub fn build(self) -> CameraRig {
-        let mut rig = CameraRig {
-            drivers: self.drivers,
-            // Initialize with a dummy identity transform. Will be overridden in a moment.
-            final_transform: Transform::default(),
+fn update_camera_system(
+    time: Res<Time>,
+    keys: Res<Input<KeyCode>>,
+    windows: Res<Windows>,
+    //config: Res<DollyConfig>,
+    mut mouse_motion_events: EventReader<MouseMotion>,
+    mut query: Query<(&mut Transform, &mut CameraRig, &CameraActionMap )>,
+) {
+    for (mut t, mut rig, camera_keys) in query.iter_mut() {
+        let time_delta_seconds: f32 = time.delta_seconds();
+        let boost_mult: f32 = 5.0;
+        let sensitivity = Vec2::splat(1.0);
+
+        let mut move_vec = Vec3::ZERO;
+
+        if camera_keys.pressed( CameraAction::Forward, &keys ) {
+            move_vec.z += 1.0;
+        }
+        if camera_keys.pressed( CameraAction::Backward, &keys ) {
+            move_vec.z -= 1.0;
+        }
+        if camera_keys.pressed( CameraAction::Left, &keys ) {
+            move_vec.x -= 1.0;
+        }
+        if camera_keys.pressed( CameraAction::Right, &keys ) {
+            move_vec.x += 1.0;
+        }
+        if camera_keys.pressed( CameraAction::Up, &keys ) {
+            move_vec.y += 1.0;
+        }
+        if camera_keys.pressed( CameraAction::Down, &keys ) {
+            move_vec.y -= 1.0;
+        }
+
+        let boost = match camera_keys.pressed( CameraAction::Boost, &keys ) {
+            true => 1.0,
+            false => 0.0,
         };
 
-        // Update once to find the final transform
-        rig.update(0.0);
-        rig
+        let mut delta = Vec2::ZERO;
+        for event in mouse_motion_events.iter() {
+            delta += event.delta;
+        }
+
+        let move_vec =
+            rig.final_transform.rotation * move_vec.clamp_length_max(1.0) * boost_mult.powf(boost);
+
+        let window = windows.get_primary().unwrap();
+        if window.cursor_locked() {
+            rig.driver_mut::<YawPitch>().rotate_yaw_pitch(
+                -0.1 * delta.x * sensitivity.x,
+                -0.1 * delta.y * sensitivity.y,
+            );
+            rig.driver_mut::<Position>()
+                .translate(move_vec * time_delta_seconds * 10.0);
+        }
+
+        *t = rig.update(time_delta_seconds);
+        info!("update rig");
     }
 }

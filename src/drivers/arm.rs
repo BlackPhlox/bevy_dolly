@@ -1,4 +1,4 @@
-use crate::{RigDriver, RigUpdateParams};
+use super::{RigDriver, RigUpdateParams};
 use bevy::prelude::*;
 
 /// Offsets the camera along a vector, in the coordinate space of the parent.

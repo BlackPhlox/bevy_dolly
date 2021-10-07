@@ -1,7 +1,7 @@
-use crate::{
-    util::{ExpSmoothed, ExpSmoothingParams},
-    RigDriver, RigUpdateParams,
-};
+
+use crate::ExpSmoothed;
+
+use super::{RigDriver, RigUpdateParams, ExpSmoothingParams};
 use bevy::prelude::*;
 
 /// Rotates the camera to point at a world-space position.

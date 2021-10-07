@@ -1,4 +1,4 @@
-use crate::{RigDriver, RigUpdateParams};
+use super::{RigDriver, RigUpdateParams};
 use bevy::prelude::*;
 
 /// Directly sets the rotation of the camera
