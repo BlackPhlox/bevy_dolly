@@ -32,11 +32,7 @@ impl Default for Smooth {
 }
 
 impl Smooth {
-    pub fn new(
-        position_smoothness: f32,
-        rotation_smoothness: f32,
-        predictive: bool,
-    ) -> Self {
+    pub fn new(position_smoothness: f32, rotation_smoothness: f32, predictive: bool) -> Self {
         Self {
             position_smoothness,
             rotation_smoothness,

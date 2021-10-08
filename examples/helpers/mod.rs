@@ -11,7 +11,7 @@ pub fn setup_example_scene(
     asset_server: Res<AssetServer>,
 ) {
     // Spawn a sheep, gives us something to look
-    spawn_sheep( Vec3::new(0.0, 0.2, 0.), &mut commands, &asset_server);
+    spawn_sheep(Vec3::new(0.0, 0.2, 0.), &mut commands, &asset_server);
 
     // Spawn some ground for it to stand on
     commands.spawn_bundle(PbrBundle {
@@ -55,7 +55,6 @@ pub fn print_control_actions() {
     info!("RotateRight: {:?}", vec![KeyCode::E]);
     info!("Boost: {:?}", vec![KeyCode::LShift]);
 }
-
 
 // TODO: add cursor stuff back once everything works well
 /// Grabs/ungrabs mouse cursor

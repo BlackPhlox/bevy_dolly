@@ -7,7 +7,6 @@ fn main() {
     App::new()
         .insert_resource(Msaa { samples: 4 })
         .add_plugins(DefaultPlugins)
-
         // Add Dolly plugin
         .add_plugin(DollyPlugin)
         .add_startup_system(setup)

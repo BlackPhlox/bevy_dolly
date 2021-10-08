@@ -1,11 +1,10 @@
-use std::any::Any;
-use super::{RigDriver};
+use super::RigDriver;
 use bevy::prelude::*;
+use std::any::Any;
 
 /// Sets Transform to Target's
 #[derive(Debug)]
 pub struct Follow {
-    
     /// The world-space position to look at
     pub target_entity: Entity,
 

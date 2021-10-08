@@ -49,9 +49,10 @@ fn setup(
             .add(Position::default())
             .add(Rotation::default())
             .add(YawPitch::default())
-            .add(
-                LookAt::new(target_config.entities[0], Vec3::new(0.0, 1.0, 0.0)),
-            )
+            .add(LookAt::new(
+                target_config.entities[0],
+                Vec3::new(0.0, 1.0, 0.0),
+            ))
             .add(Smooth::new(1.0, 2.0, false)),
         transform: Transform::from_xyz(0.0, 2.0, 10.0),
         ..Default::default()
@@ -71,7 +72,6 @@ fn change_target(
 ) {
     for mut rig in query.iter_mut() {
         if let Some(d) = rig.get_driver_mut::<LookAt>() {
-
             // Lets map keys to the targets, and set the target entity
             if keys.just_pressed(KeyCode::Key1) {
                 d.target_entity = Some(target_config.entities[0]);

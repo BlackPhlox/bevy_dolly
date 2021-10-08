@@ -97,7 +97,6 @@ fn apply_rigs_system(time: Res<Time>, mut query: Query<(&mut Transform, &mut Rig
     }
 }
 
-
 // Handle user input
 // NOTE: This is only run for DollyControlCameraBundles, not DollyCameraBundles due
 // to CameraActions component

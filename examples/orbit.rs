@@ -18,12 +18,11 @@ fn main() {
 
 /// Set our cameras
 fn setup_camera(mut commands: Commands) {
-
     commands.spawn_bundle(DollyCameraBundle {
         rig: Rig::default()
             .add(YawPitch::default().yaw_degrees(45.0).pitch_degrees(-30.0))
             .add(Smooth::new(0.0, 1.0, false))
-            .add(Arm::new( Vec3::Z * 8.0 )),
+            .add(Arm::new(Vec3::Z * 8.0)),
         ..Default::default()
     });
     info!("Use Z and X to rotate");

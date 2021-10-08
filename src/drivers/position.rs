@@ -1,6 +1,6 @@
-use std::any::Any;
-use bevy::prelude::*;
 use super::RigDriver;
+use bevy::prelude::*;
+use std::any::Any;
 
 /// Directly sets the position of the camera
 #[derive(Debug)]

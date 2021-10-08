@@ -51,10 +51,8 @@ impl Default for DollyCameraBundle {
     }
 }
 
-
 impl Default for DollyControlCameraBundle {
     fn default() -> Self {
-        
         Self {
             camera_actions: CameraActions::default(),
             rig: Rig::default()
@@ -79,8 +77,6 @@ impl DollyControlCameraBundle {
     // Provide few easy use default cameras
     pub fn new(preset: ControlledType) -> Self {
         info!("here");
-
-
 
         let result = match preset {
             ControlledType::Free => Self {
@@ -150,7 +146,6 @@ pub struct CameraActions {
 
 impl Default for CameraActions {
     fn default() -> Self {
-
         let mut keys: HashMap<CameraAction, Vec<KeyCode>> = HashMap::default();
 
         keys.insert(CameraAction::Forward, vec![KeyCode::Up, KeyCode::W]);

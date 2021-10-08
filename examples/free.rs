@@ -16,7 +16,6 @@ fn main() {
 
 /// set up a simple 3D scene
 fn setup(mut commands: Commands) {
-
     // Create our camera with defaults, currently that is free look
     commands.spawn_bundle(DollyControlCameraBundle {
         rig: Rig::default()

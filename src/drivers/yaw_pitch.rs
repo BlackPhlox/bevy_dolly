@@ -26,7 +26,6 @@ pub struct YawPitch {
 }
 
 impl YawPitch {
-
     pub fn new(yaw_degrees: f32, pitch_degrees: f32) -> Self {
         Self {
             yaw_degrees,

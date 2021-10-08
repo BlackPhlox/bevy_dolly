@@ -10,7 +10,6 @@ use bevy::prelude::*;
 /// The target tracking can be additionally smoothed, and made to look ahead of it.
 #[derive(Debug)]
 pub struct LookAt {
-    
     /// The world-space position to look at
     pub target_entity: Option<Entity>,
     pub target_transform: Option<Transform>,
@@ -60,10 +59,9 @@ impl LookAt {
 
 impl RigDriver for LookAt {
     fn update(&mut self, transform: &mut Transform, delta_time_seconds: f32) {
-
-        let mut offset= Vec3::ZERO;
+        let mut offset = Vec3::ZERO;
         if let Some(t) = self.target_transform {
-            offset = t.translation + ( t.rotation * self.offset );
+            offset = t.translation + (t.rotation * self.offset);
         }
 
         let target = self.smoothed_target.exp_smooth_towards(

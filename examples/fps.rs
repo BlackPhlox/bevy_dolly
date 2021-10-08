@@ -8,11 +8,9 @@ fn main() {
     App::new()
         .insert_resource(Msaa { samples: 4 })
         .add_plugins(DefaultPlugins)
-
         .add_plugin(DollyPlugin)
         .add_startup_system(setup)
         .add_system(update_camera_system)
-
         .add_startup_system(setup_example_scene)
         .run();
 }
@@ -71,7 +69,6 @@ fn update_camera_system(
 
         move_vec = rig.final_transform.rotation * move_vec.clamp_length_max(1.0) * boost;
         move_vec.y = 0.0; // clear out y so we don't move up and down
-
 
         if let Some(d) = rig.get_driver_mut::<Position>() {
             d.position += move_vec * time_delta_seconds * speed;

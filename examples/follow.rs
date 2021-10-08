@@ -7,18 +7,15 @@ fn main() {
     App::new()
         .insert_resource(Msaa { samples: 4 })
         .add_plugins(DefaultPlugins)
-
         .add_plugin(DollyPlugin)
         .add_startup_system(setup)
         .add_startup_system(setup_example_scene)
         .add_system(move_sheep_system)
-
         .run();
 }
 
 /// set up a simple 3D scene
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
-
     // Create another sheep, this time we will add a component to it so we can move it in a system
     let sheep = commands
         .spawn_bundle((Transform::from_xyz(2., 0.2, 0.), GlobalTransform::default()))
@@ -32,10 +29,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         rig: Rig::default()
             .add(Follow::new(sheep))
             .add(Arm::new(Vec3::new(0.0, 2.5, -3.5)))
-            .add(
-                LookAt::new( sheep, Vec3::new(0.0, 1.0, 1.0))
-                    ,
-            )
+            .add(LookAt::new(sheep, Vec3::new(0.0, 1.0, 1.0)))
             .add(Smooth::new(2.5, 2.5, false)),
         ..Default::default()
     });
