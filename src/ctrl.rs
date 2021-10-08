@@ -1,26 +1,16 @@
-use bevy::{
-    core::Time,
-    ecs::schedule::ShouldRun,
-    input::Input,
-    math::{Quat, Vec3},
-    pbr::PbrBundle,
-    prelude::{
-        AppBuilder, Assets, BuildChildren, Color, Commands, Entity, GlobalTransform, IntoSystem,
-        KeyCode, Mesh, Plugin, Query, Res, ResMut, StandardMaterial, SystemSet, Transform,
-    },
-};
+use bevy::{core::Time, ecs::schedule::ShouldRun, input::Input, math::{Quat, Vec3}, pbr::PbrBundle, prelude::{App, Assets, BuildChildren, Color, Commands, Component, Entity, GlobalTransform, KeyCode, Mesh, Plugin, Query, Res, ResMut, StandardMaterial, SystemSet, Transform, With}};
 
 use crate::cone::Cone;
 
 pub struct DollyCtrl;
 impl Plugin for DollyCtrl {
-    fn build(&self, app: &mut AppBuilder) {
+    fn build(&self, app: &mut App) {
         app.init_resource::<CtrlConfig>()
-            .add_startup_system(ctrl_setup.system())
+            .add_startup_system(ctrl_setup)
             .add_system_set(
                 SystemSet::new()
-                    .with_run_criteria(use_ctrl.system())
-                    .with_system(ctrl_update.system()),
+                    .with_run_criteria(use_ctrl)
+                    .with_system(ctrl_update_system),
             );
     }
 }
@@ -59,6 +49,7 @@ pub struct CtrlConfig {
     pub entity: Option<Entity>,
 }
 
+#[derive(Component)]
 pub struct CtrlMove;
 
 impl Default for CtrlConfig {
@@ -128,13 +119,13 @@ where
     codes.iter().any(|m| m == key)
 }
 
-fn ctrl_update(
+fn ctrl_update_system(
     keys: Res<Input<KeyCode>>,
     time: Res<Time>,
     config: Res<CtrlConfig>,
-    mut transforms: Query<(&CtrlMove, &mut Transform)>,
+    mut transforms: Query<&mut Transform, With<CtrlMove>>,
 ) {
-    for (_player, mut transform) in transforms.iter_mut() {
+    for mut transform in transforms.iter_mut() {
         let (_, mut rotation) = transform.rotation.to_axis_angle();
         let mut velocity = Vec3::ZERO;
         let local_z = transform.local_z();

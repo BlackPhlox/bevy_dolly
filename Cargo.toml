@@ -37,3 +37,7 @@ default-features = false
 version = "0.5"
 features = ["x11", "wayland"]
 default-features = false
+
+[patch.crates-io.bevy]
+git = "https://github.com/bevyengine/bevy"
+branch = "main"

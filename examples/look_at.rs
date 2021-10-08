@@ -1,21 +1,23 @@
 use bevy::prelude::*;
 use bevy_dolly::ctrl::{CtrlConfig, CtrlMove};
-use bevy_dolly::{DollyPlugins, Transform2Bevy, Transform2Dolly};
+use bevy_dolly::{CameraRigComponent, DollyPlugins, Transform2Bevy, Transform2Dolly};
 use dolly::glam::Vec3;
 use dolly::prelude::{CameraRig, LookAt, Position};
 
+#[derive(Component)]
 struct MainCamera;
 
 fn main() {
-    App::build()
+    App::new()
         .insert_resource(Msaa { samples: 4 })
         .add_plugins(DefaultPlugins)
         .add_plugins(DollyPlugins)
-        .add_startup_system(setup.system())
-        .add_system(update_camera.system())
+        .add_startup_system(setup)
+        .add_system(update_camera_system)
         .run();
 }
 
+#[derive(Component)]
 struct Player;
 
 /// set up a simple 3D scene
@@ -23,8 +25,8 @@ fn setup(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
-    asset_server: Res<AssetServer>,
-    mut config: ResMut<CtrlConfig>,
+    _asset_server: Res<AssetServer>,
+    mut _config: ResMut<CtrlConfig>,
 ) {
     // plane
     commands.spawn_bundle(PbrBundle {
@@ -33,7 +35,7 @@ fn setup(
         ..Default::default()
     });
 
-    let start_pos = Transform::from_translation(bevy::math::Vec3::new(0., 0., 2.));
+    let _start_pos = Transform::from_translation(bevy::math::Vec3::new(0., 0., 2.));
 
     /*
     config.entity = Some(
@@ -54,13 +56,13 @@ fn setup(
     */
 
     commands.spawn().insert(
-        CameraRig::builder()
+        CameraRigComponent( CameraRig::builder()
             .with(Position::new(Vec3::Y * 3.0))
             .with(LookAt::new(
                 /*start_pos.transform_2_dolly().position*/
                 dolly::glam::Vec3::new(0., 0., 2.),
             ))
-            .build(),
+            .build()),
     );
 
     commands
@@ -74,34 +76,37 @@ fn setup(
         .insert(MainCamera);
 
     // light
-    commands.spawn_bundle(LightBundle {
+    commands.spawn_bundle(PointLightBundle {
         transform: Transform::from_xyz(4.0, 8.0, 4.0),
         ..Default::default()
     });
 }
-
-fn update_camera(
+#[allow(clippy::type_complexity)]
+fn update_camera_system(
     time: Res<Time>,
     mut query: QuerySet<(
-        Query<(&mut Transform, With<MainCamera>)>,
-        Query<(&mut Transform, With<CtrlMove>)>,
-        Query<&mut CameraRig>,
+        QueryState<&mut Transform, With<MainCamera>>,
+        QueryState<&mut Transform, With<CtrlMove>>,
+        QueryState<&mut CameraRigComponent>,
     )>,
 ) {
-    let (player, _) = query.q1_mut().single_mut().unwrap();
+    let mut q1 = query.q1();
+    let player = q1.single_mut();
     query
-        .q2_mut()
+        .q2()
         .single_mut()
-        .unwrap()
+        .0
         .driver_mut::<LookAt>()
         .target = player.transform_2_dolly().position;
 
     let transform = query
-        .q2_mut()
+        .q2()
         .single_mut()
-        .unwrap()
+        .0
         .update(time.delta_seconds());
-    let (mut cam, _) = query.q0_mut().single_mut().unwrap();
+
+    let mut q0 = query.q0();
+    let mut cam = q0.single_mut();
 
     cam.transform_2_bevy(transform);
 }
