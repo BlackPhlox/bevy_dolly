@@ -1,12 +1,18 @@
 use std::any::Any;
 
-use super::{RigDriver};
+use super::RigDriver;
 use bevy::prelude::*;
 
 /// Offsets the camera along a vector, in the coordinate space of the parent.
 #[derive(Default, Debug)]
 pub struct Arm {
     pub offset: Vec3,
+}
+
+impl Arm {
+    pub fn new(offset: Vec3) -> Arm {
+        Self { offset }
+    }
 }
 
 impl RigDriver for Arm {

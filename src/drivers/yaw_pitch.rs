@@ -1,6 +1,6 @@
 use std::any::Any;
 
-use super::{RigDriver};
+use super::RigDriver;
 use bevy::math::*;
 use bevy::prelude::*;
 
@@ -12,7 +12,7 @@ use bevy::prelude::*;
 /// a positive value of pitch.
 ///
 /// [`right-hand rule`]: https://en.wikipedia.org/wiki/Right-hand_rule#Curve_orientation_and_normal_vectors
-#[derive(Debug)]
+#[derive(Default, Debug)]
 pub struct YawPitch {
     /// [0..720)
     ///
@@ -25,20 +25,15 @@ pub struct YawPitch {
     pub pitch_degrees: f32,
 }
 
-impl Default for YawPitch {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl YawPitch {
-    /// Creates camera looking forward along -Z
-    pub fn new() -> Self {
+
+    pub fn new(yaw_degrees: f32, pitch_degrees: f32) -> Self {
         Self {
-            yaw_degrees: 0.0,
-            pitch_degrees: 0.0,
+            yaw_degrees,
+            pitch_degrees,
         }
     }
+    /// Creates camera looking forward along -Z
 
     /// Initialize the yaw and pitch angles from a quaternion.
     /// Any roll rotation will be ignored.

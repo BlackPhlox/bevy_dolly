@@ -5,24 +5,23 @@ use bevy::prelude::*;
 #[derive(Default, Component)]
 pub struct Rig {
     pub drivers: Vec<Box<dyn RigDriver>>,
+
+    // TODO: Only really saving this for its rotation information
+    // to allow movement to be relative to the camera, get it from transfrom instead?
     pub final_transform: Transform,
 }
 
 impl Rig {
-
     /// Returns the first driver of the matching type
+    // TODO: any cleaner way? old way would panic, screw that
     pub fn get_driver_mut<T: RigDriver>(&mut self) -> Option<&mut T> {
-         for driver in  self.drivers.iter_mut() {
-             match driver.as_any_mut().downcast_mut::<T>() {
-                    Some(a) => return Some(a),
-                    None => (),
+        for driver in self.drivers.iter_mut() {
+            match driver.as_any_mut().downcast_mut::<T>() {
+                Some(a) => return Some(a),
+                None => (),
             }
-         }
-         None
-    }
-
-    pub fn add<T : RigDriver>(&mut self, driver: T) {
-        self.drivers.push( Box::new(driver) );
+        }
+        None
     }
 
     /// Runs all the drivers in sequence, animating the rig, and producing a final transform of the camera.
@@ -31,21 +30,15 @@ impl Rig {
         let mut result = Transform::default();
 
         for driver in self.drivers.iter_mut() {
-             driver.update(&mut result, delta_time_seconds);
+            driver.update(&mut result, delta_time_seconds);
         }
 
         self.final_transform = result;
         result
     }
-}
-#[derive(Default, Component)]
-pub struct RigBuilder {
-    pub drivers: Vec<Box<dyn RigDriver>>,
-}
-impl RigBuilder {
+
     pub fn add(mut self, driver: impl RigDriver) -> Self {
         self.drivers.push(Box::new(driver));
         self
     }
-
 }

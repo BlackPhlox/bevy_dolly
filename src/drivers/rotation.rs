@@ -6,8 +6,10 @@ use bevy::prelude::*;
 /// Directly sets the rotation of the camera
 #[derive(Debug)]
 pub struct Rotation {
-    pub transform_set: bool,
     pub rotation: Quat,
+
+    /// Sets using rigs transfrom
+    pub init_set: bool,
 }
 
 impl Default for Rotation {
@@ -15,7 +17,7 @@ impl Default for Rotation {
     fn default() -> Self {
         Self {
             rotation: Quat::default(),
-            transform_set: true,
+            init_set: true,
         }
     }
 }
@@ -24,7 +26,7 @@ impl Rotation {
     pub fn new(rotation: Quat) -> Self {
         Self {
             rotation,
-            transform_set: false,
+            init_set: false,
         }
     }
 }

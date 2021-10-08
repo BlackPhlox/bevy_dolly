@@ -1,5 +1,7 @@
+mod helpers;
 use bevy::prelude::*;
-use bevy_dolly::*;
+use bevy_dolly::prelude::*;
+use helpers::*;
 
 fn main() {
     App::new()
@@ -7,78 +9,56 @@ fn main() {
         .add_plugins(DefaultPlugins)
         .add_plugin(DollyPlugin)
         .add_startup_system(setup)
-        .add_system(update_camera_system)
+        .add_startup_system(setup_example_scene)
+        .add_system(move_sheep_system)
         .run();
 }
 
-#[derive(Component)]
-struct Player;
-
-// TODO: Come back and fix this example
-/// set up a simple 3D scene
-fn setup(
-    mut commands: Commands,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
+fn setup(mut commands: Commands,
     asset_server: Res<AssetServer>,
 ) {
-    // plane
-    commands.spawn_bundle(PbrBundle {
-        mesh: meshes.add(Mesh::from(shape::Plane { size: 20.0 })),
-        material: materials.add(Color::rgb(0.3, 0.5, 0.3).into()),
-        ..Default::default()
-    });
-
-    config.entity = commands
-        .spawn_bundle((
-            Transform {
-                translation: Vec3::new(0., 0.2, 0.),
-                ..Default::default()
-            },
-            GlobalTransform::identity(),
-        ))
-        .with_children(|cell| {
-            cell.spawn_scene(asset_server.load("sheep.gltf#Scene0"));
+    // Create another sheep, this time we will add a component to it so we can move it in a system
+    let sheep = commands
+        .spawn_bundle((Transform::from_xyz(2.0, 0.2, 0.), GlobalTransform::default()))
+        .with_children(|parent| {
+            parent.spawn_scene(asset_server.load("poly_dolly.gltf#Scene0"));
         })
-        .insert(Player)
+        .insert(Sheep)
         .id();
 
-    commands
-        .spawn_bundle(PerspectiveCameraBundle {
-            transform: Transform::from_xyz(-2.0, 1., 2.0)
-                .looking_at(Vec3::new(0., 0., 0.), Vec3::Y),
-            ..Default::default()
-        })
-        .insert(
-            CameraRig::builder()
-                .with(Position::new(Vec3::Y * 3.0))
-                .with(LookAt::new(Vec3::new(0., 0., 2.)))
-                .build(),
-        );
-
-    // light
-    commands.spawn_bundle(PointLightBundle {
-        transform: Transform::from_xyz(4.0, 8.0, 4.0),
+    commands.spawn_bundle(DollyCameraBundle {
+        rig: Rig::default()
+            .add(Position::default())
+            .add(Rotation::default())
+            .add(
+            LookAt::new(sheep, Vec3::new(0.0, 1.0, 0.0 ))
+                    .tracking_smoothness(1.25)
+            )
+            .add(Smooth::new( 1.25, 1.0, false)),
+        transform: Transform::from_xyz(0.0, 2.0, -5.0)
+            .looking_at(Vec3::ZERO, Vec3::Y),
         ..Default::default()
     });
+
+    info!(" Use Q and E to turn the sheep");
 }
-#[allow(clippy::type_complexity)]
-fn update_camera_system(
-    time: Res<Time>,
-    mut query: QuerySet<(
-        QueryState<(&mut Transform, CameraRig)>,
-        QueryState<&mut Transform, With<CtrlMove>>,
-        QueryState<&mut CameraRig>,
-    )>,
+
+/// Move Sheep around so we have something to track
+fn move_sheep_system(
+    keys: Res<Input<KeyCode>>,
+    mut query: Query<&mut Transform, With<Sheep>>,
+    mut left: Local<bool>,
 ) {
-    let mut q1 = query.q1();
-    let player = q1.single_mut();
-    query.q2().single_mut().driver_mut::<LookAt>().target = player.translation;
+    if keys.just_pressed(KeyCode::Q) {
+        *left = true;
+    }
+    if keys.just_pressed(KeyCode::E) {
+        *left = false;
+    }
 
-    let transform = query.q2().single_mut().update(time.delta_seconds());
-
-    let mut q0 = query.q0();
-    let mut cam = q0.single_mut();
-
-    *cam = transform;
+    for mut sheep in query.iter_mut() {
+        let rotation = sheep.rotation.clone();
+        sheep.translation += rotation * (Vec3::Z * 0.05);
+        sheep.rotation *= Quat::from_rotation_y(if *left { 0.01 } else { -0.01 });
+    }
 }

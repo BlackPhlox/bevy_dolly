@@ -1,15 +1,14 @@
 mod arm;
 mod look_at;
-mod smooth;
-mod yaw_pitch;
 mod position;
 mod rotation;
+mod smooth;
+mod yaw_pitch;
+mod follow;
 
 use std::any::Any;
-
 use bevy::prelude::*;
-
-pub use {arm::*, look_at::*, smooth::*, yaw_pitch::*, position::*, rotation::*};
+pub use {arm::*, look_at::*, position::*, rotation::*, smooth::*, yaw_pitch::*, follow::*};
 
 pub trait RigDriver: Sync + Send + std::fmt::Debug + 'static {
     /// Calculates the transform of this driver component based on the parent

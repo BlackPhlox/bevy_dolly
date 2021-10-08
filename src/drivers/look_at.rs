@@ -1,9 +1,8 @@
-
 use std::any::Any;
 
 use crate::ExpSmoothed;
 
-use super::{RigDriver, ExpSmoothingParams};
+use super::{ExpSmoothingParams, RigDriver};
 use bevy::prelude::*;
 
 /// Rotates the camera to point at a world-space position.
@@ -11,11 +10,16 @@ use bevy::prelude::*;
 /// The target tracking can be additionally smoothed, and made to look ahead of it.
 #[derive(Debug)]
 pub struct LookAt {
+    
+    /// The world-space position to look at
+    pub target_entity: Option<Entity>,
+    pub target_transform: Option<Transform>,
+
+    /// An Offset from target perspective
+    pub offset: Vec3,
+
     /// Exponential smoothing factor
     pub smoothness: f32,
-
-    /// The world-space position to look at
-    pub target: Vec3,
 
     // The scale with which smoothing should be applied to the target position
     output_offset_scale: f32,
@@ -24,12 +28,15 @@ pub struct LookAt {
 }
 
 impl LookAt {
-    ///
-    pub fn new(target: Vec3) -> Self {
+    /// Create a target to look at, you can provide and offset
+    /// from the targets perspective
+    pub fn new(target: Entity, offset: Vec3) -> Self {
         Self {
+            target_entity: Some(target),
+            offset: offset,
+            target_transform: None,
             smoothness: 0.0,
             output_offset_scale: 1.0,
-            target,
             smoothed_target: Default::default(),
         }
     }
@@ -53,8 +60,14 @@ impl LookAt {
 
 impl RigDriver for LookAt {
     fn update(&mut self, transform: &mut Transform, delta_time_seconds: f32) {
+
+        let mut offset= Vec3::ZERO;
+        if let Some(t) = self.target_transform {
+            offset = t.translation + ( t.rotation * self.offset );
+        }
+
         let target = self.smoothed_target.exp_smooth_towards(
-            &self.target,
+            &offset,
             ExpSmoothingParams {
                 smoothness: self.smoothness,
                 output_offset_scale: self.output_offset_scale,

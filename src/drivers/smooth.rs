@@ -1,6 +1,6 @@
 use std::any::Any;
 
-use super::{RigDriver, ExpSmoothed, ExpSmoothingParams};
+use super::{ExpSmoothed, ExpSmoothingParams, RigDriver};
 use bevy::prelude::*;
 
 /// Smooths the parent transformation.
@@ -32,6 +32,19 @@ impl Default for Smooth {
 }
 
 impl Smooth {
+    pub fn new(
+        position_smoothness: f32,
+        rotation_smoothness: f32,
+        predictive: bool,
+    ) -> Self {
+        Self {
+            position_smoothness,
+            rotation_smoothness,
+            output_offset_scale: if predictive { -1.0 } else { 1.0 },
+            smoothed_position: Default::default(),
+            smoothed_rotation: Default::default(),
+        }
+    }
     /// Only smooth position
     pub fn new_position(position_smoothness: f32) -> Self {
         Self {

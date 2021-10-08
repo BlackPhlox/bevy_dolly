@@ -1,30 +1,31 @@
+mod helpers;
 use bevy::input::mouse::MouseMotion;
 use bevy::prelude::*;
 use bevy_dolly::prelude::*;
-mod helpers;
+use helpers::*;
 
 fn main() {
     App::new()
         .insert_resource(Msaa { samples: 4 })
         .add_plugins(DefaultPlugins)
+
         .add_plugin(DollyPlugin)
-        .add_startup_system(setup_camera)
+        .add_startup_system(setup)
         .add_system(update_camera_system)
-        .add_startup_system(helpers::setup_example_scene)
+
+        .add_startup_system(setup_example_scene)
         .run();
 }
 
 /// Set our cameras
-fn setup_camera(mut commands: Commands) {
+fn setup(mut commands: Commands) {
     commands.spawn_bundle(DollyCameraBundle {
-        rig_builder: RigBuilder::default()
+        rig: Rig::default()
             .add(Position::default())
             .add(Rotation::default())
-            .add(YawPitch::new())
-            .add(Smooth::new_position_rotation(1.0, 1.0)),
-            //.add(Smooth::new_rotation(1.5)),
-        transform: Transform::from_xyz(0.0, 2.0, -5.0)
-            .looking_at(Vec3::ZERO, Vec3::Y),
+            .add(YawPitch::default())
+            .add(Smooth::new(2.0, 2.0, false)),
+        transform: Transform::from_xyz(0.0, 2.0, -5.0).looking_at(Vec3::ZERO, Vec3::Y),
         ..Default::default()
     });
 
@@ -69,11 +70,12 @@ fn update_camera_system(
         };
 
         move_vec = rig.final_transform.rotation * move_vec.clamp_length_max(1.0) * boost;
+        move_vec.y = 0.0; // clear out y so we don't move up and down
+
 
         if let Some(d) = rig.get_driver_mut::<Position>() {
             d.position += move_vec * time_delta_seconds * speed;
         }
-
 
         // Update Mouse Movement
         let mut delta = Vec2::ZERO;

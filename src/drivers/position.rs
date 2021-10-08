@@ -1,30 +1,28 @@
 use std::any::Any;
-
-use super::RigDriver;
 use bevy::prelude::*;
+use super::RigDriver;
 
 /// Directly sets the position of the camera
 #[derive(Debug)]
 pub struct Position {
-    pub transform_set: bool,
+    pub init_set: bool,
     pub position: Vec3,
 }
 
 impl Default for Position {
     fn default() -> Self {
         Self {
-            transform_set: true,
+            init_set: true,
             position: Vec3::ZERO,
         }
     }
 }
 
 impl Position {
-
     pub fn new(position: Vec3) -> Self {
         Self {
             position,
-            transform_set: false,
+            init_set: false,
         }
     }
 
