@@ -37,3 +37,23 @@ pub fn setup_example_scene(
     });
 }
 
+/// Grabs/ungrabs mouse cursor
+#[allow(dead_code)]
+fn toggle_grab_cursor(window: &mut Window) {
+    window.set_cursor_lock_mode(!window.cursor_locked());
+    window.set_cursor_visibility(!window.cursor_visible());
+}
+
+/// Grabs the cursor when game first starts
+#[allow(dead_code)]
+fn initial_grab_cursor(mut windows: ResMut<Windows>) {
+    toggle_grab_cursor(windows.get_primary_mut().unwrap());
+}
+
+#[allow(dead_code)]
+fn cursor_grab_system(keys: Res<Input<KeyCode>>, mut windows: ResMut<Windows>) {
+    let window = windows.get_primary_mut().unwrap();
+    if keys.just_pressed(KeyCode::Escape) {
+        toggle_grab_cursor(window);
+    }
+}

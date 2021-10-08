@@ -4,15 +4,28 @@ use super::RigDriver;
 use bevy::prelude::*;
 
 /// Directly sets the position of the camera
-#[derive(Default, Debug)]
+#[derive(Debug)]
 pub struct Position {
+    pub transform_set: bool,
     pub position: Vec3,
 }
 
+impl Default for Position {
+    fn default() -> Self {
+        Self {
+            transform_set: true,
+            position: Vec3::ZERO,
+        }
+    }
+}
+
 impl Position {
-    ///
+
     pub fn new(position: Vec3) -> Self {
-        Self { position }
+        Self {
+            position,
+            transform_set: false,
+        }
     }
 
     /// Add the specified vector to the position of this component

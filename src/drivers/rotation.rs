@@ -1,12 +1,32 @@
 use std::any::Any;
 
-use super::{RigDriver};
+use super::RigDriver;
 use bevy::prelude::*;
 
 /// Directly sets the rotation of the camera
-#[derive(Default, Debug)]
+#[derive(Debug)]
 pub struct Rotation {
+    pub transform_set: bool,
     pub rotation: Quat,
+}
+
+impl Default for Rotation {
+    /// Will use the transform for init value
+    fn default() -> Self {
+        Self {
+            rotation: Quat::default(),
+            transform_set: true,
+        }
+    }
+}
+
+impl Rotation {
+    pub fn new(rotation: Quat) -> Self {
+        Self {
+            rotation,
+            transform_set: false,
+        }
+    }
 }
 
 impl RigDriver for Rotation {

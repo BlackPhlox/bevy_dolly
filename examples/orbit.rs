@@ -11,31 +11,34 @@ fn main() {
         .add_plugins(DefaultPlugins)
 
         .add_plugin(DollyPlugin)
-
-        .add_startup_system(setup_example_scene)
         .add_startup_system(setup_camera)
         .add_system(update_camera_system)
+
+        .add_startup_system(setup_example_scene)
         .run();
 }
 
-/// set up a simple 3D scene
-fn setup_camera(
-    mut commands: Commands,
-) {
+/// Set our cameras
+fn setup_camera(mut commands: Commands) {
     commands.spawn_bundle(DollyCameraBundle {
-        camera_rig_builder: RigBuilder::default()
+        rig_builder: RigBuilder::default()
+            // .add(Position::default())
+            // .add(Rotation::default())
             .add(YawPitch::new().yaw_degrees(45.0).pitch_degrees(-30.0))
             .add(Smooth::new_rotation(1.5))
-            .add(Arm { offset: Vec3::Z * 8.0 }),
+            .add(Arm {
+                offset: Vec3::Z * 8.0,
+            }),
         transform: Transform::from_xyz(0.0, 2.0, -5.0),
         ..Default::default()
     });
+
+
+    info!("Use Z and X to rotate");
 }
 
-fn update_camera_system(
-    mut query: Query<&mut CameraRig>,
-    keys: Res<Input<KeyCode>>,
-) {
+/// Rotate our camera around
+fn update_camera_system(mut query: Query<&mut Rig>, keys: Res<Input<KeyCode>>) {
     for mut rig in query.iter_mut() {
         if let Some(driver) = rig.get_driver_mut::<YawPitch>() {
             if keys.just_pressed(KeyCode::Z) {

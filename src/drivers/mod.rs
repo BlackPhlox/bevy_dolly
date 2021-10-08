@@ -1,21 +1,21 @@
 mod arm;
 mod look_at;
-mod position;
-mod rotation;
 mod smooth;
 mod yaw_pitch;
+mod position;
+mod rotation;
+
 use std::any::Any;
 
 use bevy::prelude::*;
 
-pub use {arm::*, look_at::*, position::*, rotation::*, smooth::*, yaw_pitch::*};
+pub use {arm::*, look_at::*, smooth::*, yaw_pitch::*, position::*, rotation::*};
 
-pub trait RigDriver: Sync + Send + 'static {
+pub trait RigDriver: Sync + Send + std::fmt::Debug + 'static {
     /// Calculates the transform of this driver component based on the parent
     /// provided in `params`.
     fn update(&mut self, transform: &mut Transform, delta_time_seconds: f32);
 
-    
     fn as_any(&self) -> &dyn Any;
     fn as_any_mut(&mut self) -> &mut dyn std::any::Any;
 }

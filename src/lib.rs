@@ -1,3 +1,4 @@
+#![feature(derive_default_enum)]
 pub mod bundle;
 pub mod drivers;
 pub mod rig;
@@ -15,7 +16,7 @@ pub struct DollyPlugin;
 impl Plugin for DollyPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<DollyConfig>()
-            // Adds position and rotation drivers
+
             .add_system(init_camera_system)
             // This will update all camera rig position and rotation
             .add_system(update_camera_rigs_system)
@@ -26,6 +27,8 @@ impl Plugin for DollyPlugin {
 
 pub struct DollyConfig {
     pub speed: f32,
+    pub boost_multiplyer: f32,
+    pub sensitivity: Vec2,
     pub target: Option<Entity>,
 }
 
@@ -34,34 +37,41 @@ impl Default for DollyConfig {
         Self {
             speed: 10.0,
             target: None,
+            boost_multiplyer: 5.0,
+            sensitivity: Vec2::splat(1.0),
         }
     }
 }
 
 /// Add position and rotation from init transform
 fn init_camera_system(
-    mut query: Query<(&Transform, &mut CameraRig, &mut RigBuilder), Added<CameraRig>>,
+    mut query: Query<(&Transform, &mut Rig, &mut RigBuilder), Added<Rig>>,
 ) {
     for (transform, mut rig, mut builder) in query.iter_mut() {
-        rig.drivers.insert(
-            0,
-            Box::new(Position {
-                position: transform.translation.clone(),
-            }),
-        );
-        rig.drivers.insert(
-            1,
-            Box::new(Rotation {
-                rotation: transform.rotation.clone(),
-            }),
-        );
+
+        // Build our rig
+        rig.drivers.append(&mut builder.drivers);
+
+        if let Some(d) = rig.get_driver_mut::<Position>() {
+            if d.transform_set {
+                info!("set trans {:?}", transform.translation);
+                d.position = transform.translation;
+            }
+        }
+
+        if let Some(d) = rig.get_driver_mut::<Rotation>() {
+            if d.transform_set {
+                info!("set rot {:?}", transform.rotation);
+                d.rotation = transform.rotation;
+            }
+        }
 
         rig.update(0.0);
     }
 }
 
 // TODO: Could filter by Bundle, but this may make it more useable later
-fn update_camera_rigs_system(time: Res<Time>, mut query: Query<(&mut Transform, &mut CameraRig)>) {
+fn update_camera_rigs_system(time: Res<Time>, mut query: Query<(&mut Transform, &mut Rig)>) {
     for (mut t, mut rig) in query.iter_mut() {
         *t = rig.update(time.delta_seconds());
     }
@@ -72,11 +82,10 @@ fn update_control_system(
     keys: Res<Input<KeyCode>>,
     config: Res<DollyConfig>,
     mut mouse_motion_events: EventReader<MouseMotion>,
-    mut query: Query<(&mut Transform, &mut CameraRig, &CameraActions)>,
+    mut query: Query<(&mut Rig, &CameraActions)>,
 ) {
-    for (mut transform, mut rig, camera_keys) in query.iter_mut() {
-        let boost_mult: f32 = 5.0;
-        let sensitivity = Vec2::splat(1.0);
+    for (mut rig, camera_keys) in query.iter_mut() {
+
 
         let mut move_vec = Vec3::ZERO;
 
@@ -100,28 +109,24 @@ fn update_control_system(
         }
 
         let boost = match camera_keys.pressed(CameraAction::Boost, &keys) {
-            true => 1.0,
-            false => 0.0,
+            true => config.boost_multiplyer,
+            false => 1.0,
         };
 
         let mut delta = Vec2::ZERO;
         for event in mouse_motion_events.iter() {
             delta += event.delta;
         }
-        let move_vec =
-            rig.final_transform.rotation * move_vec.clamp_length_max(1.0) * boost_mult.powf(boost);
+        move_vec = rig.final_transform.rotation * move_vec.clamp_length_max(1.0) * boost;
 
         if let Some(d) = rig.get_driver_mut::<Position>() {
             d.position += move_vec * time.delta_seconds() * config.speed;
         }
-
         if let Some(d) = rig.get_driver_mut::<YawPitch>() {
             d.rotate_yaw_pitch(
-                -0.1 * delta.x * sensitivity.x,
-                -0.1 * delta.y * sensitivity.y,
+                -0.1 * delta.x * config.sensitivity.x,
+                -0.1 * delta.y * config.sensitivity.y,
             );
         }
-
-        //transform.translation = move_vec * time.delta_seconds() * config.speed;
     }
 }

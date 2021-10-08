@@ -1,23 +1,21 @@
-use std::{any::TypeId, slice::{Iter, IterMut}};
-
 use crate::drivers::*;
 use bevy::prelude::*;
 
 /// A chain of drivers, calculating displacements, and animating in succession.
 #[derive(Default, Component)]
-pub struct CameraRig {
+pub struct Rig {
     pub drivers: Vec<Box<dyn RigDriver>>,
     pub final_transform: Transform,
 }
 
-impl CameraRig {
+impl Rig {
 
     /// Returns the first driver of the matching type
     pub fn get_driver_mut<T: RigDriver>(&mut self) -> Option<&mut T> {
          for driver in  self.drivers.iter_mut() {
              match driver.as_any_mut().downcast_mut::<T>() {
                     Some(a) => return Some(a),
-                    None => continue,
+                    None => (),
             }
          }
          None
@@ -35,13 +33,14 @@ impl CameraRig {
         for driver in self.drivers.iter_mut() {
              driver.update(&mut result, delta_time_seconds);
         }
+
+        self.final_transform = result;
         result
     }
 }
 #[derive(Default, Component)]
 pub struct RigBuilder {
     pub drivers: Vec<Box<dyn RigDriver>>,
-   
 }
 impl RigBuilder {
     pub fn add(mut self, driver: impl RigDriver) -> Self {
