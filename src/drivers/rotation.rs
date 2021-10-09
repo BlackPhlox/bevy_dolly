@@ -9,7 +9,7 @@ pub struct Rotation {
     pub rotation: Quat,
 
     /// Sets using rigs transfrom
-    pub (crate) init_set: bool,
+    pub(crate) init_set: bool,
 }
 
 impl Default for Rotation {
@@ -43,4 +43,3 @@ impl RigDriver for Rotation {
         self
     }
 }
-

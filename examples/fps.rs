@@ -22,7 +22,7 @@ fn setup(mut commands: Commands) {
             .add(Position::default())
             .add(Rotation::default())
             .add(YawPitch::default())
-            .add(Smooth::new(2.0, 2.0, false)),
+            .add(Smooth::new(2.0, 2.0)),
         transform: Transform::from_xyz(0.0, 2.0, -5.0).looking_at(Vec3::ZERO, Vec3::Y),
         ..Default::default()
     });
@@ -32,14 +32,14 @@ fn setup(mut commands: Commands) {
     info!("Use Shift to go fast");
 }
 
-// Lets handle input our selfs
+// Lets handle input ourselfs
 fn update_camera_system(
     time: Res<Time>,
     keys: Res<Input<KeyCode>>,
     mut mouse_motion_events: EventReader<MouseMotion>,
-    mut query: Query<&mut Rig>,
+    mut query: Query<(&Transform, &mut Rig)>,
 ) {
-    for mut rig in query.iter_mut() {
+    for (t, mut rig) in query.iter_mut() {
         let time_delta_seconds: f32 = time.delta_seconds();
         let speed = 10.0;
         let boost_multiplyer: f32 = 5.0;
@@ -67,7 +67,8 @@ fn update_camera_system(
             false => 1.0,
         };
 
-        move_vec = rig.final_transform.rotation * move_vec.clamp_length_max(1.0) * boost;
+        // Move relative to the camera
+        move_vec = t.rotation * move_vec.clamp_length_max(1.0) * boost;
         move_vec.y = 0.0; // clear out y so we don't move up and down
 
         if let Some(d) = rig.get_driver_mut::<Position>() {

@@ -11,7 +11,6 @@ fn main() {
         .add_plugin(DollyPlugin)
         .add_startup_system(setup)
         .add_startup_system(setup_example_scene)
-
         .run();
 }
 

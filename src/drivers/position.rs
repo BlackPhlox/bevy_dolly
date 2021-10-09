@@ -5,7 +5,7 @@ use std::any::Any;
 /// Directly sets the position of the camera
 #[derive(Debug)]
 pub struct Position {
-    pub (crate) init_set: bool,
+    pub(crate) init_set: bool,
     pub position: Vec3,
 }
 

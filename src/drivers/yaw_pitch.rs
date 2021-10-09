@@ -31,7 +31,7 @@ impl YawPitch {
             yaw_degrees,
             pitch_degrees,
         }
-    }   
+    }
     /// Additively rotate by the specified angles.
     pub fn rotate_yaw_pitch(&mut self, yaw_degrees: f32, pitch_degrees: f32) {
         self.yaw_degrees = (self.yaw_degrees + yaw_degrees) % 720_f32;

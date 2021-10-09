@@ -60,7 +60,6 @@ pub fn print_control_actions() {
 /// Grabs/ungrabs mouse cursor
 #[allow(dead_code)]
 pub fn toggle_grab_cursor(window: &mut Window) {
-    
     if window.cursor_visible() {
         info!("here");
         window.set_cursor_lock_mode(!window.cursor_locked());

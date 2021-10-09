@@ -1,5 +1,5 @@
-mod arm;
 mod anchor;
+mod arm;
 mod look_at;
 mod position;
 mod rotation;
@@ -8,9 +8,9 @@ mod yaw_pitch;
 
 use bevy::prelude::*;
 use std::any::Any;
-pub use {arm::*, anchor::*, look_at::*, position::*, rotation::*, smooth::*, yaw_pitch::*};
+pub use {anchor::*, arm::*, look_at::*, position::*, rotation::*, smooth::*, yaw_pitch::*};
 
-pub trait RigDriver: Sync + Send  + 'static {
+pub trait RigDriver: Sync + Send + 'static {
     /// Calculates the transform of this driver component
     fn update(&mut self, transform: &mut Transform, delta_time_seconds: f32);
 

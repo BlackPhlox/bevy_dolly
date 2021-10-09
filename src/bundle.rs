@@ -76,7 +76,6 @@ impl DollyControlCameraBundle {
     /// Provide few easy use default cameras
     /// TODO: Flush this out more with tested presets
     pub fn new(preset: ControlledType) -> Self {
-
         let result = match preset {
             ControlledType::Free => Self {
                 rig: Rig::default()
