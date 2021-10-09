@@ -10,6 +10,7 @@ pub struct Arm {
 }
 
 impl Arm {
+    /// Create an offset
     pub fn new(offset: Vec3) -> Arm {
         Self { offset }
     }
@@ -19,7 +20,6 @@ impl RigDriver for Arm {
     fn update(&mut self, transform: &mut Transform, _delta_time_seconds: f32) {
         transform.translation += transform.rotation * self.offset;
     }
-
     fn as_any(&self) -> &dyn Any {
         self
     }

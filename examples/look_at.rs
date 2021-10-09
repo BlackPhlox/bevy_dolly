@@ -31,8 +31,8 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         rig: Rig::default()
             .add(Position::default())
             .add(Rotation::default())
-            .add(LookAt::new(sheep, Vec3::new(0.0, 1.0, 0.0)).tracking_smoothness(1.25))
-            .add(Smooth::new(1.25, 1.0, false)),
+            .add(LookAt::new(sheep, Vec3::new(0.0, 1.0, 0.0)))
+            .add(Smooth::new(1.25, 1.0)),
         transform: Transform::from_xyz(0.0, 2.0, -5.0).looking_at(Vec3::ZERO, Vec3::Y),
         ..Default::default()
     });

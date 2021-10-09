@@ -9,7 +9,7 @@ pub struct Rotation {
     pub rotation: Quat,
 
     /// Sets using rigs transfrom
-    pub init_set: bool,
+    pub (crate) init_set: bool,
 }
 
 impl Default for Rotation {
@@ -23,9 +23,9 @@ impl Default for Rotation {
 }
 
 impl Rotation {
-    pub fn new(rotation: Quat) -> Self {
+    pub fn new<T: Into<Quat>>(rotation: T) -> Self {
         Self {
-            rotation,
+            rotation: rotation.into(),
             init_set: false,
         }
     }
@@ -33,7 +33,7 @@ impl Rotation {
 
 impl RigDriver for Rotation {
     fn update(&mut self, transform: &mut Transform, _delta_time_seconds: f32) {
-        transform.rotation = self.rotation;
+        transform.rotation *= self.rotation;
     }
 
     fn as_any(&self) -> &dyn Any {
@@ -43,3 +43,4 @@ impl RigDriver for Rotation {
         self
     }
 }
+

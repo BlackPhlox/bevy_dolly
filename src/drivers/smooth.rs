@@ -1,6 +1,6 @@
 use std::any::Any;
 
-use super::{ExpSmoothed, ExpSmoothingParams, RigDriver};
+use super::RigDriver;
 use bevy::prelude::*;
 
 /// Smooths the parent transformation.
@@ -8,15 +8,10 @@ use bevy::prelude::*;
 pub struct Smooth {
     /// Exponential smoothing factor for the position
     pub position_smoothness: f32,
-
-    /// Exponential smoothing factor for the rotation
     pub rotation_smoothness: f32,
 
-    // The scale with which smoothing should be applied
-    output_offset_scale: f32,
-
-    smoothed_position: ExpSmoothed<Vec3>,
-    smoothed_rotation: ExpSmoothed<Quat>,
+    prev_position: Option<Vec3>,
+    prev_rotation: Option<Quat>,
 }
 
 impl Default for Smooth {
@@ -24,82 +19,51 @@ impl Default for Smooth {
         Self {
             position_smoothness: 1.0,
             rotation_smoothness: 1.0,
-            output_offset_scale: 1.0,
-            smoothed_position: Default::default(),
-            smoothed_rotation: Default::default(),
+            prev_position: None,
+            prev_rotation: None,
         }
     }
 }
 
 impl Smooth {
-    pub fn new(position_smoothness: f32, rotation_smoothness: f32, predictive: bool) -> Self {
+    pub fn new(position: f32, rotation: f32) -> Self {
         Self {
-            position_smoothness,
-            rotation_smoothness,
-            output_offset_scale: if predictive { -1.0 } else { 1.0 },
-            smoothed_position: Default::default(),
-            smoothed_rotation: Default::default(),
+            position_smoothness: position,
+            rotation_smoothness: rotation,
+            prev_position: None,
+            prev_rotation: None,
         }
-    }
-    /// Only smooth position
-    pub fn new_position(position_smoothness: f32) -> Self {
-        Self {
-            position_smoothness,
-            rotation_smoothness: 0.0,
-            ..Default::default()
-        }
-    }
-
-    /// Only smooth rotation
-    pub fn new_rotation(rotation_smoothness: f32) -> Self {
-        Self {
-            rotation_smoothness,
-            position_smoothness: 0.0,
-            ..Default::default()
-        }
-    }
-
-    /// Smooth both position and rotation
-    pub fn new_position_rotation(position_smoothness: f32, rotation_smoothness: f32) -> Self {
-        Self {
-            position_smoothness,
-            rotation_smoothness,
-            ..Default::default()
-        }
-    }
-
-    /// Reverse the smoothing, causing the camera to look ahead of the parent transform
-    ///
-    /// This can be useful on top of [`Position`], and before another `Smooth`
-    /// in the chain to create a soft yet responsive follower camera.
-    ///
-    /// [`Position`]: struct.Position.html
-    /// [`Smooth`]: struct.Smooth.html
-    pub fn predictive(mut self, predictive: bool) -> Self {
-        self.output_offset_scale = if predictive { -1.0 } else { 1.0 };
-        self
     }
 }
+// An ad-hoc multiplier to make default smoothness parameters
+// produce good-looking results.
+const SMOOTHNESS_MULT: f32 = 8.0;
 
 impl RigDriver for Smooth {
+    // TODO: This is far clearer, but 2 things
+    // - We do all the work no mater if smoothing is enabled
+    // - I bet this already exists in glam or bevy
+
+    /// Smooths translation and/or rotation
     fn update(&mut self, transform: &mut Transform, delta_time_seconds: f32) {
-        transform.translation = self.smoothed_position.exp_smooth_towards(
-            &transform.translation,
-            ExpSmoothingParams {
-                smoothness: self.position_smoothness,
-                output_offset_scale: self.output_offset_scale,
-                delta_time_seconds: delta_time_seconds,
-            },
+        // Calculate the exponential blending based on frame time
+        // TODO: Look at this more
+        let (interp_pos, interp_rot) = (
+            1.0 - (-SMOOTHNESS_MULT * delta_time_seconds / self.position_smoothness.max(1e-5))
+                .exp(),
+            1.0 - (-SMOOTHNESS_MULT * delta_time_seconds / self.rotation_smoothness.max(1e-5))
+                .exp(),
         );
 
-        transform.rotation = self.smoothed_rotation.exp_smooth_towards(
-            &transform.rotation,
-            ExpSmoothingParams {
-                smoothness: self.rotation_smoothness,
-                output_offset_scale: self.output_offset_scale,
-                delta_time_seconds: delta_time_seconds,
-            },
-        );
+        // Find our previous info if any, lerp with target
+        let prev_pos = self.prev_position.unwrap_or(transform.translation);
+        let prev_rot = self.prev_rotation.unwrap_or(transform.rotation);
+        transform.translation = Vec3::lerp(prev_pos, transform.translation, interp_pos);
+        transform.rotation = Quat::lerp(prev_rot, transform.rotation, interp_rot);
+
+        // Save
+        self.prev_position = Some(transform.translation);
+        self.prev_rotation = Some(transform.rotation);
     }
 
     fn as_any(&self) -> &dyn Any {

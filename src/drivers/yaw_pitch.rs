@@ -31,40 +31,11 @@ impl YawPitch {
             yaw_degrees,
             pitch_degrees,
         }
-    }
-    /// Creates camera looking forward along -Z
-
-    /// Initialize the yaw and pitch angles from a quaternion.
-    /// Any roll rotation will be ignored.
-    pub fn rotation_quat(mut self, rotation: Quat) -> Self {
-        self.set_rotation_quat(rotation);
-        self
-    }
-
-    /// Set the yaw angle in degrees.
-    pub fn yaw_degrees(mut self, yaw_degrees: f32) -> Self {
-        self.yaw_degrees = yaw_degrees;
-        self
-    }
-
-    /// Set the pitch angle in degrees.
-    pub fn pitch_degrees(mut self, pitch_degrees: f32) -> Self {
-        self.pitch_degrees = pitch_degrees;
-        self
-    }
-
+    }   
     /// Additively rotate by the specified angles.
     pub fn rotate_yaw_pitch(&mut self, yaw_degrees: f32, pitch_degrees: f32) {
         self.yaw_degrees = (self.yaw_degrees + yaw_degrees) % 720_f32;
         self.pitch_degrees = (self.pitch_degrees + pitch_degrees).clamp(-90.0, 90.0);
-    }
-
-    /// Set the yaw and pitch angles from a quaternion.
-    /// Any roll rotation will be ignored.
-    pub fn set_rotation_quat(&mut self, rotation: Quat) {
-        let (yaw, pitch, _) = rotation.to_euler(bevy::math::EulerRot::XYZ);
-        self.yaw_degrees = yaw.to_degrees();
-        self.pitch_degrees = pitch.to_degrees();
     }
 }
 

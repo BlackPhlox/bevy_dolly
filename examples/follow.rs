@@ -27,10 +27,10 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
 
     commands.spawn_bundle(DollyCameraBundle {
         rig: Rig::default()
-            .add(Follow::new(sheep))
+            .add(Anchor::new(sheep))
             .add(Arm::new(Vec3::new(0.0, 2.5, -3.5)))
             .add(LookAt::new(sheep, Vec3::new(0.0, 1.0, 1.0)))
-            .add(Smooth::new(2.5, 2.5, false)),
+            .add(Smooth::new(1.0, 1.0)),
         ..Default::default()
     });
 

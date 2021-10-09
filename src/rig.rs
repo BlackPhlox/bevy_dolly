@@ -24,11 +24,6 @@ impl Rig {
     /// Runs all the drivers in sequence, animating the rig, and producing a final transform of the camera.
     /// Camera rigs are approximately framerate independent, so `update` can be called at any frequency.
     pub fn update(&mut self, delta_time_seconds: f32) -> Transform {
-
-        // You would think that we would start with our current
-        // transform or some thing we saved, but it limit driver capabilities
-        // ex. (rotation, position) for a free camara vs follow driver
-        // TODO: Transform have scale, that we never ever use, should test other options
         let mut result = Transform::default();
         // excute drivers in order
         for driver in self.drivers.iter_mut() {

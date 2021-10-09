@@ -12,8 +12,6 @@ fn main() {
         .add_startup_system(setup)
         .add_startup_system(setup_example_scene)
 
-        .add_startup_system(initial_grab_cursor)
-        .add_system(cursor_grab_system)
         .run();
 }
 
@@ -25,7 +23,7 @@ fn setup(mut commands: Commands) {
             .add(Position::default())
             .add(Rotation::default())
             .add(YawPitch::default())
-            .add(Smooth::new(2.0, 2.0, false)),
+            .add(Smooth::new(2.0, 2.0)),
         transform: Transform::from_xyz(0.0, 2.0, 5.0).looking_at(Vec3::ZERO, Vec3::Y),
         ..Default::default()
     });

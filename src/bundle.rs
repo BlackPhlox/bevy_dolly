@@ -19,7 +19,7 @@ pub struct DollyCameraBundle {
 }
 
 /// These are DollyCamera with and additional CameraActions
-/// and 1 system will process actions for t hem
+/// and 1 system will process actions for them
 #[derive(Bundle)]
 pub struct DollyControlCameraBundle {
     /// Hashmap of actions to Vec<KeyCode> that we listen for
@@ -58,8 +58,7 @@ impl Default for DollyControlCameraBundle {
             rig: Rig::default()
                 .add(Position::default())
                 .add(Rotation::default())
-                .add(YawPitch::default())
-                .add(Smooth::new_position_rotation(1.0, 1.0)),
+                .add(Smooth::new(1.0, 1.0)),
             //rig: Rig::default(),
             camera: Camera {
                 name: Some(base::camera::CAMERA_3D.to_string()),
@@ -74,9 +73,9 @@ impl Default for DollyControlCameraBundle {
 }
 
 impl DollyControlCameraBundle {
-    // Provide few easy use default cameras
+    /// Provide few easy use default cameras
+    /// TODO: Flush this out more with tested presets
     pub fn new(preset: ControlledType) -> Self {
-        info!("here");
 
         let result = match preset {
             ControlledType::Free => Self {
@@ -84,7 +83,7 @@ impl DollyControlCameraBundle {
                     .add(Position::default())
                     .add(Rotation::default())
                     .add(YawPitch::default())
-                    .add(Smooth::new_position_rotation(1.0, 1.0)),
+                    .add(Smooth::new(1.0, 1.0)),
                 camera_actions: CameraActions::default(),
                 //rig: Rig::default(),
                 camera: Camera {
@@ -101,7 +100,7 @@ impl DollyControlCameraBundle {
                     .add(Position::default())
                     .add(Rotation::default())
                     .add(YawPitch::default())
-                    .add(Smooth::new_position_rotation(1.0, 1.0)),
+                    .add(Smooth::new(1.0, 1.0)),
                 camera_actions: CameraActions::default(),
                 //rig: Rig::default(),
                 camera: Camera {
@@ -163,11 +162,12 @@ impl Default for CameraActions {
 }
 
 impl CameraActions {
+    /// Helpers function to see if any of the keys are pressed
     pub fn pressed(&self, action: CameraAction, input: &Input<KeyCode>) -> bool {
         match self.map.get(&action) {
             Some(keys) => {
                 // TODO: try to get any_pressed working
-                // input.any_pressed( keys ) without copy vec
+                // input.any_pressed( keys ) without coping vec
                 for key in keys.iter() {
                     if input.pressed(*key) {
                         return true;

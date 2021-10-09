@@ -3,8 +3,9 @@ use bevy::prelude::*;
 use std::any::Any;
 
 /// Sets Transform to Target's
+/// Should only be used first in a Rig
 #[derive(Debug)]
-pub struct Follow {
+pub struct Anchor {
     /// The world-space position to look at
     pub target_entity: Entity,
 
@@ -12,8 +13,8 @@ pub struct Follow {
     pub target: Transform,
 }
 
-impl Follow {
-    ///
+impl Anchor {
+    /// Anchor to entity transform
     pub fn new(target: Entity) -> Self {
         Self {
             target_entity: target,
@@ -22,10 +23,9 @@ impl Follow {
     }
 }
 
-impl RigDriver for Follow {
+impl RigDriver for Anchor {
     fn update(&mut self, transform: &mut Transform, _delta_time_seconds: f32) {
-        transform.translation = self.target.translation;
-        transform.rotation = self.target.rotation;
+        *transform = self.target;
     }
 
     fn as_any(&self) -> &dyn Any {

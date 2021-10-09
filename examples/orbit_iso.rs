@@ -20,8 +20,8 @@ fn main() {
 fn setup_camera(mut commands: Commands) {
     commands.spawn_bundle(DollyCameraBundle {
         rig: Rig::default()
-            .add(YawPitch::default().yaw_degrees(45.0).pitch_degrees(-30.0))
-            .add(Smooth::new_rotation(1.5))
+            .add(YawPitch::new(45.0, -30.0 ))
+            .add(Smooth::new(0.0, 1.5))
             .add(Arm::new(Vec3::Z * 8.0)),
         transform: Transform::from_xyz(0.0, 2.0, -5.0),
         ..Default::default()

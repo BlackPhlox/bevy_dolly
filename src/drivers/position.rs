@@ -5,11 +5,12 @@ use std::any::Any;
 /// Directly sets the position of the camera
 #[derive(Debug)]
 pub struct Position {
-    pub init_set: bool,
+    pub (crate) init_set: bool,
     pub position: Vec3,
 }
 
 impl Default for Position {
+    /// Will use the transform for init value
     fn default() -> Self {
         Self {
             init_set: true,
@@ -24,11 +25,6 @@ impl Position {
             position,
             init_set: false,
         }
-    }
-
-    /// Add the specified vector to the position of this component
-    pub fn translate(&mut self, move_vec: Vec3) {
-        self.position += move_vec;
     }
 }
 

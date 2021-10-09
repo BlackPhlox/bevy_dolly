@@ -1,9 +1,6 @@
-use std::any::Any;
-
-use crate::ExpSmoothed;
-
-use super::{ExpSmoothingParams, RigDriver};
+use super::RigDriver;
 use bevy::prelude::*;
+use std::any::Any;
 
 /// Rotates the camera to point at a world-space position.
 ///
@@ -16,14 +13,6 @@ pub struct LookAt {
 
     /// An Offset from target perspective
     pub offset: Vec3,
-
-    /// Exponential smoothing factor
-    pub smoothness: f32,
-
-    // The scale with which smoothing should be applied to the target position
-    output_offset_scale: f32,
-
-    smoothed_target: ExpSmoothed<Vec3>,
 }
 
 impl LookAt {
@@ -34,53 +23,17 @@ impl LookAt {
             target_entity: Some(target),
             offset: offset,
             target_transform: None,
-            smoothness: 0.0,
-            output_offset_scale: 1.0,
-            smoothed_target: Default::default(),
         }
-    }
-
-    /// Set the exponential smoothing factor for target position tracking.
-    pub fn tracking_smoothness(mut self, smoothness: f32) -> Self {
-        self.smoothness = smoothness;
-        self
-    }
-
-    /// Reverse target position smoothing, causing the camera to look ahead of it.
-    /// This can then be chained with [`Smooth`], to create
-    /// a camera that smoothly follows an object, but doesn't lag far behind it.
-    ///
-    /// [`Smooth`]: struct.Smooth.html
-    pub fn tracking_predictive(mut self, predictive: bool) -> Self {
-        self.output_offset_scale = if predictive { -1.0 } else { 1.0 };
-        self
     }
 }
 
 impl RigDriver for LookAt {
-    fn update(&mut self, transform: &mut Transform, delta_time_seconds: f32) {
-        let mut offset = Vec3::ZERO;
+    fn update(&mut self, transform: &mut Transform, _delta_time_seconds: f32) {
+        let mut world_target = Vec3::ZERO;
         if let Some(t) = self.target_transform {
-            offset = t.translation + (t.rotation * self.offset);
+            world_target = t.translation + (t.rotation * self.offset);
         }
-
-        let target = self.smoothed_target.exp_smooth_towards(
-            &offset,
-            ExpSmoothingParams {
-                smoothness: self.smoothness,
-                output_offset_scale: self.output_offset_scale,
-                delta_time_seconds: delta_time_seconds,
-            },
-        );
-
-        transform.rotation = (target - transform.translation)
-            .try_normalize()
-            .and_then(|forward| {
-                let right = forward.cross(Vec3::Y).try_normalize()?;
-                let up = right.cross(forward);
-                Some(Quat::from_mat3(&Mat3::from_cols(right, up, -forward)))
-            })
-            .unwrap_or_default();
+        transform.look_at(world_target, Vec3::Y);
     }
 
     fn as_any(&self) -> &dyn Any {

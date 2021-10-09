@@ -17,19 +17,20 @@ impl Plugin for DollyPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<DollyControlConfig>()
             .add_system_to_stage(CoreStage::PreUpdate, init_camera_system)
-            .add_system_to_stage(CoreStage::PreUpdate, update_look_at_rigs_system)
+            .add_system_to_stage(CoreStage::PreUpdate, update_rigs_system)
             .add_system_to_stage(CoreStage::PreUpdate, update_control_system)
-            // This will update all camera rig position and rotation
+            // This will update all rigs position and rotation
             .add_system_to_stage(CoreStage::Update, apply_rigs_system);
     }
 }
 
 /// Configuration Resource for Dolly Controlled Rigs
+// TODO: We could store the targeting data here, would really make user
+// interaction
 pub struct DollyControlConfig {
     pub speed: f32,
     pub key_rotation: f32,
     pub boost_multiplyer: f32,
-    
     pub sensitivity: Vec2,
 }
 
@@ -62,6 +63,7 @@ fn init_camera_system(mut query: Query<(&mut Transform, &mut Rig), Added<Rig>>) 
             }
         }
 
+        // TODO: We could check for miss configurations here, like anchor is not first
         // for d in rig.drivers.iter() {
         //     info!("driver: {:?}", d);
         // }
@@ -71,7 +73,7 @@ fn init_camera_system(mut query: Query<(&mut Transform, &mut Rig), Added<Rig>>) 
     }
 }
 
-fn update_look_at_rigs_system(mut rig_query: Query<&mut Rig>, transform_query: Query<&Transform>) {
+fn update_rigs_system(mut rig_query: Query<&mut Rig>, transform_query: Query<&Transform>) {
     for mut rig in rig_query.iter_mut() {
         // Update LookAt Drivers
         if let Some(d) = rig.get_driver_mut::<LookAt>() {
@@ -82,8 +84,8 @@ fn update_look_at_rigs_system(mut rig_query: Query<&mut Rig>, transform_query: Q
             }
         }
 
-        // Update Follow Drivers
-        if let Some(d) = rig.get_driver_mut::<Follow>() {
+        // Update Anchor Drivers
+        if let Some(d) = rig.get_driver_mut::<Anchor>() {
             match transform_query.get(d.target_entity) {
                 Ok(t) => d.target = t.clone(),
                 Err(_) => (),

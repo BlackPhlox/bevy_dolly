@@ -43,7 +43,7 @@ fn setup(
     target_config.entities.append(&mut herd);
 
     // Add our camera, try changing
-    // Using `Control` version of the bundle here so we can move around
+    // You can remove the `Control` from the bundle to disable camera movement
     commands.spawn_bundle(DollyControlCameraBundle {
         rig: Rig::default()
             .add(Position::default())
@@ -51,10 +51,11 @@ fn setup(
             .add(YawPitch::default())
             .add(LookAt::new(
                 target_config.entities[0],
-                Vec3::new(0.0, 1.0, 0.0),
+                // Lets look a little in front of and above our target
+                Vec3::new(0.0, 1.0, 1.0),
             ))
-            .add(Smooth::new(1.0, 2.0, false)),
-        transform: Transform::from_xyz(0.0, 2.0, 10.0),
+            .add(Smooth::new(1.0, 2.0)),
+        transform: Transform::from_xyz(0.0, 2.0, -10.0),
         ..Default::default()
     });
 
