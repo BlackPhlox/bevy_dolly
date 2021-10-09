@@ -29,6 +29,7 @@ pub struct DollyControlConfig {
     pub speed: f32,
     pub key_rotation: f32,
     pub boost_multiplyer: f32,
+    
     pub sensitivity: Vec2,
 }
 
@@ -105,9 +106,9 @@ fn update_control_system(
     keys: Res<Input<KeyCode>>,
     config: Res<DollyControlConfig>,
     mut mouse_motion_events: EventReader<MouseMotion>,
-    mut query: Query<(&mut Rig, &CameraActions)>,
+    mut query: Query<(&Transform, &mut Rig, &CameraActions)>,
 ) {
-    for (mut rig, camera_keys) in query.iter_mut() {
+    for (t, mut rig, camera_keys) in query.iter_mut() {
         // Update position
         let mut move_vec = Vec3::ZERO;
         if camera_keys.pressed(CameraAction::Forward, &keys) {
@@ -134,8 +135,8 @@ fn update_control_system(
             false => 1.0,
         };
 
-        // Move relative to the direction of the camera
-        move_vec = rig.final_transform.rotation * move_vec.clamp_length_max(1.0) * boost;
+        // Move relative to current transform
+        move_vec = t.rotation * move_vec.clamp_length_max(1.0) * boost;
 
         if let Some(d) = rig.get_driver_mut::<Position>() {
             d.position += move_vec * time.delta_seconds() * config.speed;
