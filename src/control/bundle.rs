@@ -63,7 +63,7 @@ impl DollyControlCameraBundle {
                 transform: Default::default(),
                 global_transform: Default::default(),
             },
-            ControlledType::FPS => Self {
+            ControlledType::Fps => Self {
                 rig: Rig::default()
                     .add(Position::default())
                     .add(Rotation::default())
@@ -89,5 +89,5 @@ impl DollyControlCameraBundle {
 pub enum ControlledType {
     #[default]
     Free,
-    FPS,
+    Fps,
 }

@@ -30,7 +30,7 @@ fn setup(mut commands: Commands) {
 
     // You could just pass the bundle directly to spawn_bundle
     // but lets print the current camera actions for ref
-    camera.camera_actions.print_actions();
+    camera.control_actions.print_actions();
 
     // Now lets finally spawn our camera
     commands.spawn_bundle(camera);
