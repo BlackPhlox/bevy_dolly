@@ -41,23 +41,10 @@ pub fn spawn_sheep(position: Vec3, commands: &mut Commands, asset_server: &Asset
         .id()
 }
 
-#[allow(dead_code)]
-pub fn print_control_actions() {
-    // TODO: Build this form the hashmap
-    info!("Using 'DollyControlCameraBundle', these are the default binding");
-    info!("Forward: {:?}", vec![KeyCode::Up, KeyCode::W]);
-    info!("Backward: {:?}", vec![KeyCode::Down, KeyCode::S]);
-    info!("Left: {:?}", vec![KeyCode::Left, KeyCode::A]);
-    info!("Right: {:?}", vec![KeyCode::Right, KeyCode::D]);
-    info!("Up: {:?}", vec![KeyCode::Z]);
-    info!("Down: {:?}", vec![KeyCode::X]);
-    info!("RotateLeft: {:?}", vec![KeyCode::Q]);
-    info!("RotateRight: {:?}", vec![KeyCode::E]);
-    info!("Boost: {:?}", vec![KeyCode::LShift]);
-}
+
 
 // TODO: add cursor stuff back once everything works well
-/// Grabs/ungrabs mouse cursor
+// Grabs/ungrabs mouse cursor
 #[allow(dead_code)]
 pub fn toggle_grab_cursor(window: &mut Window) {
     if window.cursor_visible() {

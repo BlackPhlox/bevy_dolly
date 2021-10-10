@@ -59,8 +59,6 @@ fn setup(
         ..Default::default()
     });
 
-    print_control_actions();
-
     info!(" Use 1, 2, 3, 4 to target different sheep");
     info!(" Use Q and E to turn the sheep");
 }

@@ -30,7 +30,7 @@ impl Position {
 
 impl RigDriver for Position {
     fn update(&mut self, transform: &mut Transform, _delta_time_seconds: f32) {
-        transform.translation = self.position.clone();
+        transform.translation = self.position;
     }
 
     fn as_any(&self) -> &dyn Any {

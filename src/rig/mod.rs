@@ -1,4 +1,5 @@
-use crate::drivers::*;
+pub mod driver;
+pub use driver::*;
 use bevy::prelude::*;
 
 /// A chain of drivers, calculating displacements, and animating in succession.
