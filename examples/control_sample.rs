@@ -12,7 +12,7 @@ fn main() {
         .add_event::<ChangeCamera>()
         .add_startup_system(setup)
         .add_system(change_camera_system)
-        .add_system(setup_camera)
+        .add_system(listen_setup_camera)
         .add_startup_system(setup_example_scene)
         .run();
 }
@@ -21,7 +21,7 @@ fn main() {
 #[derive(Default)]
 struct ChangeCamera(ControlledType);
 
-fn setup(mut commands: Commands, mut ev_change: EventWriter<ChangeCamera>) {
+fn setup(mut ev_change: EventWriter<ChangeCamera>) {
 
     // Using the change camera system to setup
     ev_change.send(ChangeCamera(ControlledType::Free));
@@ -30,7 +30,6 @@ fn setup(mut commands: Commands, mut ev_change: EventWriter<ChangeCamera>) {
 }
 
 fn change_camera_system(
-    mut commands: Commands,
     input_keys: Res<Input<KeyCode>>,
     mut ev_change: EventWriter<ChangeCamera>,
 ) {
@@ -42,7 +41,7 @@ fn change_camera_system(
     };
 }
 
-fn setup_camera(
+fn listen_setup_camera(
     mut commands: Commands,
     mut ev_change: EventReader<ChangeCamera>,
     mut old_entity: Local<Option<Entity>>,
@@ -63,13 +62,11 @@ fn setup_camera(
             transform: Transform::from_xyz(0.0, 2.0, 5.0).looking_at(Vec3::ZERO, Vec3::Y),
             ..Default::default()
         };
-        //let camera =  DollyControlCameraBundle::new(target);
 
+        //let camera =  DollyControlCameraBundle::new(target);
         // Print out controls
         camera.control_actions.print_actions();
         let e = commands.spawn_bundle(camera).id();
         *old_entity = Some(e);
-
-
     }
 }

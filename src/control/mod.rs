@@ -40,6 +40,7 @@ pub fn update_control_system(
     mut query: Query<(&Transform, &mut Rig, &ControlActions)>,
 ) {
     for (t, mut rig, control_actions) in query.iter_mut() {
+        let mut window = windows.get_primary_mut().unwrap();
         // Update position
         let mut move_vec = Vec3::ZERO;
         if control_actions.key_pressed(Action::Forward, &input_keys) {
@@ -67,12 +68,12 @@ pub fn update_control_system(
             false => 1.0,
         };
 
-        // Make movement relative to current transform(camera)
-        //move_vec =  * move_vec.clamp_length_max(1.0);
+        // Make movement relative to current transform(camera) and limit effect
+        move_vec = t.rotation * move_vec.clamp_length_max(1.0);
 
         // Apply the move
         if let Some(d) = rig.get_driver_mut::<Position>() {
-            d.position += t.rotation * move_vec * time.delta_seconds() * config.speed * boost;
+            d.position +=  move_vec * time.delta_seconds() * config.speed * boost;
         }
 
         // Update rotation
@@ -87,14 +88,10 @@ pub fn update_control_system(
 
         // Mouse Enable Look
         if let Some(btn) = control_actions.mouse_map.get(&Action::EnableLook) {
-            // Lock cursor
-            look_around(&mut windows, &input_mouse_btn, btn, &mut mouse_motion_events, &mut delta);
+           look_around(&mut window, &input_mouse_btn, btn, &mut mouse_motion_events, &mut delta);
         }
-
-        if let Some(keys) = control_actions.key_map.get(&Action::EnableLook) {
-            for key in keys {
-                look_around(&mut windows, &input_keys, key, &mut mouse_motion_events, &mut delta);
-            }
+        if let Some(key) = control_actions.key_map.get(&Action::EnableLook) {
+            look_around(&mut window, &input_keys, key, &mut mouse_motion_events, &mut delta);
         }
 
         // Apply rotation
@@ -104,11 +101,31 @@ pub fn update_control_system(
                 -0.1 * delta.y * config.sensitivity.y,
             );
         }
+
+        // Lock cursor toggle
+        if let Some(key) = control_actions.key_map.get(&Action::ToggleLook) {
+            if input_keys.just_pressed(*key) {
+                if window.cursor_locked() {
+                    window.set_cursor_lock_mode(false);
+                    window.set_cursor_visibility(true);
+                } else {
+                    window.set_cursor_lock_mode(true);
+                    window.set_cursor_visibility(false);
+                }
+            }
+        }
+
+        if control_actions.key_pressed(Action::EnableLook, &input_keys) {
+            window.set_cursor_lock_mode(true);
+            window.set_cursor_visibility(false);
+        }
+
+
     }
 }
 
-fn look_around<T : Copy + Eq + std::hash::Hash>(windows: &mut ResMut<Windows>, input: &Input<T>, btn: &T, mouse_motion_events: &mut EventReader<MouseMotion>, delta: &mut Vec2) {
-    let window = windows.get_primary_mut().unwrap();
+fn look_around<T : Copy + Eq + std::hash::Hash>(window: &mut Window, input: &Input<T>, btn: &T, mouse_motion_events: &mut EventReader<MouseMotion>, delta: &mut Vec2) {
+
     if input.just_pressed(*btn) {
         window.set_cursor_lock_mode(true);
         window.set_cursor_visibility(false);
