@@ -102,23 +102,23 @@ pub fn update_control_system(
             );
         }
 
-        // Lock cursor toggle
-        if let Some(key) = control_actions.key_map.get(&Action::ToggleLook) {
-            if input_keys.just_pressed(*key) {
-                if window.cursor_locked() {
-                    window.set_cursor_lock_mode(false);
-                    window.set_cursor_visibility(true);
-                } else {
-                    window.set_cursor_lock_mode(true);
-                    window.set_cursor_visibility(false);
-                }
-            }
-        }
+        // // Lock cursor toggle
+        // if let Some(key) = control_actions.key_map.get(&Action::ToggleLook) {
+        //     if input_keys.just_pressed(*key) {
+        //         if window.cursor_locked() {
+        //             window.set_cursor_lock_mode(false);
+        //             window.set_cursor_visibility(true);
+        //         } else {
+        //             window.set_cursor_lock_mode(true);
+        //             window.set_cursor_visibility(false);
+        //         }
+        //     }
+        // }
 
-        if control_actions.key_pressed(Action::EnableLook, &input_keys) {
-            window.set_cursor_lock_mode(true);
-            window.set_cursor_visibility(false);
-        }
+        // if control_actions.key_pressed(Action::EnableLook, &input_keys) {
+        //     window.set_cursor_lock_mode(true);
+        //     window.set_cursor_visibility(false);
+        // }
 
 
     }

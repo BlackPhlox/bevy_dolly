@@ -3,7 +3,6 @@ pub use driver::*;
 use bevy::prelude::*;
 
 /// A chain of drivers, calculating displacements, and animating in succession.
-/// NOTE: Kind of sad to even do this when we have bevy
 #[derive(Default, Component)]
 pub struct Rig {
     /// Drivers to excute in order

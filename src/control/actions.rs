@@ -23,8 +23,7 @@ pub enum Action {
 #[derive(Component)]
 /// Actions our controller can handle
 pub struct ControlActions {
-    // TODO: test different structures
-    // TODO: Remove hashmaps use build, been static object
+    // TODO: test different structure, this feels heavy
     pub key_map: StableHashMap<Action, KeyCode>,
     pub mouse_map: StableHashMap<Action, MouseButton>,
 }
