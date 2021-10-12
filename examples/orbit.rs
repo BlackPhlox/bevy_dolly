@@ -20,7 +20,7 @@ fn main() {
 fn setup_camera(mut commands: Commands) {
     commands.spawn_bundle(DollyCameraBundle {
         rig: Rig::default()
-            .add(YawPitch::new(45.0, -30.0))
+            .add(Rotation::new(45.0, -30.0))
             .add(Smooth::new(0.0, 1.0))
             .add(Arm::new(Vec3::Z * 8.0)),
         ..Default::default()
@@ -31,7 +31,7 @@ fn setup_camera(mut commands: Commands) {
 /// Rotate our camera around
 fn update_camera_system(mut query: Query<&mut Rig>, keys: Res<Input<KeyCode>>) {
     for mut rig in query.iter_mut() {
-        if let Some(driver) = rig.get_driver_mut::<YawPitch>() {
+        if let Some(driver) = rig.get_driver_mut::<Rotation>() {
             if keys.pressed(KeyCode::Z) {
                 driver.rotate_yaw_pitch(-2.0, 0.0);
             }

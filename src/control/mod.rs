@@ -95,7 +95,7 @@ pub fn update_control_system(
         }
 
         // Apply rotation
-        if let Some(d) = rig.get_driver_mut::<YawPitch>() {
+        if let Some(d) = rig.get_driver_mut::<Rotation>() {
             d.rotate_yaw_pitch(
                 -0.1 * delta.x * config.sensitivity.x,
                 -0.1 * delta.y * config.sensitivity.y,

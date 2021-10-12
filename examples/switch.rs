@@ -48,7 +48,6 @@ fn setup(
         rig: Rig::default()
             .add(Position::default())
             .add(Rotation::default())
-            .add(YawPitch::default())
             .add(LookAt::new(
                 target_config.entities[0],
                 // Lets look a little in front of and above our target

@@ -21,7 +21,6 @@ fn setup(mut commands: Commands) {
         rig: Rig::default()
             .add(Position::default())
             .add(Rotation::default())
-            .add(YawPitch::default())
             .add(Smooth::new(2.0, 2.0)),
         transform: Transform::from_xyz(0.0, 2.0, -5.0).looking_at(Vec3::ZERO, Vec3::Y),
         ..Default::default()
@@ -80,7 +79,7 @@ fn update_camera_system(
         for event in mouse_motion_events.iter() {
             delta += event.delta;
         }
-        if let Some(d) = rig.get_driver_mut::<YawPitch>() {
+        if let Some(d) = rig.get_driver_mut::<Rotation>() {
             d.rotate_yaw_pitch(
                 -0.1 * delta.x * sensitivity.x,
                 -0.1 * delta.y * sensitivity.y,

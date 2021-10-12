@@ -26,7 +26,7 @@ impl Default for DollyControlCameraBundle {
             rig: Rig::default()
                 .add(Position::default())
                 .add(Rotation::default())
-                .add(YawPitch::default())
+
                 .add(Smooth::new(1.0, 1.0)),
             //rig: Rig::default(),
             camera: Camera {
@@ -50,7 +50,6 @@ impl DollyControlCameraBundle {
                 rig: Rig::default()
                     .add(Position::default())
                     .add(Rotation::default())
-                    .add(YawPitch::default())
                     .add(Smooth::new(1.0, 1.0)),
                 control_actions: ControlActions::default(),
                 //rig: Rig::default(),
@@ -67,7 +66,6 @@ impl DollyControlCameraBundle {
                 rig: Rig::default()
                     .add(Position::default())
                     .add(Rotation::default())
-                    .add(YawPitch::default())
                     .add(Smooth::new(1.0, 1.0)),
                 control_actions: ControlActions::default(),
                 //rig: Rig::default(),
