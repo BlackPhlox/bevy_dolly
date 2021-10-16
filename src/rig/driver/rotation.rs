@@ -41,8 +41,7 @@ impl Rotation {
     pub fn rotate_yaw_pitch(&mut self, yaw: f32, pitch: f32) {
         let yaw_degrees = yaw % 720_f32;
         let pitch_degrees = pitch.clamp(-90.0, 90.0);
-
-        self.rotation  *= Quat::from_euler(
+        Quat::from_euler(
             bevy::math::EulerRot::YXZ,
             yaw_degrees.to_radians(),
             pitch_degrees.to_radians(),

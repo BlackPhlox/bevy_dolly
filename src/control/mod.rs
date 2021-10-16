@@ -70,6 +70,7 @@ pub fn update_control_system(
 
         // Make movement relative to current transform(camera) and limit effect
         move_vec = t.rotation * move_vec.clamp_length_max(1.0);
+        move_vec.y = 0.0;
 
         // Apply the move
         if let Some(d) = rig.get_driver_mut::<Position>() {

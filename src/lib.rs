@@ -28,7 +28,7 @@ impl Plugin for DollyPlugin {
 /// Listen for new Rigs
 /// Add position and rotation info if needed
 fn init_rig_system(mut query: Query<(&mut Transform, &mut Rig), Added<Rig>>) {
-    for (mut transform, mut rig) in query.iter_mut() {
+    for (transform, mut rig) in query.iter_mut() {
 
         // Update Position if needed
         if let Some(d) = rig.get_driver_mut::<Position>() {
