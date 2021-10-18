@@ -21,7 +21,7 @@ impl LookAt {
     pub fn new(target: Entity, offset: Vec3) -> Self {
         Self {
             target_entity: Some(target),
-            offset: offset,
+            offset,
             target_transform: None,
         }
     }

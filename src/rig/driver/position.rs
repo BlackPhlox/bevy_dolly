@@ -4,12 +4,12 @@ use std::any::Any;
 
 /// Directly sets the position of the camera
 #[derive(Debug)]
-pub struct Position {
+pub struct RigPosition {
     pub(crate) init_set: bool,
     pub position: Vec3,
 }
 
-impl Default for Position {
+impl Default for RigPosition {
     /// Will use the transform for init value
     fn default() -> Self {
         Self {
@@ -19,7 +19,7 @@ impl Default for Position {
     }
 }
 
-impl Position {
+impl RigPosition {
     pub fn new(position: Vec3) -> Self {
         Self {
             position,
@@ -28,7 +28,7 @@ impl Position {
     }
 }
 
-impl RigDriver for Position {
+impl RigDriver for RigPosition {
     fn update(&mut self, transform: &mut Transform, _delta_time_seconds: f32) {
         transform.translation = self.position;
     }

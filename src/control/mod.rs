@@ -22,7 +22,7 @@ impl Default for DollyControlConfig {
             speed: 10.0,
             key_rotation: 15.0,
             boost_multiplyer: 5.0,
-            sensitivity: Vec2::splat(1.0),
+            sensitivity: Vec2::splat(0.001),
         }
     }
 }
@@ -40,7 +40,7 @@ pub fn update_control_system(
     mut query: Query<(&Transform, &mut Rig, &ControlActions)>,
 ) {
     for (t, mut rig, control_actions) in query.iter_mut() {
-        let mut window = windows.get_primary_mut().unwrap();
+        let window = windows.get_primary_mut().unwrap();
         // Update position
         let mut move_vec = Vec3::ZERO;
         if control_actions.key_pressed(Action::Forward, &input_keys) {
@@ -70,10 +70,10 @@ pub fn update_control_system(
 
         // Make movement relative to current transform(camera) and limit effect
         move_vec = t.rotation * move_vec.clamp_length_max(1.0);
-        move_vec.y = 0.0;
+        //move_vec.y = 0.0;
 
         // Apply the move
-        if let Some(d) = rig.get_driver_mut::<Position>() {
+        if let Some(d) = rig.get_driver_mut::<RigPosition>() {
             d.position +=  move_vec * time.delta_seconds() * config.speed * boost;
         }
 
@@ -89,17 +89,17 @@ pub fn update_control_system(
 
         // Mouse Enable Look
         if let Some(btn) = control_actions.mouse_map.get(&Action::EnableLook) {
-           look_around(&mut window, &input_mouse_btn, btn, &mut mouse_motion_events, &mut delta);
+           look_around(window, &input_mouse_btn, btn, &mut mouse_motion_events, &mut delta);
         }
         if let Some(key) = control_actions.key_map.get(&Action::EnableLook) {
-            look_around(&mut window, &input_keys, key, &mut mouse_motion_events, &mut delta);
+            look_around(window, &input_keys, key, &mut mouse_motion_events, &mut delta);
         }
 
         // Apply rotation
         if let Some(d) = rig.get_driver_mut::<Rotation>() {
             d.rotate_yaw_pitch(
-                -0.1 * delta.x * config.sensitivity.x,
-                -0.1 * delta.y * config.sensitivity.y,
+                -1.0 * delta.x * config.sensitivity.x,
+                -1.0 * delta.y * config.sensitivity.y,
             );
         }
 

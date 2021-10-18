@@ -19,7 +19,7 @@ fn main() {
 fn setup(mut commands: Commands) {
     commands.spawn_bundle(DollyCameraBundle {
         rig: Rig::default()
-            .add(Position::default())
+            .add(RigPosition::default())
             .add(Rotation::default())
             .add(Smooth::new(2.0, 2.0)),
         transform: Transform::from_xyz(0.0, 2.0, -5.0).looking_at(Vec3::ZERO, Vec3::Y),
@@ -70,7 +70,7 @@ fn update_camera_system(
         move_vec = t.rotation * move_vec.clamp_length_max(1.0) * boost;
         move_vec.y = 0.0; // clear out y so we don't move up and down
 
-        if let Some(d) = rig.get_driver_mut::<Position>() {
+        if let Some(d) = rig.get_driver_mut::<RigPosition>() {
             d.position += move_vec * time_delta_seconds * speed;
         }
 

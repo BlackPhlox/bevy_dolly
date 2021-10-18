@@ -24,7 +24,7 @@ impl Default for DollyControlCameraBundle {
         Self {
             control_actions: ControlActions::default(),
             rig: Rig::default()
-                .add(Position::default())
+                .add(RigPosition::default())
                 .add(Rotation::default())
 
                 .add(Smooth::new(1.0, 1.0)),
@@ -45,10 +45,11 @@ impl DollyControlCameraBundle {
     /// Provide few easy use default cameras
     /// TODO: Flush this out more with tested presets
     pub fn new(preset: ControlledType) -> Self {
-        let result = match preset {
+       match preset {
+            // WARN: Don't call default on control camera bundle its self, you will get a loop
             ControlledType::Free => Self {
                 rig: Rig::default()
-                    .add(Position::default())
+                    .add(RigPosition::default())
                     .add(Rotation::default())
                     .add(Smooth::new(1.0, 1.0)),
                 control_actions: ControlActions::default(),
@@ -64,7 +65,7 @@ impl DollyControlCameraBundle {
             },
             ControlledType::Fps => Self {
                 rig: Rig::default()
-                    .add(Position::default())
+                    .add(RigPosition::default())
                     .add(Rotation::default())
                     .add(Smooth::new(1.0, 1.0)),
                 control_actions: ControlActions::default(),
@@ -78,8 +79,7 @@ impl DollyControlCameraBundle {
                 transform: Default::default(),
                 global_transform: Default::default(),
             },
-        };
-        result
+        }
     }
 }
 

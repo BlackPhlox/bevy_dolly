@@ -46,7 +46,7 @@ fn setup(
     // You can remove the `Control` from the bundle to disable camera movement
     commands.spawn_bundle(DollyControlCameraBundle {
         rig: Rig::default()
-            .add(Position::default())
+            .add(RigPosition::default())
             .add(Rotation::default())
             .add(LookAt::new(
                 target_config.entities[0],

@@ -31,7 +31,7 @@ fn init_rig_system(mut query: Query<(&mut Transform, &mut Rig), Added<Rig>>) {
     for (transform, mut rig) in query.iter_mut() {
 
         // Update Position if needed
-        if let Some(d) = rig.get_driver_mut::<Position>() {
+        if let Some(d) = rig.get_driver_mut::<RigPosition>() {
             if d.init_set {
                 d.position = transform.translation;
             }
