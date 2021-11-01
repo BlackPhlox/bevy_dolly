@@ -24,10 +24,10 @@ impl Default for DollyControlCameraBundle {
         Self {
             control_actions: ControlActions::default(),
             rig: Rig::default()
-                .add(RigPosition::default())
-                .add(Rotation::default())
+                .with(RigPosition::default())
+                .with(Rotation::default())
 
-                .add(Smooth::new(1.0, 1.0)),
+                .with(Smooth::new(1.0, 1.0)),
             //rig: Rig::default(),
             camera: Camera {
                 name: Some(base::camera::CAMERA_3D.to_string()),
@@ -49,9 +49,9 @@ impl DollyControlCameraBundle {
             // WARN: Don't call default on control camera bundle its self, you will get a loop
             ControlledType::Free => Self {
                 rig: Rig::default()
-                    .add(RigPosition::default())
-                    .add(Rotation::default())
-                    .add(Smooth::new(1.0, 1.0)),
+                    .with(RigPosition::default())
+                    .with(Rotation::default())
+                    .with(Smooth::new(1.0, 1.0)),
                 control_actions: ControlActions::default(),
                 //rig: Rig::default(),
                 camera: Camera {
@@ -65,9 +65,9 @@ impl DollyControlCameraBundle {
             },
             ControlledType::Fps => Self {
                 rig: Rig::default()
-                    .add(RigPosition::default())
-                    .add(Rotation::default())
-                    .add(Smooth::new(1.0, 1.0)),
+                    .with(RigPosition::default())
+                    .with(Rotation::default())
+                    .with(Smooth::new(1.0, 1.0)),
                 control_actions: ControlActions::default(),
                 //rig: Rig::default(),
                 camera: Camera {

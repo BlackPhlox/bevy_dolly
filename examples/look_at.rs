@@ -29,10 +29,10 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
 
     commands.spawn_bundle(DollyCameraBundle {
         rig: Rig::default()
-            .add(RigPosition::default())
-            .add(Rotation::default())
-            .add(LookAt::new(sheep, Vec3::new(0.0, 1.0, 0.0)))
-            .add(Smooth::new(1.25, 1.0)),
+            .with(RigPosition::default())
+            .with(Rotation::default())
+            .with(LookAt::new(sheep, Vec3::new(0.0, 1.0, 0.0)))
+            .with(Smooth::new(1.25, 1.0)),
         transform: Transform::from_xyz(0.0, 2.0, -5.0).looking_at(Vec3::ZERO, Vec3::Y),
         ..Default::default()
     });
@@ -54,8 +54,8 @@ fn move_sheep_system(
     }
 
     for mut sheep in query.iter_mut() {
-        let rotation = sheep.rotation.clone();
-        sheep.translation += rotation * (Vec3::Z * 0.05);
+        let movement = sheep.forward() * 0.05;
+        sheep.translation += movement;
         sheep.rotation *= Quat::from_rotation_y(if *left { 0.01 } else { -0.01 });
     }
 }

@@ -75,9 +75,8 @@ fn update_rigs_system(mut rig_query: Query<&mut Rig>, transform_query: Query<&Tr
 
         // Update Anchor Drivers
         if let Some(d) = rig.get_driver_mut::<Anchor>() {
-            match transform_query.get(d.target_entity) {
-                Ok(t) => d.target = t.clone(),
-                Err(_) => (),
+            if let Ok(t) = transform_query.get(d.target_entity) {
+                d.target = *t;
             }
         }
     }

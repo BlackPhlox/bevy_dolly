@@ -14,9 +14,8 @@ impl Rig {
     // TODO: any cleaner way? old way would panic, screw that
     pub fn get_driver_mut<T: RigDriver>(&mut self) -> Option<&mut T> {
         for driver in self.drivers.iter_mut() {
-            match driver.as_any_mut().downcast_mut::<T>() {
-                Some(a) => return Some(a),
-                None => (),
+            if let Some(a) = driver.as_any_mut().downcast_mut::<T>() { 
+                return Some(a)
             }
         }
         None
@@ -34,7 +33,7 @@ impl Rig {
     }
 
     /// Add driver in order to rig
-    pub fn add(mut self, driver: impl RigDriver) -> Self {
+    pub fn with(mut self, driver: impl RigDriver) -> Self {
         self.drivers.push(Box::new(driver));
         self
     }

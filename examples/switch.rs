@@ -46,14 +46,14 @@ fn setup(
     // You can remove the `Control` from the bundle to disable camera movement
     commands.spawn_bundle(DollyControlCameraBundle {
         rig: Rig::default()
-            .add(RigPosition::default())
-            .add(Rotation::default())
-            .add(LookAt::new(
+            .with(RigPosition::default())
+            .with(Rotation::default())
+            .with(LookAt::new(
                 target_config.entities[0],
                 // Lets look a little in front of and above our target
                 Vec3::new(0.0, 1.0, 1.0),
             ))
-            .add(Smooth::new(1.0, 2.0)),
+            .with(Smooth::new(1.0, 2.0)),
         transform: Transform::from_xyz(0.0, 2.0, -10.0),
         ..Default::default()
     });
@@ -101,8 +101,8 @@ fn move_sheep_system(
     }
 
     for mut sheep in query.iter_mut() {
-        let rotation = sheep.rotation.clone();
-        sheep.translation += rotation * (Vec3::Z * 0.05);
+        let movement = sheep.forward() * 0.05;
+        sheep.translation += movement;
         sheep.rotation *= Quat::from_rotation_y(if *left { 0.01 } else { -0.01 });
     }
 }
