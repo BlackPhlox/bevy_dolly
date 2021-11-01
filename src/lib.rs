@@ -31,6 +31,8 @@ fn init_rig_system(mut query: Query<(&mut Transform, &mut Rig), Added<Rig>>) {
     for (transform, mut rig) in query.iter_mut() {
         // set init target for the transform
         rig.target = *transform;
+
+        
     }
 }
 
@@ -56,6 +58,11 @@ fn update_rigs_system(mut rig_query: Query<&mut Rig>, transform_query: Query<&Tr
 
 fn apply_rigs_system(time: Res<Time>, mut query: Query<(&mut Transform, &mut Rig)>) {
     for (mut transform, mut rig) in query.iter_mut() {
-        *transform = rig.update(time.delta_seconds());
+        
+        let delta_seconds = time.delta_seconds();
+        // Apply Rigs
+        *transform = rig.update(&transform, delta_seconds);
+
+
     }
 }

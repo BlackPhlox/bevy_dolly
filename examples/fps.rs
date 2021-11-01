@@ -1,5 +1,4 @@
 mod helpers;
-use bevy::input::mouse::MouseMotion;
 use bevy::prelude::*;
 use bevy_dolly::prelude::*;
 use helpers::*;
@@ -19,7 +18,7 @@ fn setup(mut commands: Commands) {
     commands.spawn_bundle(DollyControlCameraBundle {
         rig: Rig::default(),
         transform: Transform::from_xyz(0.0, 2.0, -5.0)
-        .looking_at(Vec3::ZERO, Vec3::Y),
+            .looking_at(Vec3::ZERO, Vec3::Y),
         ..Default::default()
     });
 

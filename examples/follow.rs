@@ -29,8 +29,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         rig: Rig::default()
             .with(Anchor::new(sheep))
             .with(Arm::new(Vec3::new(0.0, 2.5, -3.5)))
-            .with(LookAt::new(sheep, Vec3::new(0.0, 1.0, 1.0)))
-            .with(Smooth::new(1.0, 1.0)),
+            .with(LookAt::new(sheep, Vec3::new(0.0, 1.0, 1.0))),
         ..Default::default()
     });
 

@@ -1,5 +1,7 @@
 mod helpers;
 
+use std::f32::consts::*;
+
 use bevy::prelude::*;
 use bevy_dolly::prelude::*;
 use helpers::*;
@@ -19,10 +21,12 @@ fn main() {
 /// Set our cameras
 fn setup_camera(mut commands: Commands) {
     commands.spawn_bundle(DollyCameraBundle {
-        rig: Rig::default()
-            .with(Smooth::new(0.0, 1.5))
-            .with(Arm::new(Vec3::Z * 8.0)),
-        transform: Transform::from_xyz(0.0, 2.0, -5.0),
+        rig: Rig {
+            position_smoothness: 0.0,
+            ..Default::default()
+        }
+            .with(Arm::new(Vec3::new(5.0, 2.0, 10.0))),
+        transform: Transform::from_xyz(0.0, 0.0, 0.0),
         ..Default::default()
     });
     info!("Use Z and X to rotate");
@@ -32,10 +36,10 @@ fn setup_camera(mut commands: Commands) {
 fn update_camera_system(mut query: Query<&mut Rig>, keys: Res<Input<KeyCode>>) {
     for mut rig in query.iter_mut() {
         if keys.just_pressed(KeyCode::Z) {
-            rig.target.rotate(Quat::from_rotation_x(-90.0));
+            rig.target.rotate(Quat::from_rotation_y(FRAC_PI_2));
         }
         if keys.just_pressed(KeyCode::X) {
-            rig.target.rotate(Quat::from_rotation_x(90.0));
+            rig.target.rotate(Quat::from_rotation_y(-FRAC_PI_2));
         }
     }
 }

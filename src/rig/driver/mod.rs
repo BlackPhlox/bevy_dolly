@@ -2,11 +2,10 @@
 mod anchor;
 mod arm;
 mod look_at;
-mod smooth;
 
 use bevy::prelude::*;
 use std::any::Any;
-pub use {anchor::*, arm::*, look_at::*, smooth::*};
+pub use {anchor::*, arm::*, look_at::*};
 
 pub trait RigDriver: Sync + Send + 'static {
     /// Calculates the transform of this driver component

@@ -50,8 +50,7 @@ fn setup(
                 target_config.entities[0],
                 // Lets look a little in front of and above our target
                 Vec3::new(0.0, 1.0, 1.0),
-            ))
-            .with(Smooth::new(1.0, 2.0)),
+            )),
         transform: Transform::from_xyz(0.0, 2.0, -10.0),
         ..Default::default()
     });

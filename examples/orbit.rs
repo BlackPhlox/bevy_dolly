@@ -19,8 +19,10 @@ fn main() {
 /// Set our cameras
 fn setup_camera(mut commands: Commands) {
     commands.spawn_bundle(DollyCameraBundle {
-        rig: Rig::default()
-            .with(Smooth::new(1.0, 1.0))
+        rig: Rig {
+            position_smoothness: 0.0,
+            ..Default::default()
+        }
             .with(Arm::new(Vec3::new(0.0, 2.0, 8.0))),
          transform: Transform::from_xyz(0.0, 0.0, 0.0),
         ..Default::default()
