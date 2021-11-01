@@ -6,9 +6,7 @@ use bevy::{
 
 #[derive(Bundle)]
 pub struct DollyCameraBundle {
-    //pub rig_builder: RigBuilder,
     pub rig: Rig,
-
     pub camera: Camera,
     pub perspective_projection: PerspectiveProjection,
     pub visible_entities: VisibleEntities,

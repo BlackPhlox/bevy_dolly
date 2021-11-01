@@ -29,36 +29,8 @@ impl Plugin for DollyPlugin {
 /// Add position and rotation info if needed
 fn init_rig_system(mut query: Query<(&mut Transform, &mut Rig), Added<Rig>>) {
     for (transform, mut rig) in query.iter_mut() {
-
-        // Update Position if needed
-        if let Some(d) = rig.get_driver_mut::<RigPosition>() {
-            if d.init_set {
-                d.position = transform.translation;
-            }
-        }
-
-        // Update Rotation if needed
-        if let Some(d) = rig.get_driver_mut::<Rotation>() {
-            if d.init_set {
-                d.rotation = transform.rotation;
-            }
-        }
-
-        // if let Some(d) = rig.get_driver_mut::<YawPitch>() {
-        //     if d.init_set {
-        //         info!("transfrom: {:?}", transform.rotation);
-        //         d.rotation = transform.rotation;
-        //     }
-        // }
-
-
-        // for d in rig.drivers.iter() {
-        //     info!("driver: {:?}", d);
-        // }
-
-        // Update once with no time
-        //*transform = rig.update(0.0);
-        // TODO: We could check for miss configurations here
+        // set init target for the transform
+        rig.target = *transform;
     }
 }
 

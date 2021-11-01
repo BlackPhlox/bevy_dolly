@@ -51,7 +51,7 @@ fn move_sheep_system(
     }
 
     for mut sheep in query.iter_mut() {
-        let movement = sheep.forward() * 0.05;
+        let movement = sheep.local_z() * 0.05;
         sheep.translation += movement;
         sheep.rotation *= Quat::from_rotation_y(if *left { 0.01 } else { -0.01 });
     }

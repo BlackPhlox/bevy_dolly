@@ -1,5 +1,5 @@
 use bevy::{prelude::*, render::{camera::{Camera, PerspectiveProjection, VisibleEntities}, render_graph::base}};
-use crate::rig::{Rig, driver::*};
+use crate::rig::{Rig};
 
 use super::actions::*;
 
@@ -23,12 +23,7 @@ impl Default for DollyControlCameraBundle {
     fn default() -> Self {
         Self {
             control_actions: ControlActions::default(),
-            rig: Rig::default()
-                .with(RigPosition::default())
-                .with(Rotation::default())
-
-                .with(Smooth::new(1.0, 1.0)),
-            //rig: Rig::default(),
+            rig: Rig::default(),
             camera: Camera {
                 name: Some(base::camera::CAMERA_3D.to_string()),
                 ..Default::default()
@@ -48,12 +43,9 @@ impl DollyControlCameraBundle {
        match preset {
             // WARN: Don't call default on control camera bundle its self, you will get a loop
             ControlledType::Free => Self {
-                rig: Rig::default()
-                    .with(RigPosition::default())
-                    .with(Rotation::default())
-                    .with(Smooth::new(1.0, 1.0)),
+                rig: Rig::default(),
                 control_actions: ControlActions::default(),
-                //rig: Rig::default(),
+
                 camera: Camera {
                     name: Some(base::camera::CAMERA_3D.to_string()),
                     ..Default::default()
@@ -64,10 +56,7 @@ impl DollyControlCameraBundle {
                 global_transform: Default::default(),
             },
             ControlledType::Fps => Self {
-                rig: Rig::default()
-                    .with(RigPosition::default())
-                    .with(Rotation::default())
-                    .with(Smooth::new(1.0, 1.0)),
+                rig: Rig::default(),
                 control_actions: ControlActions::default(),
                 //rig: Rig::default(),
                 camera: Camera {

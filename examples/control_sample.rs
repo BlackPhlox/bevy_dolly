@@ -54,10 +54,7 @@ fn listen_setup_camera(
 
         info!("Selected {:?}", change_event.0);
         let camera = DollyControlCameraBundle {
-            rig: Rig::default()
-                .with(RigPosition::default())
-                .with(Rotation::default())
-                .with(Smooth::new(2.0, 2.0)),
+            rig: Rig::default(),
             transform: Transform::from_xyz(0.0, 2.0, 5.0).looking_at(Vec3::ZERO, Vec3::Y),
             ..Default::default()
         };

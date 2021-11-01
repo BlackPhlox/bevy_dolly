@@ -20,9 +20,9 @@ fn main() {
 fn setup_camera(mut commands: Commands) {
     commands.spawn_bundle(DollyCameraBundle {
         rig: Rig::default()
-            .with(Rotation::new(45.0, -30.0))
-            .with(Smooth::new(0.0, 1.0))
-            .with(Arm::new(Vec3::Z * 8.0)),
+            .with(Smooth::new(1.0, 1.0))
+            .with(Arm::new(Vec3::new(0.0, 2.0, 8.0))),
+         transform: Transform::from_xyz(0.0, 0.0, 0.0),
         ..Default::default()
     });
     info!("Use Z and X to rotate");
@@ -31,13 +31,11 @@ fn setup_camera(mut commands: Commands) {
 /// Rotate our camera around
 fn update_camera_system(mut query: Query<&mut Rig>, keys: Res<Input<KeyCode>>) {
     for mut rig in query.iter_mut() {
-        if let Some(driver) = rig.get_driver_mut::<Rotation>() {
-            if keys.pressed(KeyCode::Z) {
-                driver.rotate_yaw_pitch(-2.0, 0.0);
-            }
-            if keys.pressed(KeyCode::X) {
-                driver.rotate_yaw_pitch(2.0, 0.0);
-            }
+        if keys.pressed(KeyCode::Z) {
+            rig.target.rotate(Quat::from_rotation_y(-0.1));
+        }
+        if keys.pressed(KeyCode::X) {
+            rig.target.rotate(Quat::from_rotation_y(0.1));
         }
     }
 }

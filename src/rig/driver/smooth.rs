@@ -35,23 +35,26 @@ impl Smooth {
         }
     }
 }
-// An ad-hoc multiplier to make default smoothness parameters
-// produce good-looking results.
-const SMOOTHNESS_MULT: f32 = 8.0;
+
+
 
 impl RigDriver for Smooth {
     // TODO: This is far clearer, but 2 things
     // - We do all the work no mater if smoothing is enabled
-    // - I bet this already exists in glam or bevy
+    // - no need 
 
     /// Smooths translation and/or rotation
     fn update(&mut self, transform: &mut Transform, delta_time_seconds: f32) {
         // Calculate the exponential blending based on frame time
-        // TODO: Look at this more
+
+
+        // An ad-hoc multiplier to make default smoothness parameters
+        // produce good-looking results.
+        let smoothness_mult: f32 = 8.0;
         let (interp_pos, interp_rot) = (
-            1.0 - (-SMOOTHNESS_MULT * delta_time_seconds / self.position_smoothness.max(1e-5))
+            1.0 - (-smoothness_mult * delta_time_seconds / self.position_smoothness.max(1e-5))
                 .exp(),
-            1.0 - (-SMOOTHNESS_MULT * delta_time_seconds / self.rotation_smoothness.max(1e-5))
+            1.0 - (-smoothness_mult * delta_time_seconds / self.rotation_smoothness.max(1e-5))
                 .exp(),
         );
 

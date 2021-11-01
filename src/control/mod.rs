@@ -1,10 +1,10 @@
 mod actions;
 mod bundle;
-use bevy::{input::mouse::MouseMotion, prelude::*};
 pub use actions::*;
+use bevy::{input::mouse::MouseMotion, prelude::*};
 pub use bundle::*;
 
-use crate::rig::{driver::*, Rig};
+use crate::rig::Rig;
 
 /// Configuration Resource for Dolly Controlled Rigs
 // TODO: We could store the targeting data here, would really make user
@@ -73,9 +73,7 @@ pub fn update_control_system(
         //move_vec.y = 0.0;
 
         // Apply the move
-        if let Some(d) = rig.get_driver_mut::<RigPosition>() {
-            d.position +=  move_vec * time.delta_seconds() * config.speed * boost;
-        }
+        rig.target.translation += move_vec * time.delta_seconds() * config.speed * boost;
 
         // Update rotation
         let mut delta = Vec2::ZERO;
@@ -89,44 +87,39 @@ pub fn update_control_system(
 
         // Mouse Enable Look
         if let Some(btn) = control_actions.mouse_map.get(&Action::EnableLook) {
-           look_around(window, &input_mouse_btn, btn, &mut mouse_motion_events, &mut delta);
+            look_around(
+                window,
+                &input_mouse_btn,
+                btn,
+                &mut mouse_motion_events,
+                &mut delta,
+            );
         }
         if let Some(key) = control_actions.key_map.get(&Action::EnableLook) {
-            look_around(window, &input_keys, key, &mut mouse_motion_events, &mut delta);
-        }
-
-        // Apply rotation
-        if let Some(d) = rig.get_driver_mut::<Rotation>() {
-            d.rotate_yaw_pitch(
-                -1.0 * delta.x * config.sensitivity.x,
-                -1.0 * delta.y * config.sensitivity.y,
+            look_around(
+                window,
+                &input_keys,
+                key,
+                &mut mouse_motion_events,
+                &mut delta,
             );
         }
 
-        // // Lock cursor toggle
-        // if let Some(key) = control_actions.key_map.get(&Action::ToggleLook) {
-        //     if input_keys.just_pressed(*key) {
-        //         if window.cursor_locked() {
-        //             window.set_cursor_lock_mode(false);
-        //             window.set_cursor_visibility(true);
-        //         } else {
-        //             window.set_cursor_lock_mode(true);
-        //             window.set_cursor_visibility(false);
-        //         }
-        //     }
-        // }
-
-        // if control_actions.key_pressed(Action::EnableLook, &input_keys) {
-        //     window.set_cursor_lock_mode(true);
-        //     window.set_cursor_visibility(false);
-        // }
-
-
+        // Apply rotation
+        rig.target
+            .rotate(Quat::from_rotation_x(-config.sensitivity.y * delta.y));
+        rig.target
+            .rotate(Quat::from_rotation_y(-config.sensitivity.x * delta.x));
     }
 }
 
-fn look_around<T : Copy + Eq + std::hash::Hash>(window: &mut Window, input: &Input<T>, btn: &T, mouse_motion_events: &mut EventReader<MouseMotion>, delta: &mut Vec2) {
-
+fn look_around<T: Copy + Eq + std::hash::Hash>(
+    window: &mut Window,
+    input: &Input<T>,
+    btn: &T,
+    mouse_motion_events: &mut EventReader<MouseMotion>,
+    delta: &mut Vec2,
+) {
     if input.just_pressed(*btn) {
         window.set_cursor_lock_mode(true);
         window.set_cursor_visibility(false);
