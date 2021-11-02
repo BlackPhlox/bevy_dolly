@@ -4,7 +4,7 @@ use std::any::Any;
 
 /// Rotates the camera to point at a world-space position.
 ///
-/// The target tracking can be additionally smoothed, and made to look ahead of it.
+/// The target tracking can be additionally smoothed, anad made to look ahead of it.
 #[derive(Debug)]
 pub struct LookAt {
     /// The world-space position to look at

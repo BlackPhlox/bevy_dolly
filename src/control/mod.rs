@@ -1,7 +1,7 @@
 mod actions;
 mod bundle;
 pub use actions::*;
-use bevy::{input::mouse::MouseMotion, prelude::*};
+use bevy::{input::mouse::MouseMotion, math::vec3, prelude::*};
 pub use bundle::*;
 
 use crate::rig::Rig;
@@ -13,7 +13,7 @@ pub struct DollyControlConfig {
     pub speed: f32,
     pub key_rotation: f32,
     pub boost_multiplyer: f32,
-    pub sensitivity: Vec2,
+    pub sensitivity: Vec3,
 }
 
 impl Default for DollyControlConfig {
@@ -22,7 +22,7 @@ impl Default for DollyControlConfig {
             speed: 10.0,
             key_rotation: 15.0,
             boost_multiplyer: 5.0,
-            sensitivity: Vec2::splat(0.001),
+            sensitivity: Vec3::splat(0.001),
         }
     }
 }
@@ -76,13 +76,13 @@ pub fn update_control_system(
         rig.target.translation += move_vec * time.delta_seconds() * config.speed * boost;
 
         // Update rotation
-        let mut delta = Vec2::ZERO;
+        let mut delta = Vec3::ZERO;
 
         if control_actions.key_pressed(Action::RotateLeft, &input_keys) {
-            delta.x -= 10.0;
+            delta.z -= 10.0;
         }
         if control_actions.key_pressed(Action::RotateRight, &input_keys) {
-            delta.x += 10.0;
+            delta.z += 10.0;
         }
 
         // Mouse Enable Look
@@ -105,12 +105,13 @@ pub fn update_control_system(
             );
         }
 
-        // Apply rotation
-        rig.target
-            .rotate(Quat::from_rotation_x(-config.sensitivity.y * delta.y));
-        rig.target
-            .rotate(Quat::from_rotation_y(-config.sensitivity.x * delta.x));
-    }
+         rig.target
+         .rotate(Quat::from_euler(bevy::math::EulerRot::XYZ,
+             -config.sensitivity.y * delta.y,
+             -config.sensitivity.x * delta.x,
+             -config.sensitivity.z * delta.z
+            ));
+      }
 }
 
 fn look_around<T: Copy + Eq + std::hash::Hash>(
@@ -118,7 +119,7 @@ fn look_around<T: Copy + Eq + std::hash::Hash>(
     input: &Input<T>,
     btn: &T,
     mouse_motion_events: &mut EventReader<MouseMotion>,
-    delta: &mut Vec2,
+    delta: &mut Vec3,
 ) {
     if input.just_pressed(*btn) {
         window.set_cursor_lock_mode(true);
@@ -130,7 +131,7 @@ fn look_around<T: Copy + Eq + std::hash::Hash>(
     }
     if input.pressed(*btn) {
         for event in mouse_motion_events.iter() {
-            *delta += event.delta;
+            *delta +=  vec3( event.delta.x, event.delta.y, 0.0);
         }
     }
 }
