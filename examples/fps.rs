@@ -4,7 +4,7 @@ use bevy_dolly::drivers::fps::{Fps, Vec3KeyMapWithBoost};
 use bevy_dolly::{cam_ctrl::DollyCursorGrab, Transform2Bevy, Transform2Dolly};
 
 use dolly::glam::Vec3;
-use dolly::prelude::{CameraRig, Smooth};
+use dolly::prelude::CameraRig;
 
 struct MainCamera;
 
