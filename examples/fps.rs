@@ -15,12 +15,13 @@ fn main() {
 
 /// Set our cameras
 fn setup(mut commands: Commands) {
-    commands.spawn_bundle(DollyControlCameraBundle {
-        rig: Rig::default(),
-        transform: Transform::from_xyz(0.0, 2.0, -5.0)
-            .looking_at(Vec3::ZERO, Vec3::Y),
-        ..Default::default()
-    });
+    commands
+        .spawn_bundle(PerspectiveCameraBundle {
+            transform: Transform::from_xyz(0.0, 2.0, -5.0).looking_at(Vec3::ZERO, Vec3::Y),
+            ..Default::default()
+        })
+        .insert(Rig::default())
+        .insert(DollyActions::default());
 
     // Print our user controls for reference
     info!("Use W, A, S, D for movement");

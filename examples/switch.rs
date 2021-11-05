@@ -44,16 +44,16 @@ fn setup(
 
     // Add our camera, try changing
     // You can remove the `Control` from the bundle to disable camera movement
-    commands.spawn_bundle(DollyControlCameraBundle {
-        rig: Rig::default()
-            .with(LookAt::new(
-                target_config.entities[0],
-                // Lets look a little in front of and above our target
-                Vec3::new(0.0, 1.0, 1.0),
-            )),
-        transform: Transform::from_xyz(0.0, 2.0, -10.0),
-        ..Default::default()
-    });
+    commands
+        .spawn_bundle(PerspectiveCameraBundle {
+            transform: Transform::from_xyz(0.0, 2.0, -10.0),
+            ..Default::default()
+        })
+        .insert(Rig::default().with(LookAt::new(
+            target_config.entities[0],
+            // Lets look a little in front of and above our target
+            Vec3::new(0.0, 1.0, 1.0),
+        )));
 
     info!(" Use 1, 2, 3, 4 to target different sheep");
     info!(" Use Q and E to turn the sheep");

@@ -1,14 +1,101 @@
-mod actions;
-mod bundle;
-pub use actions::*;
-use bevy::{input::mouse::MouseMotion, math::vec3, prelude::*};
-pub use bundle::*;
-
 use crate::rig::Rig;
+use bevy::utils::{AHashExt, StableHashMap};
+use bevy::{input::mouse::MouseMotion, math::vec3, prelude::*};
+
+// NOTE: Most actions are not implented for both Keyboard and mouse
+#[derive(Debug, PartialEq, Eq, Hash)]
+pub enum Action {
+    // Keyboard
+    Forward,
+    Backward,
+    Left,
+    Right,
+    Up,
+    Down,
+    RotateLeft,
+    RotateRight,
+    Boost,
+    ToggleLook,
+
+    // Both possible
+    EnableLook,
+}
+
+#[derive(Component)]
+/// Actions our controller can handle
+pub struct DollyActions {
+    // TODO: test different structure
+    pub key_map: StableHashMap<Action, KeyCode>,
+    pub mouse_map: StableHashMap<Action, MouseButton>,
+}
+
+impl Default for DollyActions {
+    fn default() -> Self {
+        let mut keys: StableHashMap<Action, KeyCode> = StableHashMap::with_capacity(10);
+        keys.insert(Action::Forward, KeyCode::W);
+        keys.insert(Action::Backward, KeyCode::S);
+        keys.insert(Action::Left, KeyCode::A);
+        keys.insert(Action::Right, KeyCode::D);
+        keys.insert(Action::Up, KeyCode::Z);
+        keys.insert(Action::Down, KeyCode::X);
+        keys.insert(Action::RotateLeft, KeyCode::Q);
+        keys.insert(Action::RotateRight, KeyCode::E);
+        keys.insert(Action::Boost, KeyCode::LShift);
+
+        keys.insert(Action::EnableLook, KeyCode::Space);
+
+        let mut mouse: StableHashMap<Action, MouseButton> = StableHashMap::with_capacity(2);
+        mouse.insert(Action::EnableLook, MouseButton::Right);
+        mouse.insert(Action::Up, MouseButton::Other(1));
+
+        Self {
+            key_map: keys,
+            mouse_map: mouse,
+        }
+    }
+}
+
+impl DollyActions {
+    /// Helpers function to see if any of the keys are pressed
+    pub fn key_pressed(&self, action: Action, input: &Input<KeyCode>) -> bool {
+        match self.key_map.get(&action) {
+            Some(key) => {
+                if input.pressed(*key) {
+                    return true;
+                }
+                false
+            }
+            None => false,
+        }
+    }
+
+    // TODO: remove this fn
+    pub fn mouse_pressed(&self, action: Action, input: &Input<MouseButton>) -> bool {
+        match self.mouse_map.get(&action) {
+            Some(button) => {
+                if input.pressed(*button) {
+                    return true;
+                }
+                false
+            }
+            None => false,
+        }
+    }
+
+    pub fn print_actions(&self) {
+        info!("Key Actions - {}", self.key_map.len());
+        for (action, key) in self.key_map.iter() {
+            info!(" action: {:?}, key: {:?}", action, key);
+        }
+        info!("Mouse Actions - {}", self.mouse_map.len());
+        for (action, btn) in self.mouse_map.iter() {
+            info!(" action: {:?}, button: {:?}", action, btn);
+        }
+    }
+}
 
 /// Configuration Resource for Dolly Controlled Rigs
-// TODO: We could store the targeting data here, would really make user
-// interaction
+// TODO: We could store the targeting data here
 pub struct DollyControlConfig {
     pub speed: f32,
     pub key_rotation: f32,
@@ -37,7 +124,7 @@ pub fn update_control_system(
     config: Res<DollyControlConfig>,
     mut windows: ResMut<Windows>,
     mut mouse_motion_events: EventReader<MouseMotion>,
-    mut query: Query<(&Transform, &mut Rig, &ControlActions)>,
+    mut query: Query<(&Transform, &mut Rig, &DollyActions)>,
 ) {
     for (t, mut rig, control_actions) in query.iter_mut() {
         let window = windows.get_primary_mut().unwrap();
@@ -70,19 +157,17 @@ pub fn update_control_system(
 
         // Make movement relative to current transform(camera) and limit effect
         move_vec = t.rotation * move_vec.clamp_length_max(1.0);
-        //move_vec.y = 0.0;
 
         // Apply the move
         rig.target.translation += move_vec * time.delta_seconds() * config.speed * boost;
 
         // Update rotation
         let mut delta = Vec3::ZERO;
-
         if control_actions.key_pressed(Action::RotateLeft, &input_keys) {
-            delta.z -= 10.0;
+            delta.z += 10.0;
         }
         if control_actions.key_pressed(Action::RotateRight, &input_keys) {
-            delta.z += 10.0;
+            delta.z -= 10.0;
         }
 
         // Mouse Enable Look
@@ -105,13 +190,14 @@ pub fn update_control_system(
             );
         }
 
-         rig.target
-         .rotate(Quat::from_euler(bevy::math::EulerRot::XYZ,
-             -config.sensitivity.y * delta.y,
-             -config.sensitivity.x * delta.x,
-             -config.sensitivity.z * delta.z
-            ));
-      }
+        // TODO: clean this up, and limit rotation to keep level
+        rig.target.rotate(Quat::from_euler(
+            bevy::math::EulerRot::XYZ,
+            config.sensitivity.x * delta.x,
+            config.sensitivity.y * delta.y,
+            config.sensitivity.z * delta.z,
+        ));
+    }
 }
 
 fn look_around<T: Copy + Eq + std::hash::Hash>(
@@ -131,7 +217,8 @@ fn look_around<T: Copy + Eq + std::hash::Hash>(
     }
     if input.pressed(*btn) {
         for event in mouse_motion_events.iter() {
-            *delta +=  vec3( event.delta.x, event.delta.y, 0.0);
+            // TODO: have to reverse this, is there a way in which i don't?
+            *delta += vec3(-event.delta.y, -event.delta.x, 0.0);
         }
     }
 }

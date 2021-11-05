@@ -16,12 +16,12 @@ fn main() {
 
 /// set up a simple 3D scene
 fn setup(mut commands: Commands) {
-
-    let camera =  DollyControlCameraBundle {
-        rig: Rig::default(),
-        transform: Transform::from_xyz(0.0, 2.0, -5.0).looking_at(Vec3::ZERO, Vec3::Y),
-        ..Default::default()
-    };
     // Now lets finally spawn our camera
-    commands.spawn_bundle(camera);
+    commands
+        .spawn_bundle(PerspectiveCameraBundle {
+            transform: Transform::from_xyz(0.0, 2.0, -5.0).looking_at(Vec3::ZERO, Vec3::Y),
+            ..Default::default()
+        })
+        .insert(Rig::default())
+        .insert(DollyActions::default());
 }

@@ -20,15 +20,18 @@ fn main() {
 
 /// Set our cameras
 fn setup_camera(mut commands: Commands) {
-    commands.spawn_bundle(DollyCameraBundle {
-        rig: Rig {
-            position_smoothness: 0.0,
+    commands
+        .spawn_bundle(PerspectiveCameraBundle {
+            transform: Transform::from_xyz(0.0, 0.0, 0.0),
             ..Default::default()
-        }
+        })
+        .insert(
+            Rig {
+                position_smoothness: 0.0,
+                ..Default::default()
+            }
             .with(Arm::new(Vec3::new(5.0, 2.0, 10.0))),
-        transform: Transform::from_xyz(0.0, 0.0, 0.0),
-        ..Default::default()
-    });
+        );
     info!("Use Z and X to rotate");
 }
 

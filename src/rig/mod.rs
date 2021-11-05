@@ -46,9 +46,6 @@ impl Rig {
 
 
         // TODO: This is overly complicated
-        // Apply smoothness
-        // An ad-hoc multiplier to make default smoothness parameters
-        // produce good-looking results.
         let smoothness_multi: f32 = 8.0;
         let (interp_pos, interp_rot) = (
             1.0 - (-smoothness_multi * delta_time_seconds / self.position_smoothness.max(1e-5))
@@ -56,14 +53,13 @@ impl Rig {
             1.0 - (-smoothness_multi * delta_time_seconds / self.rotation_smoothness.max(1e-5))
                 .exp(),
         );
-
         result.translation = Vec3::lerp(current.translation, self.target.translation, interp_pos);
         result.rotation = Quat::lerp(current.rotation, self.target.rotation, interp_rot);
 
-                // excute drivers in order
-                for driver in self.drivers.iter_mut() {
-                    driver.update(&mut result, delta_time_seconds);
-                }
+        // excute drivers in order
+        for driver in self.drivers.iter_mut() {
+            driver.update(&mut result, delta_time_seconds);
+        }
         result
     }
 

@@ -27,11 +27,12 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         .insert(Sheep)
         .id();
 
-    commands.spawn_bundle(DollyCameraBundle {
-        rig: Rig::default(),
+    commands.spawn_bundle(PerspectiveCameraBundle{
+        
         transform: Transform::from_xyz(0.0, 2.0, -5.0).looking_at(Vec3::ZERO, Vec3::Y),
         ..Default::default()
-    });
+    })
+    .insert(Rig::default());
 
     info!(" Use Q and E to turn the sheep");
 }

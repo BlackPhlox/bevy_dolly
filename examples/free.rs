@@ -17,18 +17,12 @@ fn main() {
 
 fn setup(mut commands: Commands) {
 
-    // Create our camera with defaults, currently that is free look
-    let camera =  DollyControlCameraBundle {
-        rig: Rig::default(),
+    // Now lets finally spawn our camera
+    commands.spawn_bundle(PerspectiveCameraBundle {
         transform: Transform::from_xyz(0.0, 2.0, 5.0).looking_at(Vec3::ZERO, Vec3::Y),
         ..Default::default()
-    };
-
-    // You could just pass the bundle directly to spawn_bundle
-    // but lets print the current camera actions for ref
-    camera.control_actions.print_actions();
-
-    // Now lets finally spawn our camera
-    commands.spawn_bundle(camera);
+    })
+    .insert(Rig::default())
+    .insert(DollyActions::default());
 
 }
