@@ -83,7 +83,7 @@ fn update_camera(
 
     let mut rig = query.q2_mut().single_mut().unwrap();
 
-    rig.driver_mut::<Follow>().update(
+    rig.driver_mut::<Follow>().follow(
         player_dolly.position,
         player_dolly.rotation,
         player_dolly.position + Vec3::Y,

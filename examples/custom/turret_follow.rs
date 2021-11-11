@@ -2,7 +2,7 @@ use std::f32::consts::{FRAC_2_PI, FRAC_PI_2, FRAC_PI_4, FRAC_PI_8, PI};
 
 use bevy::prelude::*;
 use bevy_dolly::{DollyPlugins, Transform2Bevy, Transform2Dolly, UpdateYawPitch, ZeroedYRotation};
-use dolly::prelude::{Arm, Axis, CameraRig, LockRotation, LookAt, Rotation, Smooth, YawPitch};
+use dolly::prelude::{Arm, CameraRig, LockRotation, LookAt, Rotation, Smooth, YawPitch};
 
 struct MainCamera;
 
@@ -78,7 +78,7 @@ fn setup(
                     .tracking_smoothness(1.25)
                     .tracking_predictive(true),
                 )
-                .with(LockRotation::new(&[Axis::X, Axis::Z]))
+                .with(LockRotation::new().y())
                 .build(),
         )
         .insert(TurretRig);

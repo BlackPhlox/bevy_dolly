@@ -3,15 +3,16 @@ use bevy::prelude::*;
 use dolly::driver::RigDriver;
 use dolly::glam::Vec3;
 use dolly::prelude::{CameraRig, Position, Rotation, Smooth, YawPitch};
-use dolly::rig::RigUpdateParams;
-use dolly::DollyDriver;
 use std::fmt::Debug;
 
 use crate::{IterAnyPressed, ZeroedYRotation};
+#[derive(Debug)]
+pub struct Fps(CameraRig);
 
-#[derive(Debug, DollyDriver)]
-pub struct Fps {
-    pub rig: CameraRig,
+impl RigDriver for Fps {
+    fn update(&mut self, params: dolly::rig::RigUpdateParams) -> dolly::transform::Transform {
+        self.0.update(params.delta_time_seconds)
+    }
 }
 
 pub struct Vec3KeyMapWithBoost {
@@ -42,18 +43,16 @@ impl Fps {
     pub fn init(transform: dolly::transform::Transform) -> Self {
         let mut yp = YawPitch::new();
         yp.set_rotation_quat(transform.rotation);
-        Fps {
-            rig: CameraRig::builder()
-                .with(Position {
-                    position: transform.position,
-                })
-                .with(Rotation {
-                    rotation: transform.rotation,
-                })
-                .with(yp)
-                .with(Smooth::new_position_rotation(1.0, 0.5))
-                .build(),
-        }
+        Fps(CameraRig::builder()
+            .with(Position {
+                position: transform.position,
+            })
+            .with(Rotation {
+                rotation: transform.rotation,
+            })
+            .with(yp)
+            .with(Smooth::new_position_rotation(1.0, 0.5))
+            .build())
     }
 
     pub fn update(
@@ -104,18 +103,18 @@ impl Fps {
             delta += event.delta;
         }
 
-        let move_vec = self.rig.final_transform.rotation.zeroed_y_rotation()
+        let move_vec = self.0.final_transform.rotation.zeroed_y_rotation()
             * move_vec.clamp_length_max(1.0)
             * boost_mult.powf(boost);
 
         let window = windows.get_primary().unwrap();
         if window.cursor_locked() {
-            self.rig.driver_mut::<YawPitch>().rotate_yaw_pitch(
+            self.0.driver_mut::<YawPitch>().rotate_yaw_pitch(
                 -0.1 * delta.x * sensitivity.x,
                 -0.1 * delta.y * sensitivity.y,
             );
 
-            self.rig
+            self.0
                 .driver_mut::<Position>()
                 .translate(move_vec * time_delta_seconds * 10.0);
         }

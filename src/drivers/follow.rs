@@ -2,19 +2,21 @@ use dolly::{
     driver::RigDriver,
     glam::Vec3,
     prelude::{Arm, CameraRig, LookAt, Position, Rotation, Smooth},
-    rig::RigUpdateParams,
-    DollyDriver,
 };
 
-#[derive(Debug, DollyDriver)]
-pub struct Follow {
-    pub rig: CameraRig,
+#[derive(Debug)]
+pub struct Follow(CameraRig);
+
+impl RigDriver for Follow {
+    fn update(&mut self, params: dolly::rig::RigUpdateParams) -> dolly::transform::Transform {
+        self.0.update(params.delta_time_seconds)
+    }
 }
 
 impl Follow {
     pub fn init(transform: dolly::transform::Transform) -> Self {
-        Self {
-            rig: CameraRig::builder()
+        Self(
+            CameraRig::builder()
                 .with(Position::new(transform.position))
                 .with(Rotation::new(transform.rotation))
                 .with(Smooth::new_position(1.25).predictive(true))
@@ -26,12 +28,12 @@ impl Follow {
                         .tracking_predictive(true),
                 )
                 .build(),
-        }
+        )
     }
 
-    pub fn update(&mut self, position: Vec3, rotation: dolly::glam::Quat, target: Vec3) {
-        self.rig.driver_mut::<Position>().position = position;
-        self.rig.driver_mut::<Rotation>().rotation = rotation;
-        self.rig.driver_mut::<LookAt>().target = target;
+    pub fn follow(&mut self, position: Vec3, rotation: dolly::glam::Quat, target: Vec3) {
+        self.0.driver_mut::<Position>().position = position;
+        self.0.driver_mut::<Rotation>().rotation = rotation;
+        self.0.driver_mut::<LookAt>().target = target;
     }
 }
