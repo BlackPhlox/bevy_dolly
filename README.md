@@ -1,3 +1,4 @@
+<h1>bevy_dolly</h1>
 <div align="left">
 <a href="https://github.com/BlackPhlox/bevy_dolly"><img src="https://raw.githubusercontent.com/BlackPhlox/BlackPhlox/master/bevy_dolly_1.svg" alt="bevy_dolly"></a>
 </div><br/>
