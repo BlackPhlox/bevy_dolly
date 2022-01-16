@@ -28,7 +28,6 @@ impl Default for Rig {
 }
 
 impl Rig {
-
     /// Returns the first driver of the matching type
     pub fn get_driver_mut<T: RigDriver>(&mut self) -> Option<&mut T> {
         for driver in self.drivers.iter_mut() {
@@ -43,7 +42,6 @@ impl Rig {
     /// Camera rigs are approximately framerate independent, so `update` can be called at any frequency.
     pub fn update(&mut self, current: &Transform, delta_time_seconds: f32) -> Transform {
         let mut result = self.target;
-
 
         // TODO: This is overly complicated
         let smoothness_multi: f32 = 8.0;
@@ -64,6 +62,7 @@ impl Rig {
     }
 
     /// Add driver in order to rig
+    #[must_use]
     pub fn with(mut self, driver: impl RigDriver) -> Self {
         self.drivers.push(Box::new(driver));
         self

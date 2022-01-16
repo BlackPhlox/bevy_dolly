@@ -1,8 +1,8 @@
 #![feature(derive_default_enum)]
 pub mod actions;
 pub mod rig;
-use bevy::prelude::*;
 pub use actions::*;
+use bevy::prelude::*;
 pub use rig::*;
 
 pub mod prelude {
@@ -12,12 +12,10 @@ pub mod prelude {
 pub struct DollyPlugin;
 impl Plugin for DollyPlugin {
     fn build(&self, app: &mut App) {
-
         // TODO: We are getting a frame+1 lag, not worth fixing complexity with stages right now
         app.add_system_to_stage(CoreStage::PreUpdate, init_rig_system)
             .add_system_to_stage(CoreStage::PreUpdate, update_rigs_system)
             .add_system_to_stage(CoreStage::Update, apply_rigs_system)
-
             // These are only use for camera control system
             .init_resource::<DollyControlConfig>()
             .add_system_to_stage(CoreStage::PreUpdate, actions::update_control_system);
@@ -55,7 +53,6 @@ fn update_rigs_system(mut rig_query: Query<&mut Rig>, transform_query: Query<&Tr
 
 fn apply_rigs_system(time: Res<Time>, mut query: Query<(&mut Transform, &mut Rig)>) {
     for (mut transform, mut rig) in query.iter_mut() {
-        
         let delta_seconds = time.delta_seconds();
         // Apply Rigs
         *transform = rig.update(&transform, delta_seconds);

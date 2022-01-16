@@ -41,8 +41,6 @@ pub fn spawn_sheep(position: Vec3, commands: &mut Commands, asset_server: &Asset
         .id()
 }
 
-
-
 // TODO: add cursor stuff back once everything works well
 // Grabs/ungrabs mouse cursor
 #[allow(dead_code)]
