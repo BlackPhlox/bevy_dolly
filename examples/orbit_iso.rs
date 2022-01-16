@@ -1,128 +1,48 @@
-use bevy::input::mouse::MouseMotion;
+mod helpers;
+
+use std::f32::consts::*;
+
 use bevy::prelude::*;
-use bevy_dolly::{CameraRigComponent, Transform2Bevy};
-use dolly::glam::Vec3;
-use dolly::prelude::{Arm, CameraRig, Smooth, YawPitch};
+use bevy_dolly::prelude::*;
+use helpers::*;
 
-#[derive(Component)]
-struct MainCamera;
-
+// In this example we not going to use a bundle
 fn main() {
     App::new()
         .insert_resource(Msaa { samples: 4 })
         .add_plugins(DefaultPlugins)
-        .add_state(Pan::Keys)
-        .add_startup_system(setup)
+        .add_plugin(DollyPlugin)
+        .add_startup_system(setup_camera)
         .add_system(update_camera_system)
+        .add_startup_system(setup_example_scene)
         .run();
 }
 
-#[derive(PartialEq, Eq, Debug, Clone, Copy, Hash)]
-enum Pan {
-    Mouse,
-    Keys,
-}
-
-/// set up a simple 3D scene
-fn setup(
-    mut commands: Commands,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
-    asset_server: Res<AssetServer>,
-) {
-    // plane
-    commands.spawn_bundle(PbrBundle {
-        mesh: meshes.add(Mesh::from(shape::Plane { size: 5.0 })),
-        material: materials.add(Color::rgb(0.3, 0.5, 0.3).into()),
-        ..Default::default()
-    });
-
+/// Set our cameras
+fn setup_camera(mut commands: Commands) {
     commands
-        .spawn_bundle((
-            Transform {
-                translation: bevy::math::Vec3::new(0., 0.2, 0.),
-                ..Default::default()
-            },
-            GlobalTransform::identity(),
-        ))
-        .with_children(|cell| {
-            cell.spawn_scene(asset_server.load("poly_dolly.gltf#Scene0"));
+        .spawn_bundle(PerspectiveCameraBundle {
+            transform: Transform::from_xyz(0.0, 0.0, 0.0),
+            ..Default::default()
         })
-        .id();
-
-    commands.spawn().insert(
-        CameraRigComponent(CameraRig::builder()
-            .with(YawPitch::new().yaw_degrees(45.0).pitch_degrees(-30.0))
-            .with(Smooth::new_rotation(1.5))
-            .with(Arm::new(Vec3::Z * 4.0))
-            .build()),
-    );
-
-    let mut camera = OrthographicCameraBundle::new_3d();
-    camera.orthographic_projection.scale = 3.0;
-    camera.transform =
-        Transform::from_xyz(5.0, 5.0, 5.0).looking_at(bevy::math::Vec3::ZERO, bevy::math::Vec3::Y);
-
-    commands.spawn_bundle(camera).insert(MainCamera);
-
-    // light
-    commands.spawn_bundle(PointLightBundle {
-        transform: Transform::from_xyz(4.0, 8.0, 4.0),
-        ..Default::default()
-    });
+        .insert(
+            Rig {
+                position_smoothness: 0.0,
+                ..Default::default()
+            }
+            .with(Arm::new(Vec3::new(5.0, 2.0, 10.0))),
+        );
+    info!("Use Z and X to rotate");
 }
 
-#[allow(unused_must_use)]
-#[allow(clippy::type_complexity)]
-fn update_camera_system(
-    keys: Res<Input<KeyCode>>,
-    time: Res<Time>,
-    mut pan: ResMut<State<Pan>>,
-    mut mouse_motion_events: EventReader<MouseMotion>,
-    mut query: QuerySet<(
-        QueryState<&mut Transform, With<MainCamera>>,
-        QueryState<&mut CameraRigComponent>,
-    )>,
-) {
-    let mut q1 = query.q1();
-    let mut rig = q1.single_mut();
-
-    let camera_driver = rig.0.driver_mut::<YawPitch>();
-    let sensitivity = Vec2::splat(2.0);
-
-    let mut delta = Vec2::ZERO;
-    for event in mouse_motion_events.iter() {
-        delta += event.delta;
-    }
-
-    if pan.current().eq(&Pan::Keys) {
+/// Rotate our camera around
+fn update_camera_system(mut query: Query<&mut Rig>, keys: Res<Input<KeyCode>>) {
+    for mut rig in query.iter_mut() {
         if keys.just_pressed(KeyCode::Z) {
-            camera_driver.rotate_yaw_pitch(-90.0, 0.0);
+            rig.target.rotate(Quat::from_rotation_y(FRAC_PI_2));
         }
         if keys.just_pressed(KeyCode::X) {
-            camera_driver.rotate_yaw_pitch(90.0, 0.0);
+            rig.target.rotate(Quat::from_rotation_y(-FRAC_PI_2));
         }
-    } else {
-        camera_driver.rotate_yaw_pitch(
-            -0.1 * delta.x * sensitivity.x,
-            -0.1 * delta.y * sensitivity.y,
-        );
     }
-
-    if keys.just_pressed(KeyCode::E) {
-        let result = if pan.current().eq(&Pan::Keys) {
-            Pan::Mouse
-        } else {
-            Pan::Keys
-        };
-        pan.overwrite_set(result);
-        println!("State:{:?}", result);
-    }
-
-    let transform = rig.0.update(time.delta_seconds());
-    
-    let mut q0 = query.q0();
-    let mut cam = q0.single_mut();
-
-    cam.transform_2_bevy(transform);
 }

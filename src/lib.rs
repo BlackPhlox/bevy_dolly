@@ -1,73 +1,63 @@
-mod cone;
-pub mod ctrl;
+#![feature(derive_default_enum)]
+pub mod actions;
+pub mod rig;
+use bevy::prelude::*;
+pub use actions::*;
+pub use rig::*;
 
-use bevy::{app::PluginGroupBuilder, prelude::{App, Component, Mut, Plugin, PluginGroup, Transform}};
-use ctrl::DollyCtrl;
-pub use dolly::prelude::*;
-use dolly::glam::{Quat, Vec3};
-
-pub struct Dolly;
-impl Plugin for Dolly {
-    fn build(&self, _app: &mut App) {}
+pub mod prelude {
+    pub use crate::{actions::*, rig::*, *};
 }
 
-pub struct DollyPlugins;
-impl PluginGroup for DollyPlugins {
-    fn build(&mut self, group: &mut PluginGroupBuilder) {
-        group.add(Dolly).add(DollyCtrl);
+pub struct DollyPlugin;
+impl Plugin for DollyPlugin {
+    fn build(&self, app: &mut App) {
+
+        // TODO: We are getting a frame+1 lag, not worth fixing complexity with stages right now
+        app.add_system_to_stage(CoreStage::PreUpdate, init_rig_system)
+            .add_system_to_stage(CoreStage::PreUpdate, update_rigs_system)
+            .add_system_to_stage(CoreStage::Update, apply_rigs_system)
+
+            // These are only use for camera control system
+            .init_resource::<DollyControlConfig>()
+            .add_system_to_stage(CoreStage::PreUpdate, actions::update_control_system);
     }
 }
 
-pub trait Transform2Bevy {
-    fn transform_2_bevy(&mut self, transform: dolly::transform::Transform);
-}
-
-impl Transform2Bevy for Mut<'_, Transform> {
-    fn transform_2_bevy(&mut self, transform: dolly::transform::Transform) {
-        let (translation, rotation) = transform.into_position_rotation();
-        self.translation = bevy::math::Vec3::new(translation.x, translation.y, translation.z);
-        self.rotation = bevy::math::Quat::from_xyzw(rotation.x, rotation.y, rotation.z, rotation.w);
+/// Listen for new Rigs
+/// Add position and rotation info if needed
+fn init_rig_system(mut query: Query<(&mut Transform, &mut Rig), Added<Rig>>) {
+    for (transform, mut rig) in query.iter_mut() {
+        // set init target for the transform
+        rig.target = *transform;
     }
 }
 
-impl Transform2Bevy for Transform {
-    fn transform_2_bevy(&mut self, transform: dolly::transform::Transform) {
-        let (translation, rotation) = transform.into_position_rotation();
-        self.translation = bevy::math::Vec3::new(translation.x, translation.y, translation.z);
-        self.rotation = bevy::math::Quat::from_xyzw(rotation.x, rotation.y, rotation.z, rotation.w);
-    }
-}
+fn update_rigs_system(mut rig_query: Query<&mut Rig>, transform_query: Query<&Transform>) {
+    for mut rig in rig_query.iter_mut() {
+        // Update LookAt Drivers
+        if let Some(d) = rig.get_driver_mut::<LookAt>() {
+            if let Some(target_entity) = d.target_entity {
+                if let Ok(target_transfrom) = transform_query.get(target_entity) {
+                    d.target_transform = Some(*target_transfrom);
+                }
+            }
+        }
 
-pub trait Transform2DollyMut {
-    fn transform_2_dolly_mut(&self) -> dolly::transform::Transform;
-}
-
-impl Transform2DollyMut for Mut<'_, Transform> {
-    fn transform_2_dolly_mut(&self) -> dolly::transform::Transform {
-        let t = self.translation;
-        let r = self.rotation;
-        dolly::transform::Transform {
-            position: Vec3::new(t.x, t.y, t.z),
-            rotation: Quat::from_xyzw(r.x, r.y, r.z, r.w),
+        // Update Anchor Drivers
+        if let Some(d) = rig.get_driver_mut::<Anchor>() {
+            if let Ok(t) = transform_query.get(d.target_entity) {
+                d.target = *t;
+            }
         }
     }
 }
 
-pub trait Transform2Dolly {
-    fn transform_2_dolly(&self) -> dolly::transform::Transform;
-}
-
-impl Transform2Dolly for Transform {
-    fn transform_2_dolly(&self) -> dolly::transform::Transform {
-        let t = self.translation;
-        let r = self.rotation;
-        dolly::transform::Transform {
-            position: Vec3::new(t.x, t.y, t.z),
-            rotation: Quat::from_xyzw(r.x, r.y, r.z, r.w),
-        }
+fn apply_rigs_system(time: Res<Time>, mut query: Query<(&mut Transform, &mut Rig)>) {
+    for (mut transform, mut rig) in query.iter_mut() {
+        
+        let delta_seconds = time.delta_seconds();
+        // Apply Rigs
+        *transform = rig.update(&transform, delta_seconds);
     }
 }
-
-/// Wrapper for CameraRig so we can derive Component
-#[derive(Component)]
-pub struct CameraRigComponent(pub CameraRig);
