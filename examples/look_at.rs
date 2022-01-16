@@ -16,7 +16,7 @@ fn main() {
 
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     // Create another sheep, this time we will add a component to it so we can move it in a system
-    let sheep = commands
+    let _sheep = commands
         .spawn_bundle((
             Transform::from_xyz(2.0, 0.2, 0.),
             GlobalTransform::default(),
