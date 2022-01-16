@@ -46,9 +46,8 @@ fn setup(
         .id();
 
     let translation = [-2.0f32, 2.0f32, 5.0f32];
-    let transform =
-        Transform::from_translation(bevy::math::Vec3::from_slice(&translation))
-            .looking_at(bevy::math::Vec3::ZERO, bevy::math::Vec3::Y);
+    let transform = Transform::from_translation(bevy::math::Vec3::from_slice(&translation))
+        .looking_at(bevy::math::Vec3::ZERO, bevy::math::Vec3::Y);
 
     let rotation = transform.transform_2_dolly().rotation;
     let mut yaw_pitch = YawPitch::new();

@@ -112,11 +112,7 @@ fn follow_player(
 
     let transform = rig.update(time.delta_seconds());
 
-    query
-        .q0()
-        .single_mut()
-        .0
-        .transform_2_bevy(transform);
+    query.q0().single_mut().0.transform_2_bevy(transform);
 }
 
 fn follow_sheep(
@@ -141,11 +137,7 @@ fn follow_sheep(
 
     let transform = rig.update(time.delta_seconds());
 
-    query
-        .q0()
-        .single_mut()
-        .0
-        .transform_2_bevy(transform);
+    query.q0().single_mut().0.transform_2_bevy(transform);
 }
 
 #[derive(Component)]

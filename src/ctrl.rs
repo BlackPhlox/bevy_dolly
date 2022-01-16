@@ -5,8 +5,9 @@ use bevy::{
     math::{Quat, Vec3},
     pbr::PbrBundle,
     prelude::{
-        App, Assets, BuildChildren, Color, Commands, Entity, GlobalTransform, IntoSystem,
-        KeyCode, Mesh, Plugin, Query, Res, ResMut, StandardMaterial, SystemSet, Transform, Component,
+        App, Assets, BuildChildren, Color, Commands, Component, Entity, GlobalTransform,
+        IntoSystem, KeyCode, Mesh, Plugin, Query, Res, ResMut, StandardMaterial, SystemSet,
+        Transform,
     },
 };
 

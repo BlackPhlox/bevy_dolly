@@ -91,16 +91,9 @@ fn update_camera(
 ) {
     let mut q1 = query.q1();
     let (player, _) = q1.single_mut();
-    query
-        .q2()
-        .single_mut()
-        .driver_mut::<LookAt>()
-        .target = player.transform_2_dolly().position;
+    query.q2().single_mut().driver_mut::<LookAt>().target = player.transform_2_dolly().position;
 
-    let transform = query
-        .q2()
-        .single_mut()
-        .update(time.delta_seconds());
+    let transform = query.q2().single_mut().update(time.delta_seconds());
 
     let mut q0 = query.q0();
     let (mut cam, _) = q0.single_mut();
