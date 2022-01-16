@@ -1,16 +1,16 @@
 use bevy::{
     app::PluginGroupBuilder,
-    prelude::{AppBuilder, Mut, Plugin, PluginGroup, Transform},
+    prelude::{App, Mut, Plugin, PluginGroup, Transform, Component},
 };
 use ctrl::DollyCtrl;
-use dolly::glam::{Quat, Vec3};
+use dolly::{glam::{Quat, Vec3}, prelude::CameraRig};
 
 mod cone;
 pub mod ctrl;
 
 pub struct Dolly;
 impl Plugin for Dolly {
-    fn build(&self, _app: &mut AppBuilder) {}
+    fn build(&self, _app: &mut App) {}
 }
 
 pub struct DollyPlugins;

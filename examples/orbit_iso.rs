@@ -4,10 +4,11 @@ use bevy_dolly::Transform2Bevy;
 use dolly::glam::Vec3;
 use dolly::prelude::{Arm, CameraRig, Smooth, YawPitch};
 
+#[derive(Component)]
 struct MainCamera;
 
 fn main() {
-    App::build()
+    App::new()
         .insert_resource(Msaa { samples: 4 })
         .add_plugins(DefaultPlugins)
         .add_state(Pan::Keys)
@@ -65,7 +66,7 @@ fn setup(
     commands.spawn_bundle(camera).insert(MainCamera);
 
     // light
-    commands.spawn_bundle(LightBundle {
+    commands.spawn_bundle(PointLightBundle {
         transform: Transform::from_xyz(4.0, 8.0, 4.0),
         ..Default::default()
     });
@@ -78,11 +79,12 @@ fn update_camera(
     mut pan: ResMut<State<Pan>>,
     mut mouse_motion_events: EventReader<MouseMotion>,
     mut query: QuerySet<(
-        Query<(&mut Transform, With<MainCamera>)>,
-        Query<&mut CameraRig>,
+        QueryState<(&mut Transform, With<MainCamera>)>,
+        QueryState<&mut CameraRig>,
     )>,
 ) {
-    let mut rig = query.q1_mut().single_mut().unwrap();
+    let mut q1 = query.q1();
+    let mut rig = q1.single_mut();
     let camera_driver = rig.driver_mut::<YawPitch>();
     let sensitivity = Vec2::splat(2.0);
 
@@ -116,7 +118,8 @@ fn update_camera(
     }
 
     let transform = rig.update(time.delta_seconds());
-    let (mut cam, _) = query.q0_mut().single_mut().unwrap();
+    let mut q0 = query.q0();
+    let (mut cam, _) = q0.single_mut();
 
     cam.transform_2_bevy(transform);
 }

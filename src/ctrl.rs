@@ -5,8 +5,8 @@ use bevy::{
     math::{Quat, Vec3},
     pbr::PbrBundle,
     prelude::{
-        AppBuilder, Assets, BuildChildren, Color, Commands, Entity, GlobalTransform, IntoSystem,
-        KeyCode, Mesh, Plugin, Query, Res, ResMut, StandardMaterial, SystemSet, Transform,
+        App, Assets, BuildChildren, Color, Commands, Entity, GlobalTransform, IntoSystem,
+        KeyCode, Mesh, Plugin, Query, Res, ResMut, StandardMaterial, SystemSet, Transform, Component,
     },
 };
 
@@ -14,7 +14,7 @@ use crate::cone::Cone;
 
 pub struct DollyCtrl;
 impl Plugin for DollyCtrl {
-    fn build(&self, app: &mut AppBuilder) {
+    fn build(&self, app: &mut App) {
         app.init_resource::<CtrlConfig>()
             .add_startup_system(ctrl_setup.system())
             .add_system_set(
@@ -59,6 +59,7 @@ pub struct CtrlConfig {
     pub entity: Option<Entity>,
 }
 
+#[derive(Component)]
 pub struct CtrlMove;
 
 impl Default for CtrlConfig {
