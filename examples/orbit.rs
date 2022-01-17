@@ -2,6 +2,8 @@ mod helpers;
 
 use bevy::prelude::*;
 use bevy_dolly::prelude::*;
+use dolly::glam;
+use dolly::prelude::{Arm, CameraRig, Smooth, YawPitch};
 use helpers::*;
 
 #[derive(Component)]
@@ -11,9 +13,9 @@ fn main() {
     App::new()
         .insert_resource(Msaa { samples: 4 })
         .add_plugins(DefaultPlugins)
-        .add_plugin(DollyPlugin)
-        .add_startup_system(setup_camera)
-        .add_system(update_camera_system)
+        //.add_plugin(DollyPlugin)
+        .add_startup_system(setup)
+        //.add_system(update_camera_system)
         .add_startup_system(setup_example_scene)
         .run();
 }
@@ -49,7 +51,7 @@ fn setup(
         CameraRig::builder()
             .with(YawPitch::new().yaw_degrees(45.0).pitch_degrees(-30.0))
             .with(Smooth::new_rotation(1.5))
-            .with(Arm::new(Vec3::Z * 4.0))
+            .with(Arm::new(dolly::glam::Vec3::Z * 4.0))
             .build(),
     );
 

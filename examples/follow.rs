@@ -1,10 +1,10 @@
 mod helpers;
 use bevy::prelude::*;
 use bevy_dolly::prelude::*;
-use helpers::*;
 use bevy_dolly::{Transform2Bevy, Transform2Dolly};
 use dolly::glam::Vec3;
 use dolly::prelude::{Arm, CameraRig, LookAt, Position, Rotation, Smooth};
+use helpers::*;
 
 #[derive(Component)]
 struct MainCamera;
@@ -13,11 +13,10 @@ fn main() {
     App::new()
         .insert_resource(Msaa { samples: 4 })
         .add_plugins(DefaultPlugins)
-        .add_plugin(DollyPlugin)
+        //.add_plugin(DollyPlugin)
         .add_startup_system(setup)
         .add_startup_system(setup_example_scene)
-        .add_system(move_sheep_system)
-        .add_startup_system(setup)
+        //.add_system(move_sheep_system)
         .add_system(rotator_system)
         .add_system(update_camera)
         .run();

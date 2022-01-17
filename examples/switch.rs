@@ -1,6 +1,8 @@
 mod helpers;
 use bevy::prelude::*;
 use bevy_dolly::prelude::*;
+use dolly::glam;
+use dolly::prelude::{Arm, CameraRig, LookAt, Position, Rotation, Smooth};
 
 use helpers::*;
 #[derive(Component)]
@@ -17,7 +19,12 @@ fn main() {
         .insert_resource(Msaa { samples: 4 })
         .add_plugins(DefaultPlugins)
         .add_plugins(DollyPlugins)
+        //.add_plugin(DollyPlugin)
+        .init_resource::<TargetConfig>()
         .add_startup_system(setup)
+        //.add_system(move_sheep_system)
+        //.add_system_to_stage(CoreStage::PreUpdate, change_target)
+        .add_startup_system(setup_example_scene)
         .add_system(rotator_system)
         .add_state(Camera::FollowSheep)
         .add_system(switch_camera_rig)
@@ -27,12 +34,6 @@ fn main() {
         .add_system_set(
             SystemSet::on_update(Camera::FollowSheep).with_system(follow_sheep.system()),
         )
-        .add_plugin(DollyPlugin)
-        .init_resource::<TargetConfig>()
-        .add_startup_system(setup)
-        .add_system(move_sheep_system)
-        .add_system_to_stage(CoreStage::PreUpdate, change_target)
-        .add_startup_system(setup_example_scene)
         .run();
 }
 
@@ -57,7 +58,7 @@ fn setup(
         ..Default::default()
     });
 
-    let start_pos = Vec3::new(0., 0., 0.);
+    let start_pos = glam::Vec3::new(0., 0., 0.);
 
     commands
         .spawn_bundle((
@@ -77,10 +78,10 @@ fn setup(
             .with(Position::new(start_pos))
             .with(Rotation::new(dolly::glam::Quat::IDENTITY))
             .with(Smooth::new_position(1.25).predictive(true))
-            .with(Arm::new(Vec3::new(0.0, 1.5, -3.5)))
+            .with(Arm::new(glam::Vec3::new(0.0, 1.5, -3.5)))
             .with(Smooth::new_position(2.5))
             .with(
-                LookAt::new(start_pos + Vec3::Y)
+                LookAt::new(start_pos + glam::Vec3::Y)
                     .tracking_smoothness(1.25)
                     .tracking_predictive(true),
             )
@@ -122,7 +123,8 @@ fn follow_player(
 
     rig.driver_mut::<Position>().position = player_dolly.position;
     rig.driver_mut::<Rotation>().rotation = player_dolly.rotation;
-    rig.driver_mut::<LookAt>().target = player_dolly.position + Vec3::Y + Vec3::new(0., -1., 0.);
+    rig.driver_mut::<LookAt>().target =
+        player_dolly.position + glam::Vec3::Y + glam::Vec3::new(0., -1., 0.);
 
     let transform = rig.update(time.delta_seconds());
 
@@ -147,7 +149,7 @@ fn follow_sheep(
 
     rig.driver_mut::<Position>().position = player_dolly.position;
     rig.driver_mut::<Rotation>().rotation = player_dolly.rotation;
-    rig.driver_mut::<LookAt>().target = player_dolly.position + Vec3::Y;
+    rig.driver_mut::<LookAt>().target = player_dolly.position + glam::Vec3::Y;
 
     let transform = rig.update(time.delta_seconds());
 

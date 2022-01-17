@@ -8,6 +8,10 @@ use dolly::glam::{Quat, Vec3};
 mod cone;
 pub mod ctrl;
 
+pub mod prelude {
+    pub use crate::{ctrl::*, *};
+}
+
 pub struct Dolly;
 impl Plugin for Dolly {
     fn build(&self, _app: &mut App) {}

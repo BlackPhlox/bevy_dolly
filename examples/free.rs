@@ -1,10 +1,12 @@
 mod helpers;
+
+use bevy::input::mouse::MouseMotion;
 use bevy::prelude::*;
 use bevy_dolly::prelude::*;
-use helpers::*;
 use bevy_dolly::{Transform2Bevy, Transform2Dolly};
 use dolly::glam::Vec3;
 use dolly::prelude::{CameraRig, Position, Rotation, Smooth, YawPitch};
+use helpers::*;
 
 #[derive(Component)]
 struct MainCamera;
@@ -14,7 +16,7 @@ fn main() {
         .insert_resource(Msaa { samples: 4 })
         .add_plugins(DefaultPlugins)
         // Add Dolly plugin
-        .add_plugin(DollyPlugin)
+        //.add_plugin(DollyPlugin)
         .add_startup_system(setup)
         .add_startup_system(setup_example_scene)
         .run();
