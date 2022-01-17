@@ -11,6 +11,7 @@ use crate::{driver::RigDriver, rig::RigUpdateParams, transform::Transform};
 ///
 /// [`right-hand rule`]: https://en.wikipedia.org/wiki/Right-hand_rule#Curve_orientation_and_normal_vectors
 #[derive(Debug)]
+#[must_use]
 pub struct YawPitch {
     /// [0..720)
     ///

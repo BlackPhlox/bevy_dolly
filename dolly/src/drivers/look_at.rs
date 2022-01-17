@@ -11,6 +11,7 @@ use crate::{
 ///
 /// The target tracking can be additionally smoothed, and made to look ahead of it.
 #[derive(Debug)]
+#[must_use]
 pub struct LookAt {
     /// Exponential smoothing factor
     pub smoothness: f32,

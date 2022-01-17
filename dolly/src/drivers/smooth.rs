@@ -9,6 +9,7 @@ use crate::{
 
 /// Smooths the parent transformation.
 #[derive(Debug)]
+#[must_use]
 pub struct Smooth {
     /// Exponential smoothing factor for the position
     pub position_smoothness: f32,

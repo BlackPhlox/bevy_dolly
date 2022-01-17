@@ -81,6 +81,7 @@ pub struct CameraRigBuilder {
 
 impl CameraRigBuilder {
     ///
+    #[must_use]
     pub fn with(mut self, driver: impl RigDriverTraits) -> Self {
         self.drivers.push(Box::new(driver));
         self

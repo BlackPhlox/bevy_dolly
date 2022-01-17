@@ -2,6 +2,7 @@ use crate::{driver::RigDriver, rig::RigUpdateParams, transform::Transform};
 
 /// Locks/constrains the position of the camera to one or more axes
 #[derive(Debug)]
+#[must_use]
 pub struct LockPosition {
     x: Option<f32>,
     y: Option<f32>,
