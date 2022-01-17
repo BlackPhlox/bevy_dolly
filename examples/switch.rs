@@ -3,15 +3,30 @@ use bevy::prelude::*;
 use bevy_dolly::prelude::*;
 
 use helpers::*;
+#[derive(Component)]
+struct MainCamera;
 
-// In this example we are going to switch our look at target
-// All you need to do is set a LookAt driver target_entity
-// and its will track it
+#[derive(Clone, Eq, PartialEq, Debug, Hash)]
+enum Camera {
+    FollowPlayer,
+    FollowSheep,
+}
 
 fn main() {
     App::new()
         .insert_resource(Msaa { samples: 4 })
         .add_plugins(DefaultPlugins)
+        .add_plugins(DollyPlugins)
+        .add_startup_system(setup)
+        .add_system(rotator_system)
+        .add_state(Camera::FollowSheep)
+        .add_system(switch_camera_rig)
+        .add_system_set(
+            SystemSet::on_update(Camera::FollowPlayer).with_system(follow_player.system()),
+        )
+        .add_system_set(
+            SystemSet::on_update(Camera::FollowSheep).with_system(follow_sheep.system()),
+        )
         .add_plugin(DollyPlugin)
         .init_resource::<TargetConfig>()
         .add_startup_system(setup)
@@ -30,76 +45,136 @@ struct TargetConfig {
 
 fn setup(
     mut commands: Commands,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
     asset_server: Res<AssetServer>,
     mut target_config: ResMut<TargetConfig>,
 ) {
-    // Add a few more sheep and save the entities in our target config
-    let mut herd = vec![
-        helpers::spawn_sheep(Vec3::new(2.0, 0.2, 2.0), &mut commands, &asset_server),
-        helpers::spawn_sheep(Vec3::new(2.0, 0.2, -2.0), &mut commands, &asset_server),
-        helpers::spawn_sheep(Vec3::new(-2.0, 0.2, 2.0), &mut commands, &asset_server),
-        helpers::spawn_sheep(Vec3::new(-2.0, 0.2, -2.0), &mut commands, &asset_server),
-    ];
-    target_config.entities.append(&mut herd);
+    // plane
+    commands.spawn_bundle(PbrBundle {
+        mesh: meshes.add(Mesh::from(shape::Plane { size: 5.0 })),
+        material: materials.add(Color::rgb(0.3, 0.5, 0.3).into()),
+        ..Default::default()
+    });
 
-    // Add our camera, try changing
-    // You can remove the `Control` from the bundle to disable camera movement
+    let start_pos = Vec3::new(0., 0., 0.);
+
+    commands
+        .spawn_bundle((
+            Transform {
+                translation: bevy::math::Vec3::new(0., 0.2, 0.),
+                ..Default::default()
+            },
+            GlobalTransform::identity(),
+        ))
+        .with_children(|cell| {
+            cell.spawn_scene(asset_server.load("poly_dolly.gltf#Scene0"));
+        })
+        .insert(Rotates);
+
+    commands.spawn().insert(
+        CameraRig::builder()
+            .with(Position::new(start_pos))
+            .with(Rotation::new(dolly::glam::Quat::IDENTITY))
+            .with(Smooth::new_position(1.25).predictive(true))
+            .with(Arm::new(Vec3::new(0.0, 1.5, -3.5)))
+            .with(Smooth::new_position(2.5))
+            .with(
+                LookAt::new(start_pos + Vec3::Y)
+                    .tracking_smoothness(1.25)
+                    .tracking_predictive(true),
+            )
+            .build(),
+    );
+
     commands
         .spawn_bundle(PerspectiveCameraBundle {
-            transform: Transform::from_xyz(0.0, 2.0, -10.0),
+            transform: Transform::from_xyz(-2.0, 1., 5.0)
+                .looking_at(bevy::math::Vec3::ZERO, bevy::math::Vec3::Y),
             ..Default::default()
         })
-        .insert(Rig::default().with(LookAt::new(
-            target_config.entities[0],
-            // Lets look a little in front of and above our target
-            Vec3::new(0.0, 1.0, 1.0),
-        )));
+        .insert(MainCamera);
 
     info!(" Use 1, 2, 3, 4 to target different sheep");
     info!(" Use Q and E to turn the sheep");
+    // light
+    commands.spawn_bundle(PointLightBundle {
+        transform: Transform::from_xyz(4.0, 8.0, 4.0),
+        ..Default::default()
+    });
 }
 
-// Look for key presses to select a target
-fn change_target(
-    target_config: Res<TargetConfig>,
-    keys: Res<Input<KeyCode>>,
-    mut query: Query<&mut Rig>,
+fn follow_player(
+    time: Res<Time>,
+    mut query: QuerySet<(
+        QueryState<(&mut Transform, With<MainCamera>)>,
+        QueryState<(&mut Transform, With<CtrlMove>)>,
+        QueryState<&mut CameraRig>,
+    )>,
 ) {
-    for mut rig in query.iter_mut() {
-        if let Some(d) = rig.get_driver_mut::<LookAt>() {
-            // Lets map keys to the targets, and set the target entity
-            if keys.just_pressed(KeyCode::Key1) {
-                d.target_entity = Some(target_config.entities[0]);
-            }
-            if keys.just_pressed(KeyCode::Key2) {
-                d.target_entity = Some(target_config.entities[1]);
-            }
-            if keys.just_pressed(KeyCode::Key3) {
-                d.target_entity = Some(target_config.entities[2]);
-            }
-            if keys.just_pressed(KeyCode::Key4) {
-                d.target_entity = Some(target_config.entities[3]);
-            }
-        }
+    let mut q1 = query.q1();
+    let player = q1.single_mut().0;
+
+    let player_dolly = player.transform_2_dolly();
+
+    let mut q2 = query.q2();
+    let mut rig = q2.single_mut();
+
+    rig.driver_mut::<Position>().position = player_dolly.position;
+    rig.driver_mut::<Rotation>().rotation = player_dolly.rotation;
+    rig.driver_mut::<LookAt>().target = player_dolly.position + Vec3::Y + Vec3::new(0., -1., 0.);
+
+    let transform = rig.update(time.delta_seconds());
+
+    query.q0().single_mut().0.transform_2_bevy(transform);
+}
+
+fn follow_sheep(
+    time: Res<Time>,
+    mut query: QuerySet<(
+        QueryState<(&mut Transform, With<MainCamera>)>,
+        QueryState<(&mut Transform, With<Rotates>)>,
+        QueryState<&mut CameraRig>,
+    )>,
+) {
+    let mut q1 = query.q1();
+    let player = q1.single_mut().0;
+
+    let player_dolly = player.transform_2_dolly();
+
+    let mut q2 = query.q2();
+    let mut rig = q2.single_mut();
+
+    rig.driver_mut::<Position>().position = player_dolly.position;
+    rig.driver_mut::<Rotation>().rotation = player_dolly.rotation;
+    rig.driver_mut::<LookAt>().target = player_dolly.position + Vec3::Y;
+
+    let transform = rig.update(time.delta_seconds());
+
+    query.q0().single_mut().0.transform_2_bevy(transform);
+}
+
+#[derive(Component)]
+struct Rotates;
+
+fn rotator_system(time: Res<Time>, mut query: Query<&mut Transform, With<Rotates>>) {
+    for mut transform in query.iter_mut() {
+        *transform = Transform::from_rotation(bevy::math::Quat::from_rotation_y(
+            (4.0 * std::f32::consts::PI / 20.0) * time.delta_seconds(),
+        )) * *transform;
     }
 }
 
-/// Move Sheep around so we have something to track
-fn move_sheep_system(
-    keys: Res<Input<KeyCode>>,
-    mut query: Query<&mut Transform, With<Sheep>>,
-    mut left: Local<bool>,
-) {
-    if keys.just_pressed(KeyCode::Q) {
-        *left = true;
-    }
-    if keys.just_pressed(KeyCode::E) {
-        *left = false;
-    }
+#[allow(unused_must_use)]
+fn switch_camera_rig(mut camera: ResMut<State<Camera>>, keyboard_input: Res<Input<KeyCode>>) {
+    if keyboard_input.just_pressed(KeyCode::C) {
+        let result = if camera.current().eq(&Camera::FollowPlayer) {
+            Camera::FollowSheep
+        } else {
+            Camera::FollowPlayer
+        };
 
-    for mut sheep in query.iter_mut() {
-        let movement = sheep.local_z() * 0.05;
-        sheep.translation += movement;
-        sheep.rotation *= Quat::from_rotation_y(if *left { 0.01 } else { -0.01 });
+        println!("{:?}", result);
+        camera.set(result);
     }
 }
