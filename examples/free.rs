@@ -1,6 +1,6 @@
 use bevy::input::mouse::MouseMotion;
 use bevy::prelude::*;
-use bevy_dolly::{Transform2Bevy, Transform2Dolly};
+use bevy_dolly::{Transform2Bevy, Transform2Dolly, DollyCursorGrab};
 use dolly::glam::Vec3;
 use dolly::prelude::{CameraRig, Position, Rotation, Smooth, YawPitch};
 
@@ -11,10 +11,9 @@ fn main() {
     App::new()
         .insert_resource(Msaa { samples: 4 })
         .add_plugins(DefaultPlugins)
-        .add_startup_system(setup.system())
-        .add_startup_system(initial_grab_cursor.system())
-        .add_system(update_camera.system())
-        .add_system(cursor_grab.system())
+        .add_plugin(DollyCursorGrab)
+        .add_startup_system(setup)
+        .add_system(update_camera)
         .run();
 }
 
@@ -76,24 +75,6 @@ fn setup(
         transform: Transform::from_xyz(4.0, 8.0, 4.0),
         ..Default::default()
     });
-}
-
-/// Grabs/ungrabs mouse cursor
-fn toggle_grab_cursor(window: &mut Window) {
-    window.set_cursor_lock_mode(!window.cursor_locked());
-    window.set_cursor_visibility(!window.cursor_visible());
-}
-
-/// Grabs the cursor when game first starts
-fn initial_grab_cursor(mut windows: ResMut<Windows>) {
-    toggle_grab_cursor(windows.get_primary_mut().unwrap());
-}
-
-fn cursor_grab(keys: Res<Input<KeyCode>>, mut windows: ResMut<Windows>) {
-    let window = windows.get_primary_mut().unwrap();
-    if keys.just_pressed(KeyCode::Escape) {
-        toggle_grab_cursor(window);
-    }
 }
 
 fn update_camera(

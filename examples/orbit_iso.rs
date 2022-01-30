@@ -1,6 +1,6 @@
 use bevy::input::mouse::MouseMotion;
 use bevy::prelude::*;
-use bevy_dolly::Transform2Bevy;
+use bevy_dolly::{DollyCursorGrab, Transform2Bevy};
 use dolly::glam::Vec3;
 use dolly::prelude::{Arm, CameraRig, Smooth, YawPitch};
 
@@ -11,6 +11,7 @@ fn main() {
     App::new()
         .insert_resource(Msaa { samples: 4 })
         .add_plugins(DefaultPlugins)
+        .add_plugin(DollyCursorGrab)
         .add_state(Pan::Keys)
         .add_startup_system(setup.system())
         .add_system(update_camera.system())
