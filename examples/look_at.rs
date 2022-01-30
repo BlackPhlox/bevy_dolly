@@ -1,6 +1,5 @@
 use bevy::prelude::*;
-use bevy_dolly::{DollyPlugins, Transform2Bevy, Transform2Dolly, DollyPosCtrlMove};
-use dolly::glam::Vec3;
+use bevy_dolly::{DollyPlugins, DollyPosCtrlMove, UpdateMutTransform};
 use dolly::prelude::{CameraRig, LookAt, Position};
 
 #[derive(Component)]
@@ -58,7 +57,7 @@ fn setup(
             .with(Position::new(Vec3::Y * 3.0))
             .with(LookAt::new(
                 /*start_pos.transform_2_dolly().position*/
-                dolly::glam::Vec3::new(0., 0., 2.),
+                Vec3::new(0., 0., 2.),
             ))
             .build(),
     );
@@ -90,12 +89,12 @@ fn update_camera(
 ) {
     let mut q1 = query.q1();
     let (player, _) = q1.single_mut();
-    query.q2().single_mut().driver_mut::<LookAt>().target = player.transform_2_dolly().position;
+    query.q2().single_mut().driver_mut::<LookAt>().target = player.translation;
 
     let transform = query.q2().single_mut().update(time.delta_seconds());
 
     let mut q0 = query.q0();
     let (mut cam, _) = q0.single_mut();
 
-    cam.transform_2_bevy(transform);
+    cam.update(transform);
 }

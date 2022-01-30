@@ -1,6 +1,5 @@
 use bevy::prelude::*;
-use bevy_dolly::Transform2Bevy;
-use dolly::glam::Vec3;
+use bevy_dolly::{UpdateMutTransform};
 use dolly::prelude::{Arm, CameraRig, Smooth, YawPitch};
 
 #[derive(Component)]
@@ -88,5 +87,5 @@ fn update_camera(
     let mut q0 = query.q0();
     let (mut cam, _) = q0.single_mut();
 
-    cam.transform_2_bevy(transform);
+    cam.update(transform);
 }

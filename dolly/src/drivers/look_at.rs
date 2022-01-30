@@ -1,4 +1,5 @@
-use glam::{Mat3, Quat, Vec3};
+//use glam::{Mat3, Quat, Vec3};
+use bevy::math::*;
 
 use crate::{
     driver::RigDriver,
@@ -63,7 +64,7 @@ impl RigDriver for LookAt {
             },
         );
 
-        let rotation = (target - params.parent.position)
+        let rotation = (target - params.parent.translation)
             .try_normalize()
             .and_then(|forward| {
                 let right = forward.cross(Vec3::Y).try_normalize()?;
@@ -73,8 +74,9 @@ impl RigDriver for LookAt {
             .unwrap_or_default();
 
         Transform {
-            position: params.parent.position,
+            translation: params.parent.translation,
             rotation,
+            scale: params.parent.scale,
         }
     }
 }

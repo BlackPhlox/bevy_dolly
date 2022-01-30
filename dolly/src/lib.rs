@@ -41,4 +41,4 @@ pub mod transform;
 
 mod util;
 
-pub use glam;
+//pub use glam;

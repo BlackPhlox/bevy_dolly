@@ -50,13 +50,14 @@ impl Default for LockPosition {
 
 impl RigDriver for LockPosition {
     fn update(&mut self, params: RigUpdateParams) -> Transform {
-        let mut delta_pos = params.parent.position;
+        let mut delta_pos = params.parent.translation;
         delta_pos.x = self.x.unwrap_or(delta_pos.x);
         delta_pos.y = self.y.unwrap_or(delta_pos.y);
         delta_pos.z = self.z.unwrap_or(delta_pos.z);
         Transform {
-            position: delta_pos,
+            translation: delta_pos,
             rotation: params.parent.rotation,
+            scale: params.parent.scale,
         }
     }
 }

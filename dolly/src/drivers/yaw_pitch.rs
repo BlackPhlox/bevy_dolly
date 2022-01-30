@@ -1,4 +1,5 @@
-use glam::{EulerRot, Quat};
+//use glam::{EulerRot, Quat};
+use bevy::math::{Quat, EulerRot};
 
 use crate::{driver::RigDriver, rig::RigUpdateParams, transform::Transform};
 
@@ -75,13 +76,14 @@ impl YawPitch {
 impl RigDriver for YawPitch {
     fn update(&mut self, params: RigUpdateParams) -> Transform {
         Transform {
-            position: params.parent.position,
+            translation: params.parent.translation,
             rotation: Quat::from_euler(
                 EulerRot::YXZ,
                 self.yaw_degrees.to_radians(),
                 self.pitch_degrees.to_radians(),
                 0.0,
             ),
+            scale: params.parent.scale,
         }
     }
 }

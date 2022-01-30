@@ -1,4 +1,5 @@
-use glam::{Quat, Vec3};
+//use glam::{Quat, Vec3};
+use bevy::math::*;
 
 use crate::{
     driver::RigDriver,
@@ -78,8 +79,8 @@ impl Smooth {
 
 impl RigDriver for Smooth {
     fn update(&mut self, params: RigUpdateParams) -> Transform {
-        let position = self.smoothed_position.exp_smooth_towards(
-            &params.parent.position,
+        let translation = self.smoothed_position.exp_smooth_towards(
+            &params.parent.translation,
             ExpSmoothingParams {
                 smoothness: self.position_smoothness,
                 output_offset_scale: self.output_offset_scale,
@@ -96,6 +97,6 @@ impl RigDriver for Smooth {
             },
         );
 
-        Transform { position, rotation }
+        Transform { translation, rotation, scale: Vec3::ONE }
     }
 }

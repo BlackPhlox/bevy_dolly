@@ -50,7 +50,7 @@ impl CameraRig {
     ///
     /// Camera rigs are approximately framerate independent, so `update` can be called at any frequency.
     pub fn update(&mut self, delta_time_seconds: f32) -> Transform {
-        let mut parent_transform = Transform::IDENTITY;
+        let mut parent_transform = Transform::identity();
 
         for driver in self.drivers.iter_mut() {
             let transform = driver.update(RigUpdateParams {
@@ -91,7 +91,7 @@ impl CameraRigBuilder {
         let mut rig = CameraRig {
             drivers: self.drivers,
             // Initialize with a dummy identity transform. Will be overridden in a moment.
-            final_transform: Transform::IDENTITY,
+            final_transform: Transform::identity(),
         };
 
         // Update once to find the final transform

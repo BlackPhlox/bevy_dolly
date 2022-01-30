@@ -1,4 +1,6 @@
-use glam::Quat;
+//use glam::Quat;
+
+use bevy::math::*;
 
 use crate::{driver::RigDriver, rig::RigUpdateParams, transform::Transform};
 
@@ -17,8 +19,9 @@ impl Rotation {
 impl RigDriver for Rotation {
     fn update(&mut self, params: RigUpdateParams) -> Transform {
         Transform {
-            position: params.parent.position,
+            translation: params.parent.translation,
             rotation: self.rotation,
+            scale: params.parent.scale,
         }
     }
 }

@@ -1,7 +1,6 @@
 use bevy::input::mouse::MouseMotion;
 use bevy::prelude::*;
-use bevy_dolly::{Transform2Bevy, Transform2Dolly, DollyCursorGrab};
-use dolly::glam::Vec3;
+use bevy_dolly::{DollyCursorGrab, UpdateMutTransform};
 use dolly::prelude::{CameraRig, Position, Rotation, Smooth, YawPitch};
 
 #[derive(Component)]
@@ -48,14 +47,14 @@ fn setup(
     let transform = Transform::from_translation(bevy::math::Vec3::from_slice(&translation))
         .looking_at(bevy::math::Vec3::ZERO, bevy::math::Vec3::Y);
 
-    let rotation = transform.transform_2_dolly().rotation;
+    let rotation = transform.rotation;
     let mut yaw_pitch = YawPitch::new();
     yaw_pitch.set_rotation_quat(rotation);
 
     commands.spawn().insert(
         CameraRig::builder()
             .with(Position {
-                position: Vec3::from_slice(&translation),
+                translation: Vec3::from_slice(&translation),
             })
             .with(Rotation { rotation })
             .with(yaw_pitch)
@@ -145,5 +144,5 @@ fn update_camera(
     let mut q0 = query.q0();
     let (mut cam, _) = q0.single_mut();
 
-    cam.transform_2_bevy(transform);
+    cam.update(transform);
 }

@@ -1241,7 +1241,6 @@ name = "dolly"
 version = "0.2.0"
 dependencies = [
  "bevy",
- "glam",
 ]
 
 [[package]]

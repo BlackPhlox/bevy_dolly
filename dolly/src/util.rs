@@ -1,4 +1,5 @@
-use glam::{Quat, Vec3};
+//use glam::{Quat, Vec3};
+use bevy::math::{Quat, Vec3};
 
 pub(crate) trait Interpolate {
     fn interpolate(self, other: Self, t: f32) -> Self;

@@ -1,6 +1,5 @@
 use bevy::prelude::*;
-use bevy_dolly::{Transform2Bevy, Transform2Dolly};
-use dolly::glam::Vec3;
+use bevy_dolly::UpdateMutTransform;
 use dolly::prelude::{Arm, CameraRig, LookAt, Position, Rotation, Smooth};
 
 #[derive(Component)]
@@ -48,7 +47,7 @@ fn setup(
     commands.spawn().insert(
         CameraRig::builder()
             .with(Position::new(start_pos))
-            .with(Rotation::new(dolly::glam::Quat::IDENTITY))
+            .with(Rotation::new(Quat::IDENTITY))
             .with(Smooth::new_position(1.25).predictive(true))
             .with(Arm::new(Vec3::new(0.0, 1.5, -3.5)))
             .with(Smooth::new_position(2.5))
@@ -86,18 +85,16 @@ fn update_camera(
     let mut q1 = query.q1();
     let player = q1.single_mut().0;
 
-    let player_dolly = player.transform_2_dolly();
-
     let mut q2 = query.q2();
     let mut rig = q2.single_mut();
 
-    rig.driver_mut::<Position>().position = player_dolly.position;
-    rig.driver_mut::<Rotation>().rotation = player_dolly.rotation;
-    rig.driver_mut::<LookAt>().target = player_dolly.position + Vec3::Y;
+    rig.driver_mut::<Position>().translation = player.translation;
+    rig.driver_mut::<Rotation>().rotation = player.rotation;
+    rig.driver_mut::<LookAt>().target = player.translation + Vec3::Y;
 
     let transform = rig.update(time.delta_seconds());
 
-    query.q0().single_mut().0.transform_2_bevy(transform);
+    query.q0().single_mut().0.update(transform);
 }
 
 #[derive(Component)]
