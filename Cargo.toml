@@ -22,7 +22,7 @@ resolver = "2"
 name = "bevy_dolly"
 
 [dependencies]
-dolly = { path = "dolly"}
+dolly = { path = "dolly" }
 strum = "0.23.0"
 strum_macros = "0.23.1"
 # Update to 0.2.0 to remove strum dependencies
