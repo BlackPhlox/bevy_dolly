@@ -7,8 +7,6 @@ jobs:
     name: Update
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Update apt
         run: sudo apt update
       - name: Install libudev
         run: sudo apt install libudev-dev
@@ -16,6 +14,8 @@ jobs:
         run: sudo apt install libxkbcommon-dev
       - name: Install libwayland
         run: sudo apt install libwayland-dev
+      - uses: actions/checkout@v2
+      - name: Update apt
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
