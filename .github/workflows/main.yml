@@ -13,7 +13,7 @@ jobs:
       - name: Install libudev
         run: sudo apt-get install g++ pkg-config libx11-dev libasound2-dev libudev-dev
       - name: Install libwaylandb & libxkbcommon
-        run: sudo apt install libwayland-dev libxkbcommon-dev
+        run: sudo apt-get install libwayland-dev libxkbcommon-dev
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
