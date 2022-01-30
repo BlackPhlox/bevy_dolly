@@ -1,7 +1,7 @@
-pub use bevy::transform::components::Transform as Transform;
+pub use bevy::transform::components::Transform;
 //use core::fmt::Debug;
 /*
- 
+
 use glam::{Quat, Vec3};
 
 /// A thin wrapper over a `Vec3` and a `Quat`

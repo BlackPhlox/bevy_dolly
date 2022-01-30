@@ -1,5 +1,5 @@
 //use glam::{EulerRot, Quat};
-use bevy::math::{Quat, EulerRot};
+use bevy::math::{EulerRot, Quat};
 
 use crate::{driver::RigDriver, rig::RigUpdateParams, transform::Transform};
 

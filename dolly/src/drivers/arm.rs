@@ -1,6 +1,6 @@
 //use glam::Vec3;
-use bevy::math::*;
 use crate::{driver::RigDriver, rig::RigUpdateParams, transform::Transform};
+use bevy::math::*;
 
 /// Offsets the camera along a vector, in the coordinate space of the parent.
 #[derive(Debug)]
