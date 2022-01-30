@@ -93,13 +93,12 @@ fn follow_player(
     time: Res<Time>,
     mut query: QuerySet<(
         QueryState<(&mut Transform, With<MainCamera>)>,
-        QueryState<(&mut Transform, With<DollyPosCtrlMove>)>,
+        QueryState<(&Transform, With<DollyPosCtrlMove>)>,
         QueryState<&mut CameraRig>,
     )>,
 ) {
-    let mut q1 = query.q1();
-    let player = q1.single_mut().0;
-
+    let q1 = query.q1();
+    let player = q1.single().0.to_owned();
 
     let mut q2 = query.q2();
     let mut rig = q2.single_mut();
@@ -110,28 +109,27 @@ fn follow_player(
 
     let transform = rig.update(time.delta_seconds());
 
-    query.q0().single_mut().0.update(transform);
+    let mut q0 = query.q0();
+    q0.single_mut().0.update(transform);
 }
 
 fn follow_sheep(
     time: Res<Time>,
     mut query: QuerySet<(
         QueryState<(&mut Transform, With<MainCamera>)>,
-        QueryState<(&mut Transform, With<Rotates>)>,
+        QueryState<(&Transform, With<Rotates>)>,
         QueryState<&mut CameraRig>,
     )>,
 ) {
-    let mut q1 = query.q1();
-    let player = q1.single_mut().0;
-
-    let player_dolly = player;
+    let q1 = query.q1();
+    let player = q1.single().0.to_owned();
 
     let mut q2 = query.q2();
     let mut rig = q2.single_mut();
 
-    rig.driver_mut::<Position>().translation = player_dolly.translation;
-    rig.driver_mut::<Rotation>().rotation = player_dolly.rotation;
-    rig.driver_mut::<LookAt>().target = player_dolly.translation + Vec3::Y;
+    rig.driver_mut::<Position>().translation = player.translation;
+    rig.driver_mut::<Rotation>().rotation = player.rotation;
+    rig.driver_mut::<LookAt>().target = player.translation + Vec3::Y;
 
     let transform = rig.update(time.delta_seconds());
 

@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use bevy_dolly::{UpdateMutTransform};
+use bevy_dolly::UpdateMutTransform;
 use dolly::prelude::{Arm, CameraRig, Smooth, YawPitch};
 
 #[derive(Component)]

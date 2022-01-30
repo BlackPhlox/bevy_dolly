@@ -78,12 +78,12 @@ fn update_camera(
     time: Res<Time>,
     mut query: QuerySet<(
         QueryState<(&mut Transform, With<MainCamera>)>,
-        QueryState<(&mut Transform, With<Rotates>)>,
+        QueryState<(&Transform, With<Rotates>)>,
         QueryState<&mut CameraRig>,
     )>,
 ) {
-    let mut q1 = query.q1();
-    let player = q1.single_mut().0;
+    let q1 = query.q1();
+    let player = q1.single().0.to_owned();
 
     let mut q2 = query.q2();
     let mut rig = q2.single_mut();
