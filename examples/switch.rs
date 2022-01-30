@@ -1,9 +1,9 @@
 use bevy::prelude::*;
-use bevy_dolly::ctrl::CtrlMove;
-use bevy_dolly::{DollyPlugins, Transform2Bevy, Transform2Dolly};
-use dolly::glam::Vec3;
+use bevy_dolly::pos_ctrl::DollyPosCtrlMove;
+use bevy_dolly::{DollyPlugins, UpdateMutTransform};
 use dolly::prelude::{Arm, CameraRig, LookAt, Position, Rotation, Smooth};
 
+#[derive(Component)]
 struct MainCamera;
 
 #[derive(Clone, Eq, PartialEq, Debug, Hash)]
@@ -13,14 +13,14 @@ enum Camera {
 }
 
 fn main() {
-    App::build()
+    App::new()
         .insert_resource(Msaa { samples: 4 })
         .add_plugins(DefaultPlugins)
         .add_plugins(DollyPlugins)
-        .add_startup_system(setup.system())
-        .add_system(rotator_system.system())
+        .add_startup_system(setup)
+        .add_system(rotator_system)
         .add_state(Camera::FollowSheep)
-        .add_system(switch_camera_rig.system())
+        .add_system(switch_camera_rig)
         .add_system_set(
             SystemSet::on_update(Camera::FollowPlayer).with_system(follow_player.system()),
         )
@@ -62,7 +62,7 @@ fn setup(
     commands.spawn().insert(
         CameraRig::builder()
             .with(Position::new(start_pos))
-            .with(Rotation::new(dolly::glam::Quat::IDENTITY))
+            .with(Rotation::new(Quat::IDENTITY))
             .with(Smooth::new_position(1.25).predictive(true))
             .with(Arm::new(Vec3::new(0.0, 1.5, -3.5)))
             .with(Smooth::new_position(2.5))
@@ -83,7 +83,7 @@ fn setup(
         .insert(MainCamera);
 
     // light
-    commands.spawn_bundle(LightBundle {
+    commands.spawn_bundle(PointLightBundle {
         transform: Transform::from_xyz(4.0, 8.0, 4.0),
         ..Default::default()
     });
@@ -92,59 +92,51 @@ fn setup(
 fn follow_player(
     time: Res<Time>,
     mut query: QuerySet<(
-        Query<(&mut Transform, With<MainCamera>)>,
-        Query<(&mut Transform, With<CtrlMove>)>,
-        Query<&mut CameraRig>,
+        QueryState<(&mut Transform, With<MainCamera>)>,
+        QueryState<(&Transform, With<DollyPosCtrlMove>)>,
+        QueryState<&mut CameraRig>,
     )>,
 ) {
-    let player = query.q1_mut().single_mut().unwrap().0;
+    let q1 = query.q1();
+    let player = q1.single().0.to_owned();
 
-    let player_dolly = player.transform_2_dolly();
+    let mut q2 = query.q2();
+    let mut rig = q2.single_mut();
 
-    let mut rig = query.q2_mut().single_mut().unwrap();
-
-    rig.driver_mut::<Position>().position = player_dolly.position;
-    rig.driver_mut::<Rotation>().rotation = player_dolly.rotation;
-    rig.driver_mut::<LookAt>().target = player_dolly.position + Vec3::Y + Vec3::new(0., -1., 0.);
+    rig.driver_mut::<Position>().translation = player.translation;
+    rig.driver_mut::<Rotation>().rotation = player.rotation;
+    rig.driver_mut::<LookAt>().target = player.translation + Vec3::Y + Vec3::new(0., -1., 0.);
 
     let transform = rig.update(time.delta_seconds());
 
-    query
-        .q0_mut()
-        .single_mut()
-        .unwrap()
-        .0
-        .transform_2_bevy(transform);
+    let mut q0 = query.q0();
+    q0.single_mut().0.update(transform);
 }
 
 fn follow_sheep(
     time: Res<Time>,
     mut query: QuerySet<(
-        Query<(&mut Transform, With<MainCamera>)>,
-        Query<(&mut Transform, With<Rotates>)>,
-        Query<&mut CameraRig>,
+        QueryState<(&mut Transform, With<MainCamera>)>,
+        QueryState<(&Transform, With<Rotates>)>,
+        QueryState<&mut CameraRig>,
     )>,
 ) {
-    let player = query.q1_mut().single_mut().unwrap().0;
+    let q1 = query.q1();
+    let player = q1.single().0.to_owned();
 
-    let player_dolly = player.transform_2_dolly();
+    let mut q2 = query.q2();
+    let mut rig = q2.single_mut();
 
-    let mut rig = query.q2_mut().single_mut().unwrap();
-
-    rig.driver_mut::<Position>().position = player_dolly.position;
-    rig.driver_mut::<Rotation>().rotation = player_dolly.rotation;
-    rig.driver_mut::<LookAt>().target = player_dolly.position + Vec3::Y;
+    rig.driver_mut::<Position>().translation = player.translation;
+    rig.driver_mut::<Rotation>().rotation = player.rotation;
+    rig.driver_mut::<LookAt>().target = player.translation + Vec3::Y;
 
     let transform = rig.update(time.delta_seconds());
 
-    query
-        .q0_mut()
-        .single_mut()
-        .unwrap()
-        .0
-        .transform_2_bevy(transform);
+    query.q0().single_mut().0.update(transform);
 }
 
+#[derive(Component)]
 struct Rotates;
 
 fn rotator_system(time: Res<Time>, mut query: Query<&mut Transform, With<Rotates>>) {

@@ -1,19 +1,18 @@
 use bevy::input::mouse::MouseMotion;
 use bevy::prelude::*;
-use bevy_dolly::{Transform2Bevy, Transform2Dolly};
-use dolly::glam::Vec3;
+use bevy_dolly::{DollyCursorGrab, UpdateMutTransform};
 use dolly::prelude::{CameraRig, Position, Rotation, Smooth, YawPitch};
 
+#[derive(Component)]
 struct MainCamera;
 
 fn main() {
-    App::build()
+    App::new()
         .insert_resource(Msaa { samples: 4 })
         .add_plugins(DefaultPlugins)
-        .add_startup_system(setup.system())
-        .add_startup_system(initial_grab_cursor.system())
-        .add_system(update_camera.system())
-        .add_system(cursor_grab.system())
+        .add_plugin(DollyCursorGrab)
+        .add_startup_system(setup)
+        .add_system(update_camera)
         .run();
 }
 
@@ -45,18 +44,17 @@ fn setup(
         .id();
 
     let translation = [-2.0f32, 2.0f32, 5.0f32];
-    let transform =
-        Transform::from_translation(bevy::math::Vec3::from_slice_unaligned(&translation))
-            .looking_at(bevy::math::Vec3::ZERO, bevy::math::Vec3::Y);
+    let transform = Transform::from_translation(bevy::math::Vec3::from_slice(&translation))
+        .looking_at(bevy::math::Vec3::ZERO, bevy::math::Vec3::Y);
 
-    let rotation = transform.transform_2_dolly().rotation;
+    let rotation = transform.rotation;
     let mut yaw_pitch = YawPitch::new();
     yaw_pitch.set_rotation_quat(rotation);
 
     commands.spawn().insert(
         CameraRig::builder()
             .with(Position {
-                position: Vec3::from_slice(&translation),
+                translation: Vec3::from_slice(&translation),
             })
             .with(Rotation { rotation })
             .with(yaw_pitch)
@@ -72,28 +70,10 @@ fn setup(
         .insert(MainCamera);
 
     // light
-    commands.spawn_bundle(LightBundle {
+    commands.spawn_bundle(PointLightBundle {
         transform: Transform::from_xyz(4.0, 8.0, 4.0),
         ..Default::default()
     });
-}
-
-/// Grabs/ungrabs mouse cursor
-fn toggle_grab_cursor(window: &mut Window) {
-    window.set_cursor_lock_mode(!window.cursor_locked());
-    window.set_cursor_visibility(!window.cursor_visible());
-}
-
-/// Grabs the cursor when game first starts
-fn initial_grab_cursor(mut windows: ResMut<Windows>) {
-    toggle_grab_cursor(windows.get_primary_mut().unwrap());
-}
-
-fn cursor_grab(keys: Res<Input<KeyCode>>, mut windows: ResMut<Windows>) {
-    let window = windows.get_primary_mut().unwrap();
-    if keys.just_pressed(KeyCode::Escape) {
-        toggle_grab_cursor(window);
-    }
 }
 
 fn update_camera(
@@ -102,8 +82,8 @@ fn update_camera(
     windows: Res<Windows>,
     mut mouse_motion_events: EventReader<MouseMotion>,
     mut query: QuerySet<(
-        Query<(&mut Transform, With<MainCamera>)>,
-        Query<&mut CameraRig>,
+        QueryState<(&mut Transform, With<MainCamera>)>,
+        QueryState<&mut CameraRig>,
     )>,
 ) {
     let time_delta_seconds: f32 = time.delta_seconds();
@@ -144,7 +124,8 @@ fn update_camera(
         delta += event.delta;
     }
 
-    let mut rig = query.q1_mut().single_mut().unwrap();
+    let mut q1 = query.q1();
+    let mut rig = q1.single_mut();
 
     let move_vec =
         rig.final_transform.rotation * move_vec.clamp_length_max(1.0) * boost_mult.powf(boost);
@@ -160,7 +141,8 @@ fn update_camera(
     }
 
     let transform = rig.update(time_delta_seconds);
-    let (mut cam, _) = query.q0_mut().single_mut().unwrap();
+    let mut q0 = query.q0();
+    let (mut cam, _) = q0.single_mut();
 
-    cam.transform_2_bevy(transform);
+    cam.update(transform);
 }

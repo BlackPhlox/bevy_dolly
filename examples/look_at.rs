@@ -1,18 +1,17 @@
 use bevy::prelude::*;
-use bevy_dolly::ctrl::{CtrlConfig, CtrlMove};
-use bevy_dolly::{DollyPlugins, Transform2Bevy, Transform2Dolly};
-use dolly::glam::Vec3;
+use bevy_dolly::{DollyPlugins, DollyPosCtrlMove, UpdateMutTransform};
 use dolly::prelude::{CameraRig, LookAt, Position};
 
+#[derive(Component)]
 struct MainCamera;
 
 fn main() {
-    App::build()
+    App::new()
         .insert_resource(Msaa { samples: 4 })
         .add_plugins(DefaultPlugins)
         .add_plugins(DollyPlugins)
-        .add_startup_system(setup.system())
-        .add_system(update_camera.system())
+        .add_startup_system(setup)
+        .add_system(update_camera)
         .run();
 }
 
@@ -24,7 +23,7 @@ fn setup(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
     asset_server: Res<AssetServer>,
-    mut config: ResMut<CtrlConfig>,
+    //mut config: ResMut<CtrlConfig>,
 ) {
     // plane
     commands.spawn_bundle(PbrBundle {
@@ -58,7 +57,7 @@ fn setup(
             .with(Position::new(Vec3::Y * 3.0))
             .with(LookAt::new(
                 /*start_pos.transform_2_dolly().position*/
-                dolly::glam::Vec3::new(0., 0., 2.),
+                Vec3::new(0., 0., 2.),
             ))
             .build(),
     );
@@ -74,7 +73,7 @@ fn setup(
         .insert(MainCamera);
 
     // light
-    commands.spawn_bundle(LightBundle {
+    commands.spawn_bundle(PointLightBundle {
         transform: Transform::from_xyz(4.0, 8.0, 4.0),
         ..Default::default()
     });
@@ -83,25 +82,19 @@ fn setup(
 fn update_camera(
     time: Res<Time>,
     mut query: QuerySet<(
-        Query<(&mut Transform, With<MainCamera>)>,
-        Query<(&mut Transform, With<CtrlMove>)>,
-        Query<&mut CameraRig>,
+        QueryState<(&mut Transform, With<MainCamera>)>,
+        QueryState<(&mut Transform, With<DollyPosCtrlMove>)>,
+        QueryState<&mut CameraRig>,
     )>,
 ) {
-    let (player, _) = query.q1_mut().single_mut().unwrap();
-    query
-        .q2_mut()
-        .single_mut()
-        .unwrap()
-        .driver_mut::<LookAt>()
-        .target = player.transform_2_dolly().position;
+    let mut q1 = query.q1();
+    let (player, _) = q1.single_mut();
+    query.q2().single_mut().driver_mut::<LookAt>().target = player.translation;
 
-    let transform = query
-        .q2_mut()
-        .single_mut()
-        .unwrap()
-        .update(time.delta_seconds());
-    let (mut cam, _) = query.q0_mut().single_mut().unwrap();
+    let transform = query.q2().single_mut().update(time.delta_seconds());
 
-    cam.transform_2_bevy(transform);
+    let mut q0 = query.q0();
+    let (mut cam, _) = q0.single_mut();
+
+    cam.update(transform);
 }
