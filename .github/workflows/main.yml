@@ -8,13 +8,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Install libudev
-        run: sudo apt install libudev-dev
+        run: sudo apt-get install g++ pkg-config libx11-dev libasound2-dev libudev-dev
       - name: Install libxkbcommon
         run: sudo apt install libxkbcommon-dev
       - name: Install libwayland
         run: sudo apt install libwayland-dev
-      - name: Install libasound
-        run: sudo apt-get install -y libasound2-dev
       - uses: actions/checkout@v2
       - name: Update apt
         run: sudo apt update
@@ -23,9 +21,6 @@ jobs:
           profile: minimal
           toolchain: stable
           override: true
-      - uses: actions-rs/cargo@v1
-        with:
-          command: clean
       - uses: actions-rs/cargo@v1
         with:
           command: update
