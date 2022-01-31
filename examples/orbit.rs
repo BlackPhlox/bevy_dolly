@@ -1,6 +1,5 @@
 use bevy::prelude::*;
-use bevy_dolly::UpdateMutTransform;
-use dolly::prelude::{Arm, CameraRig, Smooth, YawPitch};
+use bevy_dolly::prelude::*;
 
 #[derive(Component)]
 struct MainCamera;
@@ -9,8 +8,8 @@ fn main() {
     App::new()
         .insert_resource(Msaa { samples: 4 })
         .add_plugins(DefaultPlugins)
-        .add_startup_system(setup_camera)
-        .add_system(update_camera_system)
+        .add_startup_system(setup)
+        .add_system(update_camera)
         .run();
 }
 

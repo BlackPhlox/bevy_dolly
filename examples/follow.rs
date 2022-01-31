@@ -1,6 +1,5 @@
 use bevy::prelude::*;
-use bevy_dolly::UpdateMutTransform;
-use dolly::prelude::{Arm, CameraRig, LookAt, Position, Rotation, Smooth};
+use bevy_dolly::prelude::*;
 
 #[derive(Component)]
 struct MainCamera;

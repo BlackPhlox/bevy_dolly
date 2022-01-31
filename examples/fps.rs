@@ -1,7 +1,6 @@
 use bevy::input::mouse::MouseMotion;
 use bevy::prelude::*;
-use bevy_dolly::{DollyCursorGrab, UpdateMutTransform};
-use dolly::prelude::{CameraRig, Position, Rotation, Smooth, YawPitch};
+use bevy_dolly::prelude::*;
 
 #[derive(Component)]
 struct MainCamera;

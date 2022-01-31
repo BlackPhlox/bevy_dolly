@@ -1,6 +1,5 @@
 use bevy::prelude::*;
-use bevy_dolly::{DollyPlugins, DollyPosCtrlMove, UpdateMutTransform};
-use dolly::prelude::{CameraRig, LookAt, Position};
+use bevy_dolly::prelude::*;
 
 #[derive(Component)]
 struct MainCamera;
@@ -14,7 +13,7 @@ fn main() {
         .add_system(update_camera)
         .run();
 }
-
+#[allow(dead_code)]
 struct Player;
 
 /// set up a simple 3D scene
@@ -22,7 +21,6 @@ fn setup(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
-    asset_server: Res<AssetServer>,
     //mut config: ResMut<CtrlConfig>,
 ) {
     // plane
@@ -32,7 +30,7 @@ fn setup(
         ..Default::default()
     });
 
-    let start_pos = Transform::from_translation(bevy::math::Vec3::new(0., 0., 2.));
+    Transform::from_translation(bevy::math::Vec3::new(0., 0., 2.));
 
     /*
     config.entity = Some(
