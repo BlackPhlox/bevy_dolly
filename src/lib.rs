@@ -10,11 +10,12 @@ mod cone;
 
 pub mod grab_cursor;
 pub mod pos_ctrl;
+pub mod cam_ctrl;
 pub mod transform_mapping;
 
 pub mod prelude {
     pub use crate::{
-        dolly::prelude::*, grab_cursor::*, pos_ctrl::*, transform_mapping::*, Dolly, DollyPlugins,
+        dolly::prelude::*, grab_cursor::*, pos_ctrl::*, cam_ctrl::*, transform_mapping::*, Dolly, DollyPlugins,
     };
 }
 

@@ -84,13 +84,14 @@ fn setup(
         })
         .insert(MainCamera);
 
-    info!(" Use 1, 2, 3, 4 to target different sheep");
-    info!(" Use Q and E to turn the sheep");
     // light
     commands.spawn_bundle(PointLightBundle {
         transform: Transform::from_xyz(4.0, 8.0, 4.0),
         ..Default::default()
     });
+
+    //info!(" Use 1, 2, 3, 4 to target different sheep");
+    //info!(" Use Q and E to turn the sheep");
 }
 
 fn follow_player(

@@ -73,6 +73,9 @@ fn setup(
         transform: Transform::from_xyz(4.0, 8.0, 4.0),
         ..Default::default()
     });
+
+    info!("Use W, A, S, D for movement");
+    info!("Use Shift to go fast");
 }
 
 fn update_camera(
@@ -105,9 +108,6 @@ fn update_camera(
         move_vec.x += 1.0;
     }
 
-    // Print our user controls for reference
-    info!("Use W, A, S, D for movement");
-    info!("Use Shift to go fast");
     if keys.pressed(KeyCode::E) || keys.pressed(KeyCode::Space) {
         move_vec.y += 1.0;
     }
