@@ -6,6 +6,10 @@ use dolly::prelude::{Arm, CameraRig, LookAt, Position, Rotation, Smooth};
 #[derive(Component)]
 struct MainCamera;
 
+// In this example we are going to switch our look at target
+// All you need to do is set a LookAt driver target_entity
+// and its will track it
+
 #[derive(Clone, Eq, PartialEq, Debug, Hash)]
 enum Camera {
     FollowPlayer,
@@ -82,6 +86,8 @@ fn setup(
         })
         .insert(MainCamera);
 
+    info!(" Use 1, 2, 3, 4 to target different sheep");
+    info!(" Use Q and E to turn the sheep");
     // light
     commands.spawn_bundle(PointLightBundle {
         transform: Transform::from_xyz(4.0, 8.0, 4.0),

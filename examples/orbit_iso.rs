@@ -12,8 +12,8 @@ fn main() {
         .add_plugins(DefaultPlugins)
         .add_plugin(DollyCursorGrab)
         .add_state(Pan::Keys)
-        .add_startup_system(setup.system())
-        .add_system(update_camera.system())
+        .add_startup_system(setup_camera)
+        .add_system(update_camera_system)
         .run();
 }
 

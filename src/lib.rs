@@ -13,6 +13,9 @@ pub use crate::grab_cursor::*;
 pub use crate::pos_ctrl::*;
 pub use crate::transform_mapping::*;
 
+pub mod prelude {
+    pub use crate::{rig::*, *};
+}
 pub struct Dolly;
 impl Plugin for Dolly {
     fn build(&self, _app: &mut App) {}

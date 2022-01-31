@@ -9,8 +9,8 @@ fn main() {
     App::new()
         .insert_resource(Msaa { samples: 4 })
         .add_plugins(DefaultPlugins)
-        .add_startup_system(setup.system())
-        .add_system(update_camera.system())
+        .add_startup_system(setup_camera)
+        .add_system(update_camera_system)
         .run();
 }
 

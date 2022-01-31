@@ -72,6 +72,7 @@ fn setup(
         })
         .insert(MainCamera);
 
+    info!(" Use Q and E to turn the sheep");
     // light
     commands.spawn_bundle(PointLightBundle {
         transform: Transform::from_xyz(4.0, 8.0, 4.0),
