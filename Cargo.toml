@@ -3,7 +3,7 @@ name = "bevy_dolly"
 version = "0.0.1"
 authors = ["Black Phlox <bphlox@gmail.com>"]
 license = "MIT OR Apache-2.0"
-edition = "2018"
+edition = "2021"
 readme = "README.md"
 repository = "https://github.com/BlackPhlox/bevy_dolly"
 documentation = "https://docs.rs/bevy_dolly"
@@ -14,6 +14,7 @@ exclude = [
     "assets/*",
     ".github/*",
 ]
+resolver = "2"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -21,10 +22,23 @@ exclude = [
 name = "bevy_dolly"
 
 [dependencies]
-bevy = { version = "0.5", default-features = false, features = ["render"]}
+dolly = { path = "dolly" }
+strum = "0.23.0"
+strum_macros = "0.23.1"
+# Update to 0.2.0 to remove strum dependencies
+leafwing-input-manager = "0.1.2"
 
-[dev-dependencies]
-bevy = { version = "0.5" }
+[dependencies.bevy]
+version = "0.6"
+features = ["render"]
+default-features = false
 
-[patch.crates-io]
-bevy = { git = "https://github.com/bevyengine/bevy", branch = "main" }
+[dev-dependencies.bevy]
+version = "0.6"
+features = ["bevy_winit", "bevy_gltf"]
+default-features = false
+
+[target.'cfg(target_os = "linux")'.dev-dependencies.bevy]
+version = "0.6"
+features = ["x11", "wayland"]
+default-features = false

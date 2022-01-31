@@ -1,60 +1,31 @@
-#![feature(derive_default_enum)]
-pub mod actions;
-pub mod rig;
-pub use actions::*;
-use bevy::prelude::*;
-pub use rig::*;
+use bevy::{
+    app::PluginGroupBuilder,
+    prelude::{App, Plugin, PluginGroup},
+};
+
+pub use dolly;
+use pos_ctrl::DollyPosCtrl;
+
+mod cone;
+
+pub mod grab_cursor;
+pub mod pos_ctrl;
+pub mod transform_mapping;
 
 pub mod prelude {
-    pub use crate::{actions::*, rig::*, *};
+    pub use crate::{
+        dolly::prelude::*, grab_cursor::*, pos_ctrl::*, transform_mapping::*, Dolly, DollyPlugins,
+    };
 }
 
-pub struct DollyPlugin;
-impl Plugin for DollyPlugin {
-    fn build(&self, app: &mut App) {
-        // TODO: We are getting a frame+1 lag, not worth fixing complexity with stages right now
-        app.add_system_to_stage(CoreStage::PreUpdate, init_rig_system)
-            .add_system_to_stage(CoreStage::PreUpdate, update_rigs_system)
-            .add_system_to_stage(CoreStage::Update, apply_rigs_system)
-            // These are only use for camera control system
-            .init_resource::<DollyControlConfig>()
-            .add_system_to_stage(CoreStage::PreUpdate, actions::update_control_system);
-    }
+pub struct Dolly;
+impl Plugin for Dolly {
+    fn build(&self, _app: &mut App) {}
 }
 
-/// Listen for new Rigs
-/// Add position and rotation info if needed
-fn init_rig_system(mut query: Query<(&mut Transform, &mut Rig), Added<Rig>>) {
-    for (transform, mut rig) in query.iter_mut() {
-        // set init target for the transform
-        rig.target = *transform;
-    }
-}
-
-fn update_rigs_system(mut rig_query: Query<&mut Rig>, transform_query: Query<&Transform>) {
-    for mut rig in rig_query.iter_mut() {
-        // Update LookAt Drivers
-        if let Some(d) = rig.get_driver_mut::<LookAt>() {
-            if let Some(target_entity) = d.target_entity {
-                if let Ok(target_transfrom) = transform_query.get(target_entity) {
-                    d.target_transform = Some(*target_transfrom);
-                }
-            }
-        }
-
-        // Update Anchor Drivers
-        if let Some(d) = rig.get_driver_mut::<Anchor>() {
-            if let Ok(t) = transform_query.get(d.target_entity) {
-                d.target = *t;
-            }
-        }
-    }
-}
-
-fn apply_rigs_system(time: Res<Time>, mut query: Query<(&mut Transform, &mut Rig)>) {
-    for (mut transform, mut rig) in query.iter_mut() {
-        let delta_seconds = time.delta_seconds();
-        // Apply Rigs
-        *transform = rig.update(&transform, delta_seconds);
+pub struct DollyPlugins;
+impl PluginGroup for DollyPlugins {
+    fn build(&mut self, group: &mut PluginGroupBuilder) {
+        group.add(Dolly).add(DollyPosCtrl);
     }
 }

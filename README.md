@@ -1,18 +1,9 @@
-# Bevy Dolly
-
-
-
-
-
-
-
-
-
+<h1>bevy_dolly</h1>
 <div align="left">
 <a href="https://github.com/BlackPhlox/bevy_dolly"><img src="https://raw.githubusercontent.com/BlackPhlox/BlackPhlox/master/bevy_dolly_1.svg" alt="bevy_dolly"></a>
 </div><br/>
 
-`bevy_dolly` is [h3r2tic](https://github.com/h3r2tic)'s powerful crate: [dolly](https://github.com/h3r2tic/dolly), implemented in bevy.<br/>
+`bevy_dolly` is a prototype plugin using [h3r2tic](https://github.com/h3r2tic)'s powerful crate: [dolly](https://github.com/h3r2tic/dolly), implemented for bevy.<br/>
 
 It is important to note that dolly is a way to translate the camera and thus, not the camera component itself. </br>
 
@@ -22,9 +13,7 @@ Dolly requires two steps to function:
 
 To see how this is done in bevy, please look at this repository's [examples](/examples/).
 
-As this plugin is still in its prototype phase. Currently, the plugin only contains helper methods for converting between bevy and dolly's glam crate. A more standalone plugin will come later.
-
-_Please do not call `dolly.clone()`, she have already been cloned once._
+_Calling `dolly.clone()` is not recommended._
 
 ## How to run
 
@@ -35,7 +24,7 @@ _Please do not call `dolly.clone()`, she have already been cloned once._
 
 |bevy|bevy_dolly|
 |---|---|
-|0.5| 0.0.X |
+|0.6| 0.0.X |
 ## Licensing
 The project is under dual license MIT and Apache 2.0, so joink to your hearts content, just remember the license agreements.
 
