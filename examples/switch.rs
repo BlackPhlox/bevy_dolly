@@ -1,10 +1,12 @@
 use bevy::prelude::*;
-use bevy_dolly::pos_ctrl::DollyPosCtrlMove;
-use bevy_dolly::{DollyPlugins, UpdateMutTransform};
-use dolly::prelude::{Arm, CameraRig, LookAt, Position, Rotation, Smooth};
+use bevy_dolly::prelude::*;
 
 #[derive(Component)]
 struct MainCamera;
+
+// In this example we are going to switch our look at target
+// All you need to do is set a LookAt driver target_entity
+// and its will track it
 
 #[derive(Clone, Eq, PartialEq, Debug, Hash)]
 enum Camera {
@@ -82,6 +84,8 @@ fn setup(
         })
         .insert(MainCamera);
 
+    info!(" Use 1, 2, 3, 4 to target different sheep");
+    info!(" Use Q and E to turn the sheep");
     // light
     commands.spawn_bundle(PointLightBundle {
         transform: Transform::from_xyz(4.0, 8.0, 4.0),
