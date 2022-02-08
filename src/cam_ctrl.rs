@@ -1,4 +1,4 @@
-use bevy::prelude::{Plugin, App};
+use bevy::prelude::{App, Plugin};
 
 pub struct DollyCamCtrl;
 impl Plugin for DollyCamCtrl {
@@ -13,8 +13,6 @@ struct DollyCamCtrlConfig {
 
 impl Default for DollyCamCtrlConfig {
     fn default() -> Self {
-        DollyCamCtrlConfig {
-            enabled: true,
-        }
+        DollyCamCtrlConfig { enabled: true }
     }
 }

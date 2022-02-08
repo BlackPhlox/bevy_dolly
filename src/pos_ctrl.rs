@@ -4,9 +4,9 @@ use bevy::{
     math::{Quat, Vec3},
     pbr::PbrBundle,
     prelude::{
-        App, Assets, BuildChildren, Bundle, Color, Commands, Component, GamepadButtonType,
+        info, App, Assets, BuildChildren, Bundle, Color, Commands, Component, GamepadButtonType,
         GlobalTransform, KeyCode, Mesh, Plugin, Query, Res, ResMut, StandardMaterial, SystemSet,
-        Transform, With, info,
+        Transform, With,
     },
 };
 use leafwing_input_manager::{
@@ -119,14 +119,18 @@ impl Default for DollyPosCtrlInputBundle {
         input_map.insert(RotateLeft, KeyCode::Comma);
 
         input_map.insert(RotateRight, KeyCode::Period);
-        
+
         for v in input_map.map.keys() {
             print!("Action: {:?} -> ", v);
-            for a in input_map.map.get(v)  {
+            for a in input_map.map.get(v) {
                 for (i, b) in a.iter().enumerate() {
                     let str = match b {
-                        leafwing_input_manager::prelude::UserInput::Single(x) => format!("Press {}", &x),
-                        leafwing_input_manager::prelude::UserInput::Chord(x) => format!("Press and hold {:?}", &x),
+                        leafwing_input_manager::prelude::UserInput::Single(x) => {
+                            format!("Press {}", &x)
+                        }
+                        leafwing_input_manager::prelude::UserInput::Chord(x) => {
+                            format!("Press and hold {:?}", &x)
+                        }
                         leafwing_input_manager::prelude::UserInput::Null => "Null".to_string(),
                     };
                     print!("{}", str);
@@ -139,14 +143,13 @@ impl Default for DollyPosCtrlInputBundle {
                     }
                 }
             }
-        } 
+        }
         //info!("{}", input_map);
 
         let input_manager = InputManagerBundle {
             input_map,
             action_state: ActionState::default(),
         };
-
 
         Self { input_manager }
     }

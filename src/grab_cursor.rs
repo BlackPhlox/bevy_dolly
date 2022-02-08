@@ -55,7 +55,7 @@ fn cursor_grab(
     config: Res<DollyCursorGrabConfig>,
 ) {
     let window = windows.get_primary_mut().unwrap();
-    if keys.any_pressed(config.grab_keys.clone()) {
+    if keys.any_pressed(config.grab_keys) {
         toggle_grab_cursor(window);
     }
 }

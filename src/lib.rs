@@ -8,14 +8,15 @@ use pos_ctrl::DollyPosCtrl;
 
 mod cone;
 
+pub mod cam_ctrl;
 pub mod grab_cursor;
 pub mod pos_ctrl;
-pub mod cam_ctrl;
 pub mod transform_mapping;
 
 pub mod prelude {
     pub use crate::{
-        dolly::prelude::*, grab_cursor::*, pos_ctrl::*, cam_ctrl::*, transform_mapping::*, Dolly, DollyPlugins,
+        cam_ctrl::*, dolly::prelude::*, grab_cursor::*, pos_ctrl::*, transform_mapping::*, Dolly,
+        DollyPlugins,
     };
 }
 
