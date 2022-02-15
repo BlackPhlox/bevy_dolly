@@ -7,6 +7,7 @@ impl Plugin for DollyCamCtrl {
     }
 }
 
+#[allow(dead_code)]
 struct DollyCamCtrlConfig {
     enabled: bool,
 }

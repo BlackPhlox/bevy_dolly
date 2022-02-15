@@ -15,7 +15,7 @@ pub mod transform_mapping;
 
 pub mod prelude {
     pub use crate::{
-        cam_ctrl::*, dolly::prelude::*, cursor_grab::*, pos_ctrl::*, transform_mapping::*, Dolly,
+        cam_ctrl::*, cursor_grab::*, dolly::prelude::*, pos_ctrl::*, transform_mapping::*, Dolly,
         DollyPlugins,
     };
 }

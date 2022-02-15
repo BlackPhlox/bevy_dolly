@@ -4,7 +4,7 @@ use bevy::{
     math::{Quat, Vec3},
     pbr::PbrBundle,
     prelude::{
-        info, App, Assets, BuildChildren, Bundle, Color, Commands, Component, GamepadButtonType,
+        App, Assets, BuildChildren, Bundle, Color, Commands, Component, GamepadButtonType,
         GlobalTransform, KeyCode, Mesh, Plugin, Query, Res, ResMut, StandardMaterial, SystemSet,
         Transform, With,
     },
@@ -118,7 +118,7 @@ impl Default for DollyPosCtrlInputBundle {
 
         for v in input_map.map.keys() {
             print!("Action: {:?} -> ", v);
-            for a in input_map.map.get(v) {
+            if let Some(a) = input_map.map.get(v) {
                 for (i, b) in a.iter().enumerate() {
                     let str = match b {
                         UserInput::Single(x) => {
@@ -140,7 +140,6 @@ impl Default for DollyPosCtrlInputBundle {
                 }
             }
         }
-        //info!("{}", input_map);
 
         let input_manager = InputManagerBundle {
             input_map,

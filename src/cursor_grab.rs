@@ -1,5 +1,8 @@
 use bevy::{ecs::schedule::ShouldRun, prelude::*};
-use leafwing_input_manager::{Actionlike, InputManagerBundle, prelude::{InputMap, ActionState}};
+use leafwing_input_manager::{
+    prelude::{ActionState, InputMap},
+    Actionlike, InputManagerBundle,
+};
 
 pub struct DollyCursorGrab;
 impl Plugin for DollyCursorGrab {
@@ -21,9 +24,7 @@ pub struct DollyCursorGrabConfig {
 
 impl Default for DollyCursorGrabConfig {
     fn default() -> Self {
-        DollyCursorGrabConfig {
-            enabled: true,
-        }
+        DollyCursorGrabConfig { enabled: true }
     }
 }
 
@@ -34,7 +35,6 @@ fn use_grab(config: Res<DollyCursorGrabConfig>) -> ShouldRun {
         ShouldRun::No
     }
 }
-
 
 #[derive(Component)]
 struct DollyCursorGrabAction;
