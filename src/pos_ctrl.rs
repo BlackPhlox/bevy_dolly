@@ -9,18 +9,14 @@ use bevy::{
         Transform, With,
     },
 };
-use leafwing_input_manager::{
-    prelude::{ActionState, InputMap},
-    Actionlike, InputManagerBundle, InputManagerPlugin,
-};
-use strum_macros::EnumIter;
+use leafwing_input_manager::prelude::*;
 
 use crate::cone::Cone;
 
 pub struct DollyPosCtrl;
 impl Plugin for DollyPosCtrl {
     fn build(&self, app: &mut App) {
-        app.add_plugin(InputManagerPlugin::<Action>::default());
+        app.add_plugin(InputManagerPlugin::<MoveAction>::default());
         app.init_resource::<DollyPosCtrlConfig>();
         app.add_startup_system(dolly_pos_ctrl_config_input_setup);
         app.add_startup_system(dolly_pos_ctrl_config_entity_setup);
@@ -32,8 +28,8 @@ impl Plugin for DollyPosCtrl {
     }
 }
 
-#[derive(Actionlike, PartialEq, Eq, Clone, Copy, Hash, Debug, EnumIter)]
-enum Action {
+#[derive(Actionlike, PartialEq, Eq, Clone, Copy, Hash, Debug)]
+enum MoveAction {
     Forward,
     Backward,
     StrafeLeft,
@@ -84,12 +80,12 @@ pub struct DollyPosCtrlMove;
 #[derive(Bundle)]
 struct DollyPosCtrlInputBundle {
     #[bundle]
-    input_manager: InputManagerBundle<Action>,
+    input_manager: InputManagerBundle<MoveAction>,
 }
 
 impl Default for DollyPosCtrlInputBundle {
     fn default() -> Self {
-        use Action::*;
+        use MoveAction::*;
         let mut input_map = InputMap::default();
         //TODO: Impl. when added to input-manager
         //input_map.assign_gamepad(Gamepad(0));
@@ -125,13 +121,13 @@ impl Default for DollyPosCtrlInputBundle {
             for a in input_map.map.get(v) {
                 for (i, b) in a.iter().enumerate() {
                     let str = match b {
-                        leafwing_input_manager::prelude::UserInput::Single(x) => {
+                        UserInput::Single(x) => {
                             format!("Press {}", &x)
                         }
-                        leafwing_input_manager::prelude::UserInput::Chord(x) => {
+                        UserInput::Chord(x) => {
                             format!("Press and hold {:?}", &x)
                         }
-                        leafwing_input_manager::prelude::UserInput::Null => "Null".to_string(),
+                        UserInput::Null => "Null".to_string(),
                     };
                     print!("{}", str);
                     if a.len() > 1 && i != a.len() - 1 {
@@ -199,7 +195,7 @@ fn dolly_pos_ctrl_move_update(
     time: Res<Time>,
     config: Res<DollyPosCtrlConfig>,
     mut transforms: Query<(&DollyPosCtrlMove, &mut Transform)>,
-    act_query: Query<&ActionState<Action>, With<DollyPosCtrlAction>>,
+    act_query: Query<&ActionState<MoveAction>, With<DollyPosCtrlAction>>,
 ) {
     let action_state = act_query.single();
 
@@ -210,32 +206,32 @@ fn dolly_pos_ctrl_move_update(
         let forward = Vec3::new(local_z.x, 0., local_z.z);
         let right = transform.rotation * -Vec3::X;
 
-        if action_state.pressed(Action::Forward) {
+        if action_state.pressed(&MoveAction::Forward) {
             velocity += forward
         }
-        if action_state.pressed(Action::Backward) {
+        if action_state.pressed(&MoveAction::Backward) {
             velocity -= forward
         }
-        if action_state.pressed(Action::Up) {
+        if action_state.pressed(&MoveAction::Up) {
             velocity += Vec3::Y
         }
-        if action_state.pressed(Action::Down) {
+        if action_state.pressed(&MoveAction::Down) {
             velocity -= Vec3::Y
         }
-        if action_state.pressed(Action::StrafeLeft) {
+        if action_state.pressed(&MoveAction::StrafeLeft) {
             velocity -= right
         }
-        if action_state.pressed(Action::StrafeRight) {
+        if action_state.pressed(&MoveAction::StrafeRight) {
             velocity += right
         }
-        if action_state.pressed(Action::RotateLeft) {
+        if action_state.pressed(&MoveAction::RotateLeft) {
             //Wrapping around
             if rotation > std::f32::consts::FRAC_PI_2 * 4.0 - 0.05 {
                 rotation = 0.0;
             }
             rotation += 0.1
         }
-        if action_state.pressed(Action::RotateRight) {
+        if action_state.pressed(&MoveAction::RotateRight) {
             //Wrapping around
             if rotation < 0.05 {
                 rotation = std::f32::consts::FRAC_PI_2 * 4.0;
