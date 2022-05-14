@@ -4,18 +4,16 @@ use bevy::{
 };
 
 pub use dolly;
-use pos_ctrl::DollyPosCtrl;
 
-mod cone;
+pub mod dolly_type;
+pub mod map;
 
-pub mod cam_ctrl;
-pub mod cursor_grab;
-pub mod pos_ctrl;
-pub mod transform_mapping;
+//Todo: pub mod drivers
+//Do it behind a default feature flag
 
 pub mod prelude {
     pub use crate::{
-        cam_ctrl::*, cursor_grab::*, dolly::prelude::*, pos_ctrl::*, transform_mapping::*, Dolly,
+        dolly::prelude::*, map::*, Dolly,
         DollyPlugins,
     };
 }
@@ -28,6 +26,6 @@ impl Plugin for Dolly {
 pub struct DollyPlugins;
 impl PluginGroup for DollyPlugins {
     fn build(&mut self, group: &mut PluginGroupBuilder) {
-        group.add(Dolly).add(DollyPosCtrl);
+        group.add(Dolly);//.add(DollyPosCtrl);
     }
 }
