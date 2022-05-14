@@ -21,6 +21,10 @@ resolver = "2"
 [lib]
 name = "bevy_dolly"
 
+[features]
+default = ["drivers"]
+drivers = []
+
 [dependencies]
 dolly = "0.3.0"
 

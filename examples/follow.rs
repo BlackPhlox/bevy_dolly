@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 use bevy_dolly::prelude::*;
+use bevy_dolly::map::Transform2Bevy;
 
 #[derive(Component)]
 struct MainCamera;
@@ -10,7 +11,7 @@ fn main() {
         .add_plugins(DefaultPlugins)
         .add_startup_system(setup)
         .add_system(rotator_system)
-        .add_system(update_camera)
+        //.add_system(update_camera)
         .run();
 }
 
@@ -44,7 +45,7 @@ fn setup(
         .insert(Rotates);
 
     commands.spawn().insert(
-        CameraRig::builder()
+CameraRig::<LeftHanded>::builder()
             .with(Position::new(start_pos))
             .with(Rotation::new(Quat::IDENTITY))
             .with(Smooth::new_position(1.25).predictive(true))
@@ -57,6 +58,7 @@ fn setup(
             )
             .build(),
     );
+    
 
     commands
         .spawn_bundle(PerspectiveCameraBundle {
@@ -75,25 +77,25 @@ fn setup(
 
 fn update_camera(
     time: Res<Time>,
-    mut query: QuerySet<(
-        QueryState<(&mut Transform, With<MainCamera>)>,
-        QueryState<(&Transform, With<Rotates>)>,
-        QueryState<&mut CameraRig>,
+    mut query: ParamSet<(
+        Query<(&mut Transform, With<MainCamera>)>,
+        Query<(&Transform, With<Rotates>)>,
+        Query<&mut CR>,
     )>,
 ) {
-    let q1 = query.q1();
-    let player = q1.single().0.to_owned();
+    let p1 = query.p1();
+    let player = p1.single().0.to_owned();
 
-    let mut q2 = query.q2();
-    let mut rig = q2.single_mut();
-
-    rig.driver_mut::<Position>().translation = player.translation;
+    let mut p2 = query.p2();
+    let mut rig = p2.single_mut();
+    
+    rig.driver_mut::<Position>().position = player.translation;
     rig.driver_mut::<Rotation>().rotation = player.rotation;
     rig.driver_mut::<LookAt>().target = player.translation + Vec3::Y;
 
     let transform = rig.update(time.delta_seconds());
 
-    query.q0().single_mut().0.update(transform);
+    query.p0().single_mut().0.transform_2_bevy(transform);
 }
 
 #[derive(Component)]
