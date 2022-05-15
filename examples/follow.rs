@@ -46,7 +46,7 @@ fn setup(
         .insert(Rotates);
 
     commands.spawn().insert(
-    CRB(CameraRig::builder().with(MovableLookAt::from_position_target(start_pos))).build(),
+    CR::builder().with(MovableLookAt::from_position_target(start_pos)).build(),
     );
 
     commands
