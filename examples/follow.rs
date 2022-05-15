@@ -1,5 +1,7 @@
+use std::f32::consts::PI;
+
 use bevy::prelude::*;
-use bevy_dolly::prelude::*;
+use bevy_dolly::{drivers::follow::MovableLookAt, prelude::*};
 
 #[derive(Component)]
 struct MainCamera;
@@ -25,7 +27,7 @@ fn setup(
     commands.spawn_bundle(PbrBundle {
         mesh: meshes.add(Mesh::from(shape::Plane { size: 5.0 })),
         material: materials.add(Color::rgb(0.3, 0.5, 0.3).into()),
-        ..Default::default()
+        ..default()
     });
 
     let start_pos = Vec3::new(0., 0., 0.);
@@ -33,8 +35,8 @@ fn setup(
     commands
         .spawn_bundle((
             Transform {
-                translation: bevy::math::Vec3::new(0., 0.2, 0.),
-                ..Default::default()
+                translation: Vec3::new(0., 0.2, 0.),
+                ..default()
             },
             GlobalTransform::identity(),
         ))
@@ -51,16 +53,15 @@ fn setup(
 
     commands
         .spawn_bundle(PerspectiveCameraBundle {
-            transform: Transform::from_xyz(-2.0, 1., 5.0)
-                .looking_at(bevy::math::Vec3::ZERO, bevy::math::Vec3::Y),
-            ..Default::default()
+            transform: Transform::from_xyz(-2.0, 1., 5.0).looking_at(Vec3::ZERO, Vec3::Y),
+            ..default()
         })
         .insert(MainCamera);
 
     // light
     commands.spawn_bundle(PointLightBundle {
         transform: Transform::from_xyz(4.0, 8.0, 4.0),
-        ..Default::default()
+        ..default()
     });
 }
 
@@ -91,51 +92,8 @@ struct Rotates;
 
 fn rotator_system(time: Res<Time>, mut query: Query<&mut Transform, With<Rotates>>) {
     for mut transform in query.iter_mut() {
-        *transform = Transform::from_rotation(bevy::math::Quat::from_rotation_y(
-            (4.0 * std::f32::consts::PI / 20.0) * time.delta_seconds(),
+        *transform = Transform::from_rotation(Quat::from_rotation_y(
+            (4.0 * PI / 20.0) * time.delta_seconds(),
         )) * *transform;
-    }
-}
-
-/// A custom camera rig which combines smoothed movement with a look-at driver.
-#[derive(Debug, Deref, DerefMut)]
-pub struct MovableLookAt(CameraRig<RightHanded>);
-
-// Turn the nested rig into a driver, so it can be used in another rig.
-impl RigDriver<RightHanded> for MovableLookAt {
-    fn update(
-        &mut self,
-        params: dolly::rig::RigUpdateParams<RightHanded>,
-    ) -> dolly::transform::Transform<RightHanded> {
-        self.0.update(params.delta_time_seconds)
-    }
-}
-
-impl MovableLookAt {
-    pub fn from_position_target(target_position: dolly::glam::Vec3) -> Self {
-        Self(
-            CameraRig::builder()
-                .with(Position::new(target_position))
-                .with(Rotation::new(Quat::IDENTITY))
-                .with(Smooth::new_position(1.25).predictive(true))
-                .with(Arm::new(Vec3::new(0.0, 1.5, -3.5)))
-                .with(Smooth::new_position(2.5))
-                .with(
-                    LookAt::new(target_position + Vec3::Y)
-                        .tracking_smoothness(1.25)
-                        .tracking_predictive(true),
-                )
-                .build(),
-        )
-    }
-
-    pub fn set_position_target(
-        &mut self,
-        target_position: dolly::glam::Vec3,
-        target_rotation: dolly::glam::Quat,
-    ) {
-        self.driver_mut::<Position>().position = target_position;
-        self.driver_mut::<Rotation>().rotation = target_rotation;
-        self.driver_mut::<LookAt>().target = target_position + Vec3::Y;
     }
 }

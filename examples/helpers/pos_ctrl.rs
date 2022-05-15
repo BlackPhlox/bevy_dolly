@@ -11,7 +11,7 @@ use bevy::{
 };
 use leafwing_input_manager::prelude::*;
 
-use crate::cone::Cone;
+use crate::helpers::cone::Cone;
 
 pub struct DollyPosCtrl;
 impl Plugin for DollyPosCtrl {
@@ -116,9 +116,9 @@ impl Default for DollyPosCtrlInputBundle {
 
         input_map.insert(RotateRight, KeyCode::Period);
 
-        for v in input_map.map.keys() {
+        for (v, _) in input_map.iter() {
             print!("Action: {:?} -> ", v);
-            if let Some(a) = input_map.map.get(v) {
+            if let a = input_map.get(v) {
                 for (i, b) in a.iter().enumerate() {
                     let str = match b {
                         UserInput::Single(x) => {
@@ -127,7 +127,6 @@ impl Default for DollyPosCtrlInputBundle {
                         UserInput::Chord(x) => {
                             format!("Press and hold {:?}", &x)
                         }
-                        UserInput::Null => "Null".to_string(),
                     };
                     print!("{}", str);
                     if a.len() > 1 && i != a.len() - 1 {
@@ -205,32 +204,32 @@ fn dolly_pos_ctrl_move_update(
         let forward = Vec3::new(local_z.x, 0., local_z.z);
         let right = transform.rotation * -Vec3::X;
 
-        if action_state.pressed(&MoveAction::Forward) {
+        if action_state.pressed(MoveAction::Forward) {
             velocity += forward
         }
-        if action_state.pressed(&MoveAction::Backward) {
+        if action_state.pressed(MoveAction::Backward) {
             velocity -= forward
         }
-        if action_state.pressed(&MoveAction::Up) {
+        if action_state.pressed(MoveAction::Up) {
             velocity += Vec3::Y
         }
-        if action_state.pressed(&MoveAction::Down) {
+        if action_state.pressed(MoveAction::Down) {
             velocity -= Vec3::Y
         }
-        if action_state.pressed(&MoveAction::StrafeLeft) {
+        if action_state.pressed(MoveAction::StrafeLeft) {
             velocity -= right
         }
-        if action_state.pressed(&MoveAction::StrafeRight) {
+        if action_state.pressed(MoveAction::StrafeRight) {
             velocity += right
         }
-        if action_state.pressed(&MoveAction::RotateLeft) {
+        if action_state.pressed(MoveAction::RotateLeft) {
             //Wrapping around
             if rotation > std::f32::consts::FRAC_PI_2 * 4.0 - 0.05 {
                 rotation = 0.0;
             }
             rotation += 0.1
         }
-        if action_state.pressed(&MoveAction::RotateRight) {
+        if action_state.pressed(MoveAction::RotateRight) {
             //Wrapping around
             if rotation < 0.05 {
                 rotation = std::f32::consts::FRAC_PI_2 * 4.0;

@@ -93,7 +93,7 @@ fn cursor_grab(
 ) {
     let window = windows.get_primary_mut().unwrap();
     let grab_action = act_query.single();
-    if grab_action.pressed(&GrabAction::Exit) {
+    if grab_action.pressed(GrabAction::Exit) {
         toggle_grab_cursor(window);
     }
 }
