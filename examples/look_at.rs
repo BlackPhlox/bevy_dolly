@@ -1,5 +1,10 @@
 use bevy::prelude::*;
 use bevy_dolly::prelude::*;
+use dolly::prelude::{Position, LookAt};
+
+pub mod helpers;
+use helpers::pos_ctrl::DollyPosCtrl;
+use helpers::pos_ctrl::DollyPosCtrlMove;
 
 #[derive(Component)]
 struct MainCamera;
@@ -8,7 +13,7 @@ fn main() {
     App::new()
         .insert_resource(Msaa { samples: 4 })
         .add_plugins(DefaultPlugins)
-        .add_plugins(DollyPlugins)
+        .add_plugin(DollyPosCtrl)
         .add_startup_system(setup)
         .add_system(update_camera)
         .run();
@@ -51,7 +56,7 @@ fn setup(
     */
 
     commands.spawn().insert(
-        CameraRig::builder()
+        Rig::builder()
             .with(Position::new(Vec3::Y * 3.0))
             .with(LookAt::new(
                 /*start_pos.transform_2_dolly().position*/
@@ -80,20 +85,20 @@ fn setup(
 
 fn update_camera(
     time: Res<Time>,
-    mut query: QuerySet<(
-        QueryState<(&mut Transform, With<MainCamera>)>,
-        QueryState<(&mut Transform, With<DollyPosCtrlMove>)>,
-        QueryState<&mut Rig>,
+    mut query: ParamSet<(
+        Query<(&mut Transform, With<MainCamera>)>,
+        Query<(&mut Transform, With<DollyPosCtrlMove>)>,
+        Query<&mut Rig>,
     )>,
 ) {
-    let mut q1 = query.q1();
-    let (player, _) = q1.single_mut();
-    query.q2().single_mut().driver_mut::<LookAt>().target = player.translation;
+    let mut p1 = query.p1();
+    let (player, _) = p1.single_mut();
+    query.p2().single_mut().driver_mut::<LookAt>().target = player.translation;
 
-    let transform = query.q2().single_mut().update(time.delta_seconds());
+    let transform = query.p2().single_mut().update(time.delta_seconds());
 
-    let mut q0 = query.q0();
-    let (mut cam, _) = q0.single_mut();
+    let mut p0 = query.p0();
+    let (mut cam, _) = p0.single_mut();
 
-    cam.update(transform);
+    cam.transform_2_bevy(transform);
 }

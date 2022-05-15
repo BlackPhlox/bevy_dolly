@@ -1,6 +1,10 @@
 use bevy::prelude::*;
 use bevy_dolly::prelude::*;
 
+pub mod helpers;
+use dolly::prelude::{YawPitch, Smooth, Arm};
+use helpers::cursor_grab::DollyCursorGrab;
+
 #[derive(Component)]
 struct MainCamera;
 
@@ -41,7 +45,7 @@ fn setup(
         .id();
 
     commands.spawn().insert(
-        CameraRig::builder()
+        Rig::builder()
             .with(YawPitch::new().yaw_degrees(45.0).pitch_degrees(-30.0))
             .with(Smooth::new_rotation(1.5))
             .with(Arm::new(Vec3::Z * 4.0))
@@ -66,13 +70,13 @@ fn setup(
 fn update_camera(
     keys: Res<Input<KeyCode>>,
     time: Res<Time>,
-    mut query: QuerySet<(
-        QueryState<(&mut Transform, With<MainCamera>)>,
-        QueryState<&mut CameraRig>,
+    mut query: ParamSet<(
+        Query<(&mut Transform, With<MainCamera>)>,
+        Query<&mut Rig>,
     )>,
 ) {
-    let mut q1 = query.q1();
-    let mut rig = q1.single_mut();
+    let mut p1 = query.p1();
+    let mut rig = p1.single_mut();
     let camera_driver = rig.driver_mut::<YawPitch>();
 
     if keys.just_pressed(KeyCode::Z) {
@@ -83,8 +87,8 @@ fn update_camera(
     }
 
     let transform = rig.update(time.delta_seconds());
-    let mut q0 = query.q0();
-    let (mut cam, _) = q0.single_mut();
+    let mut p0 = query.p0();
+    let (mut cam, _) = p0.single_mut();
 
-    cam.update(transform);
+    cam.transform_2_bevy(transform);
 }
