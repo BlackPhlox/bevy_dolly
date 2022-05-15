@@ -6,17 +6,16 @@ use bevy::{
 pub use dolly;
 
 pub mod dolly_type;
-pub mod map;
 #[cfg(feature = "drivers")]
 pub mod drivers;
+pub mod map;
 
 //Todo: pub mod drivers
 //Do it behind a default feature flag
 
 pub mod prelude {
     pub use crate::{
-        dolly::prelude::*, map::*, dolly_type::*, drivers::*, Dolly,
-        DollyPlugins,
+        dolly::driver::*, dolly::prelude::*, dolly_type::*, drivers::*, map::*, Dolly, DollyPlugins,
     };
 }
 
@@ -28,6 +27,6 @@ impl Plugin for Dolly {
 pub struct DollyPlugins;
 impl PluginGroup for DollyPlugins {
     fn build(&mut self, group: &mut PluginGroupBuilder) {
-        group.add(Dolly);//.add(DollyPosCtrl);
+        group.add(Dolly); //.add(DollyPosCtrl);
     }
 }
