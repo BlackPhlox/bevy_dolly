@@ -46,7 +46,7 @@ fn setup(
         .insert(Rotates);
 
     commands.spawn().insert(
-    CR::builder().with(MovableLookAt::from_position_target(start_pos)).build(),
+    Rig::builder().with(MovableLookAt::from_position_target(start_pos)).build(),
     );
 
     commands
@@ -68,7 +68,7 @@ fn update_camera(
     mut query: ParamSet<(
         Query<(&mut Transform, With<MainCamera>)>,
         Query<(&Transform, With<Rotates>)>,
-        Query<&mut CR>,
+        Query<&mut Rig>,
     )>,
 ) {
     let p1 = query.p1();

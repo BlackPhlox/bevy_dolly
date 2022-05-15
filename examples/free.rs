@@ -55,7 +55,7 @@ fn setup(
     yaw_pitch.set_rotation_quat(rotation);
 
     commands.spawn().insert(
-        CR::builder()
+        Rig::builder()
             .with(Fps::from_position_target(transform))
             .build(),
     );

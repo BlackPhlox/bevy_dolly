@@ -55,7 +55,7 @@ fn setup(
         Transform::from_translation(Vec3::from_slice(&translation)).looking_at(Vec3::ZERO, Vec3::Y);
 
     commands.spawn().insert(
-        CR::builder()
+        Rig::builder()
             .with(Fps::from_position_target(transform))
             .build(),
     );
@@ -82,7 +82,7 @@ fn update_camera(
     keys: Res<Input<KeyCode>>,
     windows: Res<Windows>,
     mut mouse_motion_events: EventReader<MouseMotion>,
-    mut query: ParamSet<(Query<(&mut Transform, With<MainCamera>)>, Query<&mut CR>)>,
+    mut query: ParamSet<(Query<(&mut Transform, With<MainCamera>)>, Query<&mut Rig>)>,
 ) {
     let time_delta_seconds: f32 = time.delta_seconds();
     let boost_mult = 5.0f32;

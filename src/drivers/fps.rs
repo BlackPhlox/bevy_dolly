@@ -1,5 +1,5 @@
 use bevy::{
-    math::{Quat, Vec3},
+    math::Quat,
     prelude::{Deref, DerefMut, Transform},
 };
 use dolly::{driver::RigDriver, prelude::*};
