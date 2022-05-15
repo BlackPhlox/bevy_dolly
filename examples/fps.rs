@@ -9,6 +9,11 @@ use helpers::cursor_grab::DollyCursorGrab;
 #[derive(Component)]
 struct MainCamera;
 
+enum FpsType {
+    Fps,
+    Free,
+}
+
 fn main() {
     App::new()
         .insert_resource(Msaa { samples: 4 })
@@ -30,14 +35,14 @@ fn setup(
     commands.spawn_bundle(PbrBundle {
         mesh: meshes.add(Mesh::from(shape::Plane { size: 5.0 })),
         material: materials.add(Color::rgb(0.3, 0.5, 0.3).into()),
-        ..Default::default()
+        ..default()
     });
 
     commands
         .spawn_bundle((
             Transform {
-                translation: bevy::math::Vec3::new(0., 0.2, 0.),
-                ..Default::default()
+                translation: Vec3::new(0., 0.2, 0.),
+                ..default()
             },
             GlobalTransform::identity(),
         ))
@@ -46,8 +51,8 @@ fn setup(
         });
 
     let translation = [-2.0f32, 2.0f32, 5.0f32];
-    let transform = Transform::from_translation(bevy::math::Vec3::from_slice(&translation))
-        .looking_at(bevy::math::Vec3::ZERO, bevy::math::Vec3::Y);
+    let transform =
+        Transform::from_translation(Vec3::from_slice(&translation)).looking_at(Vec3::ZERO, Vec3::Y);
 
     commands.spawn().insert(
         CR::builder()
@@ -58,14 +63,14 @@ fn setup(
     commands
         .spawn_bundle(PerspectiveCameraBundle {
             transform,
-            ..Default::default()
+            ..default()
         })
         .insert(MainCamera);
 
     // light
     commands.spawn_bundle(PointLightBundle {
         transform: Transform::from_xyz(4.0, 8.0, 4.0),
-        ..Default::default()
+        ..default()
     });
 
     info!("Use W, A, S, D for movement");

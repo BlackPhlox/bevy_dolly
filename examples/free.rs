@@ -1,6 +1,10 @@
 use bevy::input::mouse::MouseMotion;
 use bevy::prelude::*;
+use bevy_dolly::drivers::fps::Fps;
 use bevy_dolly::prelude::*;
+
+pub mod helpers;
+use helpers::cursor_grab::DollyCursorGrab;
 
 #[derive(Component)]
 struct MainCamera;
@@ -51,13 +55,8 @@ fn setup(
     yaw_pitch.set_rotation_quat(rotation);
 
     commands.spawn().insert(
-        CameraRig::builder()
-            .with(Position {
-                translation: Vec3::from_slice(&translation),
-            })
-            .with(Rotation { rotation })
-            .with(yaw_pitch)
-            .with(Smooth::new_position_rotation(1.0, 1.0))
+        CR::builder()
+            .with(Fps::from_position_target(transform))
             .build(),
     );
 
@@ -80,9 +79,9 @@ fn update_camera(
     keys: Res<Input<KeyCode>>,
     windows: Res<Windows>,
     mut mouse_motion_events: EventReader<MouseMotion>,
-    mut query: QuerySet<(
-        QueryState<(&mut Transform, With<MainCamera>)>,
-        QueryState<&mut CameraRig>,
+    mut query: ParamSet<(
+        Query<(&mut Transform, With<MainCamera>)>,
+        Query<&mut CameraRig>,
     )>,
 ) {
     let time_delta_seconds: f32 = time.delta_seconds();

@@ -12,6 +12,24 @@ pub struct CR(CameraRig<RightHanded>);
 
 impl CR {
     /// Use this to make a new rig
+    pub fn builder() -> CRB {
+        CRB(CameraRig::builder())
+    }
+}
+
+#[derive(Deref, DerefMut)]
+pub struct CRB(pub dolly::rig::CameraRigBuilder<RightHanded>);
+
+impl CRB {
+    pub fn build(self) -> CR {
+        CR(self.0.build())
+    }
+}
+
+/*
+
+impl CR {
+    /// Use this to make a new rig
     pub fn builder() -> CameraRigBuilder<RightHanded> {
         CameraRigBuilder {
             drivers: Default::default(),
@@ -19,6 +37,9 @@ impl CR {
         }
     }
 }
+
+#[derive(Deref, DerefMut)]
+pub struct CRB(CameraRigBuilder<RightHanded>);
 
 pub struct CameraRigBuilder<H: Handedness> {
     drivers: Vec<Box<dyn RigDriverTraits<H>>>,
@@ -46,3 +67,5 @@ impl CameraRigBuilder<RightHanded> {
         rig
     }
 }
+
+*/

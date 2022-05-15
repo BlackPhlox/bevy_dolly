@@ -46,5 +46,5 @@ version = "0.7"
 features = ["x11", "wayland"]
 default-features = false
 
-[patch.crates-io]
-dolly = { path = "../dolly" }
+#[patch.crates-io]
+#dolly = { path = "../dolly" }

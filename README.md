@@ -13,8 +13,6 @@ Dolly requires two steps to function:
 
 To see how this is done in bevy, please look at this repository's [examples](/examples/).
 
-_Calling `dolly.clone()` is not recommended._
-
 ## How to run
 
 `cargo run --release --example orbit`
@@ -24,7 +22,7 @@ _Calling `dolly.clone()` is not recommended._
 
 |bevy|bevy_dolly|
 |---|---|
-|0.6| 0.0.X |
+|0.8| 0.0.X |
 ## Licensing
 The project is under dual license MIT and Apache 2.0, so joink to your hearts content, just remember the license agreements.
 
