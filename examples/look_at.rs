@@ -83,7 +83,7 @@ fn update_camera(
     mut query: QuerySet<(
         QueryState<(&mut Transform, With<MainCamera>)>,
         QueryState<(&mut Transform, With<DollyPosCtrlMove>)>,
-        QueryState<&mut CameraRig>,
+        QueryState<&mut Rig>,
     )>,
 ) {
     let mut q1 = query.q1();

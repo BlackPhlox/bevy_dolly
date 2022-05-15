@@ -10,7 +10,7 @@ use helpers::cursor_grab::DollyCursorGrab;
 struct MainCamera;
 
 #[derive(Clone, Debug, Eq, PartialEq, Hash)]
-enum FpsType {
+enum FpvType {
     Fps,
     Free,
 }
@@ -20,7 +20,7 @@ fn main() {
         .insert_resource(Msaa { samples: 4 })
         .add_plugins(DefaultPlugins)
         .add_plugin(DollyCursorGrab)
-        .add_state(FpsType::Fps)
+        .add_state(FpvType::Fps)
         .add_startup_system(setup)
         .add_system(update_fpstype)
         .add_system(update_camera)
@@ -81,12 +81,12 @@ fn setup(
     info!("Use F to switch between Fps or Free camera");
 }
 
-fn update_fpstype(keys: Res<Input<KeyCode>>, mut fps_state: ResMut<State<FpsType>>){
+fn update_fpstype(keys: Res<Input<KeyCode>>, mut fps_state: ResMut<State<FpvType>>){
     if keys.pressed(KeyCode::F) {
-        if fps_state.current().eq(&FpsType::Free) {
-            let _ = fps_state.set(FpsType::Fps);
+        if fps_state.current().eq(&FpvType::Free) {
+            let _ = fps_state.set(FpvType::Fps);
         } else {
-            let _ = fps_state.set(FpsType::Free);
+            let _ = fps_state.set(FpvType::Free);
         }
     }
 }
@@ -95,7 +95,7 @@ fn update_camera(
     time: Res<Time>,
     keys: Res<Input<KeyCode>>,
     windows: Res<Windows>,
-    fps_state: Res<State<FpsType>>,
+    fps_state: Res<State<FpvType>>,
     mut mouse_motion_events: EventReader<MouseMotion>,
     mut query: ParamSet<(Query<(&mut Transform, With<MainCamera>)>, Query<&mut Rig>)>,
 ) {
@@ -142,7 +142,7 @@ fn update_camera(
 
     let move_vec = rig
         .driver_mut::<Fps>()
-        .set_position(move_vec, boost, boost_mult, fps_state.current().eq(&FpsType::Fps));
+        .set_position(move_vec, boost, boost_mult, fps_state.current().eq(&FpvType::Fps));
 
     let window = windows.get_primary().unwrap();
     if window.cursor_locked() {

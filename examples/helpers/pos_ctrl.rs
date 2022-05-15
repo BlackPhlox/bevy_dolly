@@ -11,8 +11,6 @@ use bevy::{
 };
 use leafwing_input_manager::prelude::*;
 
-use crate::helpers::cone::Cone;
-
 pub struct DollyPosCtrl;
 impl Plugin for DollyPosCtrl {
     fn build(&self, app: &mut App) {

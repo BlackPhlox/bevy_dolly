@@ -15,7 +15,7 @@ pub mod map;
 
 pub mod prelude {
     pub use crate::{
-        dolly::driver::*, dolly::prelude::*, dolly_type::*, drivers::*, map::*, Dolly, DollyPlugins,
+        dolly::driver::*, dolly_type::*, drivers::*, map::*, Dolly, DollyPlugins,
     };
 }
 
