@@ -3,7 +3,7 @@ use bevy::prelude::*;
 use bevy_dolly::prelude::*;
 
 pub mod helpers;
-use dolly::prelude::{YawPitch, Smooth, Arm};
+use dolly::prelude::{Arm, Smooth, YawPitch};
 use helpers::cursor_grab::DollyCursorGrab;
 
 #[derive(Component)]
@@ -81,10 +81,7 @@ fn update_camera(
     time: Res<Time>,
     mut pan: ResMut<State<Pan>>,
     mut mouse_motion_events: EventReader<MouseMotion>,
-    mut query: ParamSet<(
-        Query<(&mut Transform, With<MainCamera>)>,
-        Query<&mut Rig>,
-    )>,
+    mut query: ParamSet<(Query<(&mut Transform, With<MainCamera>)>, Query<&mut Rig>)>,
 ) {
     let mut p1 = query.p1();
     let mut rig = p1.single_mut();

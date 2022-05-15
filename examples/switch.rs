@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy_dolly::prelude::*;
 
 pub mod helpers;
-use dolly::prelude::{Position, Rotation, Smooth, Arm, LookAt};
+use dolly::prelude::{Arm, LookAt, Position, Rotation, Smooth};
 use helpers::cursor_grab::DollyCursorGrab;
 use helpers::pos_ctrl::DollyPosCtrl;
 use helpers::pos_ctrl::DollyPosCtrlMove;

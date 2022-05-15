@@ -81,7 +81,7 @@ fn setup(
     info!("Use F to switch between Fps or Free camera");
 }
 
-fn update_fpstype(keys: Res<Input<KeyCode>>, mut fps_state: ResMut<State<FpvType>>){
+fn update_fpstype(keys: Res<Input<KeyCode>>, mut fps_state: ResMut<State<FpvType>>) {
     if keys.pressed(KeyCode::F) {
         if fps_state.current().eq(&FpvType::Free) {
             let _ = fps_state.set(FpvType::Fps);
@@ -140,9 +140,12 @@ fn update_camera(
     let mut p1 = query.p1();
     let mut rig = p1.single_mut();
 
-    let move_vec = rig
-        .driver_mut::<Fps>()
-        .set_position(move_vec, boost, boost_mult, fps_state.current().eq(&FpvType::Fps));
+    let move_vec = rig.driver_mut::<Fps>().set_position(
+        move_vec,
+        boost,
+        boost_mult,
+        fps_state.current().eq(&FpvType::Fps),
+    );
 
     let window = windows.get_primary().unwrap();
     if window.cursor_locked() {

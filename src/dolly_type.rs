@@ -1,7 +1,8 @@
 use bevy::prelude::{Component, Deref, DerefMut};
 use dolly::{
     driver::RigDriverTraits,
-    prelude::{CameraRig, RightHanded}, rig::CameraRigBuilder,
+    prelude::{CameraRig, RightHanded},
+    rig::CameraRigBuilder,
 };
 
 #[derive(Component, Deref, DerefMut)]

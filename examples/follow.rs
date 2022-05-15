@@ -46,7 +46,9 @@ fn setup(
         .insert(Rotates);
 
     commands.spawn().insert(
-    Rig::builder().with(MovableLookAt::from_position_target(start_pos)).build(),
+        Rig::builder()
+            .with(MovableLookAt::from_position_target(start_pos))
+            .build(),
     );
 
     commands

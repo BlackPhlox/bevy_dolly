@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 use bevy_dolly::prelude::*;
-use dolly::prelude::{Position, LookAt};
+use dolly::prelude::{LookAt, Position};
 
 pub mod helpers;
 use helpers::pos_ctrl::DollyPosCtrl;
