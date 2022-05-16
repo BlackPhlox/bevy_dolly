@@ -82,12 +82,15 @@ fn setup(
 }
 
 fn update_fpstype(keys: Res<Input<KeyCode>>, mut fps_state: ResMut<State<FpvType>>) {
-    if keys.pressed(KeyCode::F) {
-        if fps_state.current().eq(&FpvType::Free) {
-            let _ = fps_state.set(FpvType::Fps);
+    if keys.just_pressed(KeyCode::F) {
+        let result = if fps_state.current().eq(&FpvType::Fps) {
+            FpvType::Free
         } else {
-            let _ = fps_state.set(FpvType::Free);
-        }
+            FpvType::Fps
+        };
+        
+        println!("State:{:?}", result);
+        let _ = fps_state.overwrite_set(result);
     }
 }
 

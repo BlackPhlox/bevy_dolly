@@ -32,10 +32,10 @@ fn setup(
     commands.spawn_bundle(PbrBundle {
         mesh: meshes.add(Mesh::from(shape::Plane { size: 20.0 })),
         material: materials.add(Color::rgb(0.3, 0.5, 0.3).into()),
-        ..Default::default()
+        ..default()
     });
 
-    Transform::from_translation(bevy::math::Vec3::new(0., 0., 2.));
+    Transform::from_translation(Vec3::new(0., 0., 2.));
 
     /*
     config.entity = Some(
@@ -43,7 +43,7 @@ fn setup(
             .spawn_bundle((
                 Transform {
                     translation: bevy::math::Vec3::new(0., 0.2, 0.),
-                    ..Default::default()
+                    ..default()
                 },
                 GlobalTransform::identity(),
             ))
@@ -68,10 +68,10 @@ fn setup(
     commands
         .spawn_bundle(PerspectiveCameraBundle {
             transform: Transform::from_xyz(-2.0, 1., 2.0).looking_at(
-                /*start_pos.translation*/ bevy::math::Vec3::new(0., 0., 0.),
-                bevy::math::Vec3::Y,
+                Vec3::new(0., 0., 0.),
+            Vec3::Y,
             ),
-            ..Default::default()
+            ..default()
         })
         .insert(MainCamera);
 
@@ -79,7 +79,7 @@ fn setup(
     // light
     commands.spawn_bundle(PointLightBundle {
         transform: Transform::from_xyz(4.0, 8.0, 4.0),
-        ..Default::default()
+        ..default()
     });
 }
 

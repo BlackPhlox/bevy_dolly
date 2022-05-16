@@ -6,7 +6,7 @@ use bevy::{
     prelude::{
         App, Assets, BuildChildren, Bundle, Color, Commands, Component, GamepadButtonType,
         GlobalTransform, KeyCode, Mesh, Plugin, Query, Res, ResMut, StandardMaterial, SystemSet,
-        Transform, With,
+        Transform, With, default,
     },
 };
 use leafwing_input_manager::prelude::*;
@@ -164,7 +164,7 @@ fn dolly_pos_ctrl_config_entity_setup(
     let player_mat = materials.add(StandardMaterial {
         base_color: Color::rgba(1.0, 0.0, 0.0, 0.5),
         unlit: true,
-        ..Default::default()
+        ..default()
     });
 
     commands
@@ -172,7 +172,7 @@ fn dolly_pos_ctrl_config_entity_setup(
             Transform {
                 rotation: Quat::IDENTITY,
                 translation: config.position,
-                ..Default::default()
+                ..default()
             },
             GlobalTransform::identity(),
         ))
@@ -183,7 +183,7 @@ fn dolly_pos_ctrl_config_entity_setup(
                 transform: Transform::from_rotation(Quat::from_rotation_x(
                     std::f32::consts::FRAC_PI_2,
                 )),
-                ..Default::default()
+                ..default()
             });
         })
         .insert(DollyPosCtrlMove);

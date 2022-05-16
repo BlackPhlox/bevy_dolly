@@ -1,3 +1,5 @@
+use std::f32::consts::PI;
+
 use bevy::prelude::*;
 use bevy_dolly::prelude::*;
 
@@ -30,10 +32,10 @@ fn main() {
         .add_state(Camera::FollowSheep)
         .add_system(switch_camera_rig)
         .add_system_set(
-            SystemSet::on_update(Camera::FollowPlayer).with_system(follow_player.system()),
+            SystemSet::on_update(Camera::FollowPlayer).with_system(follow_player),
         )
         .add_system_set(
-            SystemSet::on_update(Camera::FollowSheep).with_system(follow_sheep.system()),
+            SystemSet::on_update(Camera::FollowSheep).with_system(follow_sheep),
         )
         .run();
 }
@@ -49,7 +51,7 @@ fn setup(
     commands.spawn_bundle(PbrBundle {
         mesh: meshes.add(Mesh::from(shape::Plane { size: 5.0 })),
         material: materials.add(Color::rgb(0.3, 0.5, 0.3).into()),
-        ..Default::default()
+        ..default()
     });
 
     let start_pos = Vec3::new(0., 0., 0.);
@@ -57,8 +59,8 @@ fn setup(
     commands
         .spawn_bundle((
             Transform {
-                translation: bevy::math::Vec3::new(0., 0.2, 0.),
-                ..Default::default()
+                translation: Vec3::new(0., 0.2, 0.),
+                ..default()
             },
             GlobalTransform::identity(),
         ))
@@ -85,15 +87,15 @@ fn setup(
     commands
         .spawn_bundle(PerspectiveCameraBundle {
             transform: Transform::from_xyz(-2.0, 1., 5.0)
-                .looking_at(bevy::math::Vec3::ZERO, bevy::math::Vec3::Y),
-            ..Default::default()
+                .looking_at(Vec3::ZERO, Vec3::Y),
+            ..default()
         })
         .insert(MainCamera);
 
     // light
     commands.spawn_bundle(PointLightBundle {
         transform: Transform::from_xyz(4.0, 8.0, 4.0),
-        ..Default::default()
+        ..default()
     });
 
     //info!(" Use 1, 2, 3, 4 to target different sheep");
@@ -152,8 +154,8 @@ struct Rotates;
 
 fn rotator_system(time: Res<Time>, mut query: Query<&mut Transform, With<Rotates>>) {
     for mut transform in query.iter_mut() {
-        *transform = Transform::from_rotation(bevy::math::Quat::from_rotation_y(
-            (4.0 * std::f32::consts::PI / 20.0) * time.delta_seconds(),
+        *transform = Transform::from_rotation(Quat::from_rotation_y(
+            (4.0 * PI / 20.0) * time.delta_seconds(),
         )) * *transform;
     }
 }
