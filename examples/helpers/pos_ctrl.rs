@@ -4,9 +4,9 @@ use bevy::{
     math::{Quat, Vec3},
     pbr::PbrBundle,
     prelude::{
-        App, Assets, BuildChildren, Bundle, Color, Commands, Component, GamepadButtonType,
+        default, App, Assets, BuildChildren, Bundle, Color, Commands, Component, GamepadButtonType,
         GlobalTransform, KeyCode, Mesh, Plugin, Query, Res, ResMut, StandardMaterial, SystemSet,
-        Transform, With, default,
+        Transform, With,
     },
 };
 use leafwing_input_manager::prelude::*;

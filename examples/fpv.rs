@@ -88,7 +88,7 @@ fn update_fpstype(keys: Res<Input<KeyCode>>, mut fps_state: ResMut<State<FpvType
         } else {
             FpvType::Fps
         };
-        
+
         println!("State:{:?}", result);
         let _ = fps_state.overwrite_set(result);
     }

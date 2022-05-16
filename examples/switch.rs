@@ -31,12 +31,8 @@ fn main() {
         .add_system(rotator_system)
         .add_state(Camera::FollowSheep)
         .add_system(switch_camera_rig)
-        .add_system_set(
-            SystemSet::on_update(Camera::FollowPlayer).with_system(follow_player),
-        )
-        .add_system_set(
-            SystemSet::on_update(Camera::FollowSheep).with_system(follow_sheep),
-        )
+        .add_system_set(SystemSet::on_update(Camera::FollowPlayer).with_system(follow_player))
+        .add_system_set(SystemSet::on_update(Camera::FollowSheep).with_system(follow_sheep))
         .run();
 }
 
@@ -86,8 +82,7 @@ fn setup(
 
     commands
         .spawn_bundle(PerspectiveCameraBundle {
-            transform: Transform::from_xyz(-2.0, 1., 5.0)
-                .looking_at(Vec3::ZERO, Vec3::Y),
+            transform: Transform::from_xyz(-2.0, 1., 5.0).looking_at(Vec3::ZERO, Vec3::Y),
             ..default()
         })
         .insert(MainCamera);
