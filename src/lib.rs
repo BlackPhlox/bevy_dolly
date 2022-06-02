@@ -9,5 +9,5 @@ pub mod map;
 //Do it behind a default feature flag
 
 pub mod prelude {
-    pub use crate::{dolly::driver::*, dolly_type::*, drivers::*, map::*};
+    pub use crate::{dolly::driver::*, dolly::prelude::*, dolly_type::*, drivers::*, map::*};
 }

@@ -3,7 +3,6 @@ use bevy::{input::mouse::MouseMotion, render::camera::ScalingMode};
 use bevy_dolly::prelude::*;
 
 pub mod helpers;
-use dolly::prelude::{Arm, Smooth, YawPitch};
 use helpers::cursor_grab::DollyCursorGrab;
 
 #[derive(Component)]

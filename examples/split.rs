@@ -7,7 +7,6 @@ use bevy::{
     window::{WindowId, WindowResized},
 };
 use bevy_dolly::prelude::*;
-use dolly::prelude::*;
 
 fn main() {
     App::new()

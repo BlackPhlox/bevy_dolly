@@ -1,6 +1,5 @@
 use bevy::input::mouse::MouseMotion;
 use bevy::prelude::*;
-use bevy_dolly::drivers::fps::Fps;
 use bevy_dolly::prelude::*;
 
 pub mod helpers;
