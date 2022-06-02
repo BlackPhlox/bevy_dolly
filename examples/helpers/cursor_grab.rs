@@ -91,9 +91,12 @@ fn cursor_grab(
     mut windows: ResMut<Windows>,
     act_query: Query<&ActionState<GrabAction>, With<DollyCursorGrabAction>>,
 ) {
-    let window = windows.get_primary_mut().unwrap();
-    let grab_action = act_query.single();
-    if grab_action.pressed(GrabAction::Exit) {
-        toggle_grab_cursor(window);
+    let window = windows.get_primary_mut();
+    if let Some(window) = window {
+        let grab_action = act_query.single();
+        if grab_action.pressed(GrabAction::Exit) {
+            println!("Cursor Grab");
+            toggle_grab_cursor(window);
+        }
     }
 }

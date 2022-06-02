@@ -66,7 +66,7 @@ fn setup(
     );
 
     commands
-        .spawn_bundle(PerspectiveCameraBundle {
+        .spawn_bundle(Camera3dBundle {
             transform: Transform::from_xyz(-2.0, 1., 2.0)
                 .looking_at(Vec3::new(0., 0., 0.), Vec3::Y),
             ..default()

@@ -1,5 +1,5 @@
-use bevy::input::mouse::MouseMotion;
 use bevy::prelude::*;
+use bevy::{input::mouse::MouseMotion, render::camera::ScalingMode};
 use bevy_dolly::prelude::*;
 
 pub mod helpers;
@@ -50,8 +50,7 @@ fn setup(
         ))
         .with_children(|cell| {
             cell.spawn_scene(asset_server.load("poly_dolly.gltf#Scene0"));
-        })
-        .id();
+        });
 
     commands.spawn().insert(
         Rig::builder()
@@ -61,9 +60,16 @@ fn setup(
             .build(),
     );
 
-    let mut camera = OrthographicCameraBundle::new_3d();
-    camera.orthographic_projection.scale = 3.0;
-    camera.transform = Transform::from_xyz(5.0, 5.0, 5.0).looking_at(Vec3::ZERO, Vec3::Y);
+    let mut camera = Camera3dBundle {
+        projection: OrthographicProjection {
+            scale: 3.0,
+            scaling_mode: ScalingMode::FixedVertical(2.0),
+            ..default()
+        }
+        .into(),
+        transform: Transform::from_xyz(5.0, 5.0, 5.0).looking_at(Vec3::ZERO, Vec3::Y),
+        ..default()
+    };
 
     commands.spawn_bundle(camera).insert(MainCamera);
 

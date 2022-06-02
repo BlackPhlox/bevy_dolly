@@ -64,7 +64,7 @@ fn setup(
     );
 
     commands
-        .spawn_bundle(PerspectiveCameraBundle {
+        .spawn_bundle(Camera3dBundle {
             transform,
             ..default()
         })
@@ -150,8 +150,9 @@ fn update_camera(
         fps_state.current().eq(&FpvType::Fps),
     );
 
-    let window = windows.get_primary().unwrap();
-    if window.cursor_locked() {
+    let window = windows.get_primary();
+
+    if window.is_some() && window.unwrap().cursor_locked() {
         rig.driver_mut::<Fps>()
             .set_rotation(delta, sensitivity, move_vec, time_delta_seconds);
     }
