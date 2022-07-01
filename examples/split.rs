@@ -32,9 +32,15 @@ fn setup(
         ..default()
     });
 
-    commands.spawn_scene(asset_server.load("poly_fox.glb#Scene0"));
+    commands.spawn_bundle(SceneBundle {
+        scene: asset_server.load("poly_fox.glb#Scene0"),
+        ..default()
+    });
 
-    commands.spawn_scene(asset_server.load("poly_dolly.gltf#Scene0"));
+    commands.spawn_bundle(SceneBundle {
+        scene: asset_server.load("poly_dolly.gltf#Scene0"),
+        ..default()
+    });
 
     // Light
     commands.spawn_bundle(DirectionalLightBundle {
@@ -65,7 +71,7 @@ fn setup(
             Rig::builder()
                 .with(YawPitch::new().yaw_degrees(45.0).pitch_degrees(-30.0))
                 .with(Smooth::new_rotation(1.5))
-                .with(Arm::new(Vec3::Z * 4.0))
+                .with(Arm::new(dolly::glam::Vec3::Z * 4.0))
                 .build(),
         )
         .insert(LeftCamera);
@@ -76,7 +82,7 @@ fn setup(
             Rig::builder()
                 .with(YawPitch::new().yaw_degrees(45.0).pitch_degrees(-30.0))
                 .with(Smooth::new_rotation(1.5))
-                .with(Arm::new(Vec3::Z * 200.0))
+                .with(Arm::new(dolly::glam::Vec3::Z * 200.0))
                 .build(),
         )
         .insert(RightCamera);
@@ -87,6 +93,7 @@ fn setup(
             transform: Transform::from_xyz(100.0, 100., 150.0).looking_at(Vec3::ZERO, Vec3::Y),
             camera_3d: Camera3d {
                 clear_color: ClearColorConfig::None,
+                ..default()
             },
             camera: Camera {
                 priority: 1,
@@ -163,7 +170,7 @@ fn update_camera_2(
     camera_driver.rotate_yaw_pitch(-1.0, 0.0);
     
     let a = rig.driver_mut::<Arm>();
-    a.offset = Vec3::Z * ((time.seconds_since_startup() as f32 * 0.2).sin().cos().abs() * 400. - 200.);
+    a.offset = dolly::glam::Vec3::Z * ((time.seconds_since_startup() as f32 * 0.2).sin().cos().abs() * 400. - 200.);
     
     let transform = rig.update(time.delta_seconds());
     let mut p0 = query.p0();

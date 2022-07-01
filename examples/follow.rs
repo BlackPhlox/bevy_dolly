@@ -30,7 +30,7 @@ fn setup(
         ..default()
     });
 
-    let start_pos = Vec3::new(0., 0., 0.);
+    let start_pos = dolly::glam::Vec3::new(0., 0., 0.);
 
     commands
         .spawn_bundle((
@@ -41,7 +41,10 @@ fn setup(
             GlobalTransform::identity(),
         ))
         .with_children(|cell| {
-            cell.spawn_scene(asset_server.load("poly_dolly.gltf#Scene0"));
+            cell.spawn_bundle(SceneBundle {
+                scene: asset_server.load("poly_dolly.gltf#Scene0"),
+                ..default()
+            });
         })
         .insert(Rotates);
 

@@ -3,14 +3,15 @@ use bevy::prelude::*;
 use bevy_dolly::prelude::*;
 
 pub mod helpers;
+use bevy_dolly::prelude::fpv::Fpv;
 use helpers::cursor_grab::DollyCursorGrab;
 
 #[derive(Component)]
 struct MainCamera;
 
 #[derive(Clone, Debug, Eq, PartialEq, Hash)]
-enum FpvType {
-    Fps,
+enum MovementType {
+    FirstPerson,
     Free,
 }
 
@@ -19,9 +20,9 @@ fn main() {
         .insert_resource(Msaa { samples: 4 })
         .add_plugins(DefaultPlugins)
         .add_plugin(DollyCursorGrab)
-        .add_state(FpvType::Fps)
+        .add_state(MovementType::FirstPerson)
         .add_startup_system(setup)
-        .add_system(update_fpstype)
+        .add_system(update_fpvtype)
         .add_system(update_camera)
         .run();
 }
@@ -58,7 +59,7 @@ fn setup(
 
     commands.spawn().insert(
         Rig::builder()
-            .with(Fps::from_position_target(transform))
+            .with(Fpv::from_position_target(transform))
             .build(),
     );
 
@@ -80,12 +81,12 @@ fn setup(
     info!("Use F to switch between Fps or Free camera");
 }
 
-fn update_fpstype(keys: Res<Input<KeyCode>>, mut fps_state: ResMut<State<FpvType>>) {
+fn update_fpvtype(keys: Res<Input<KeyCode>>, mut fps_state: ResMut<State<MovementType>>) {
     if keys.just_pressed(KeyCode::F) {
-        let result = if fps_state.current().eq(&FpvType::Fps) {
-            FpvType::Free
+        let result = if fps_state.current().eq(&MovementType::FirstPerson) {
+            MovementType::Free
         } else {
-            FpvType::Fps
+            MovementType::FirstPerson
         };
 
         println!("State:{:?}", result);
@@ -97,7 +98,7 @@ fn update_camera(
     time: Res<Time>,
     keys: Res<Input<KeyCode>>,
     windows: Res<Windows>,
-    fps_state: Res<State<FpvType>>,
+    fps_state: Res<State<MovementType>>,
     mut mouse_motion_events: EventReader<MouseMotion>,
     mut query: ParamSet<(Query<(&mut Transform, With<MainCamera>)>, Query<&mut Rig>)>,
 ) {
@@ -142,17 +143,17 @@ fn update_camera(
     let mut p1 = query.p1();
     let mut rig = p1.single_mut();
 
-    let move_vec = rig.driver_mut::<Fps>().set_position(
+    let move_vec = rig.driver_mut::<Fpv>().set_position(
         move_vec,
         boost,
         boost_mult,
-        fps_state.current().eq(&FpvType::Fps),
+        fps_state.current().eq(&MovementType::FirstPerson),
     );
 
     let window = windows.get_primary();
 
     if window.is_some() && window.unwrap().cursor_locked() {
-        rig.driver_mut::<Fps>()
+        rig.driver_mut::<Fpv>()
             .set_rotation(delta, sensitivity, move_vec, time_delta_seconds);
     }
 

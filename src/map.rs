@@ -1,6 +1,6 @@
 use bevy::{
     math::{Quat, Vec3},
-    prelude::{Mut, Transform},
+    prelude::{Mut, Transform, default, DerefMut, Deref},
 };
 use dolly::prelude::RightHanded;
 use std::marker::PhantomData;
@@ -26,8 +26,8 @@ impl Transform2DollyMut for Mut<'_, Transform> {
         let t = self.translation;
         let r = self.rotation;
         dolly::transform::Transform {
-            position: Vec3::new(t.x, t.y, t.z),
-            rotation: Quat::from_xyzw(r.x, r.y, r.z, r.w),
+            position: dolly::glam::Vec3::new(t.x, t.y, t.z),
+            rotation: dolly::glam::Quat::from_xyzw(r.x, r.y, r.z, r.w),
             phantom: PhantomData,
         }
     }
@@ -42,9 +42,23 @@ impl Transform2Dolly for Transform {
         let t = self.translation;
         let r = self.rotation;
         dolly::transform::Transform {
-            position: Vec3::new(t.x, t.y, t.z),
-            rotation: Quat::from_xyzw(r.x, r.y, r.z, r.w),
+            position: dolly::glam::Vec3::new(t.x, t.y, t.z),
+            rotation: dolly::glam::Quat::from_xyzw(r.x, r.y, r.z, r.w),
             phantom: PhantomData,
         }
+    }
+}
+
+#[derive(Deref, DerefMut)]
+struct DollyTransformInto(Transform);
+
+impl From<dolly::transform::Transform<RightHanded>> for DollyTransformInto {
+    fn from(transform: dolly::transform::Transform<RightHanded>) -> Self {
+        let (translation, rotation) = transform.into_position_rotation();
+        DollyTransformInto{0: Transform { 
+            translation: bevy::math::Vec3::new(translation.x, translation.y, translation.z), 
+            rotation:  bevy::math::Quat::from_xyzw(rotation.x, rotation.y, rotation.z, rotation.w),
+            ..default()
+        }}
     }
 }

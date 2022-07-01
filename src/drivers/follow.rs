@@ -9,12 +9,12 @@ impl MovableLookAt {
         Self(
             CameraRig::builder()
                 .with(Position::new(target_position))
-                .with(Rotation::new(Quat::IDENTITY))
+                .with(Rotation::new(dolly::glam::Quat::IDENTITY))
                 .with(Smooth::new_position(1.25).predictive(true))
-                .with(Arm::new(Vec3::new(0.0, 1.5, -3.5)))
+                .with(Arm::new(dolly::glam::Vec3::new(0.0, 1.5, -3.5)))
                 .with(Smooth::new_position(2.5))
                 .with(
-                    LookAt::new(target_position + Vec3::Y)
+                    LookAt::new(target_position + dolly::glam::Vec3::Y)
                         .tracking_smoothness(1.25)
                         .tracking_predictive(true),
                 )
@@ -29,7 +29,7 @@ impl MovableLookAt {
     ) {
         self.driver_mut::<Position>().position = target_position;
         self.driver_mut::<Rotation>().rotation = target_rotation;
-        self.driver_mut::<LookAt>().target = target_position + Vec3::Y;
+        self.driver_mut::<LookAt>().target = target_position + dolly::glam::Vec3::Y;
     }
 }
 
