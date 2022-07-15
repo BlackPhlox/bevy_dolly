@@ -28,7 +28,7 @@ default = ["drivers"]
 drivers = []
 
 [dependencies]
-dolly = "0.3.0"
+dolly = "0.3"
 
 [dependencies.bevy]
 #version = "0.7"
@@ -37,7 +37,7 @@ features = ["render"]
 default-features = false
 
 [dev-dependencies]
-leafwing-input-manager = { path = "../leafwing_input_manager" }#"0.3.0"
+leafwing-input-manager = { path = "../leafwing-input-manager" }#"0.3.0"
 
 [dev-dependencies.bevy]
 #version = "0.7"
