@@ -35,9 +35,10 @@ dolly = "0.3"
 path = "../bevy"
 features = ["render"]
 default-features = false
+ref = "#e0a80874"
 
 [dev-dependencies]
-leafwing-input-manager = { path = "../leafwing-input-manager" }#"0.3.0"
+leafwing_input_manager = { path = "../leafwing-input-manager" }#"0.3.0"
 
 [dev-dependencies.bevy]
 #version = "0.7"
@@ -52,5 +53,5 @@ features = ["x11", "wayland"]
 default-features = false
 
 [patch.crates-io]
-#leafwing-input-manager = { path = "../leafwing_input_manager" }
+#leafwing_input_manager = { path = "../leafwing_input_manager" }
 #dolly = { path = "../dolly" }
