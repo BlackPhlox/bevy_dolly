@@ -10,8 +10,8 @@ fn main() {
         .insert_resource(Msaa { samples: 4 })
         .add_plugins(DefaultPlugins)
         .add_plugin(DollyCursorGrab)
-        .add_startup_system(setup.system())
-        .add_system(update_camera.system())
+        .add_startup_system(setup)
+        .add_system(update_camera)
         .run();
 }
 
@@ -38,9 +38,11 @@ fn setup(
             GlobalTransform::identity(),
         ))
         .with_children(|cell| {
-            cell.spawn_scene(asset_server.load("poly_dolly.gltf#Scene0"));
-        })
-        .id();
+            cell.spawn_bundle(SceneBundle {
+                scene: asset_server.load("poly_dolly.gltf#Scene0"),
+                ..Default::default()
+            });        
+        });
 
     let translation = [-2.0f32, 2.0f32, 5.0f32];
     let transform = Transform::from_translation(bevy::math::Vec3::from_slice(&translation))
@@ -62,7 +64,7 @@ fn setup(
     );
 
     commands
-        .spawn_bundle(PerspectiveCameraBundle {
+        .spawn_bundle(Camera3dBundle {
             transform,
             ..Default::default()
         })
@@ -83,9 +85,9 @@ fn update_camera(
     keys: Res<Input<KeyCode>>,
     windows: Res<Windows>,
     mut mouse_motion_events: EventReader<MouseMotion>,
-    mut query: QuerySet<(
-        QueryState<(&mut Transform, With<MainCamera>)>,
-        QueryState<&mut CameraRig>,
+    mut query: ParamSet<(
+        Query<(&mut Transform, With<MainCamera>)>,
+        Query<&mut CameraRig>,
     )>,
 ) {
     let time_delta_seconds: f32 = time.delta_seconds();
@@ -126,7 +128,7 @@ fn update_camera(
         delta += event.delta;
     }
 
-    let mut q1 = query.q1();
+    let mut q1 = query.p1();
     let mut rig = q1.single_mut();
 
     let (mut euler, a) = rig.final_transform.rotation.to_axis_angle();
@@ -148,7 +150,7 @@ fn update_camera(
     }
 
     let transform = rig.update(time_delta_seconds);
-    let mut q0 = query.q0();
+    let mut q0 = query.p0();
     let (mut cam, _) = q0.single_mut();
 
     cam.update(transform);

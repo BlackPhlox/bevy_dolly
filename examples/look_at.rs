@@ -61,7 +61,7 @@ fn setup(
     );
 
     commands
-        .spawn_bundle(PerspectiveCameraBundle {
+        .spawn_bundle(Camera3dBundle {
             transform: Transform::from_xyz(-2.0, 1., 2.0).looking_at(
                 /*start_pos.translation*/ bevy::math::Vec3::new(0., 0., 0.),
                 bevy::math::Vec3::Y,
@@ -80,19 +80,19 @@ fn setup(
 
 fn update_camera(
     time: Res<Time>,
-    mut query: QuerySet<(
-        QueryState<(&mut Transform, With<MainCamera>)>,
-        QueryState<(&mut Transform, With<DollyPosCtrlMove>)>,
-        QueryState<&mut CameraRig>,
+    mut query: ParamSet<(
+        Query<(&mut Transform, With<MainCamera>)>,
+        Query<(&mut Transform, With<DollyPosCtrlMove>)>,
+        Query<&mut CameraRig>,
     )>,
 ) {
-    let mut q1 = query.q1();
+    let mut q1 = query.p1();
     let (player, _) = q1.single_mut();
-    query.q2().single_mut().driver_mut::<LookAt>().target = player.translation;
+    query.p2().single_mut().driver_mut::<LookAt>().target = player.translation;
 
-    let transform = query.q2().single_mut().update(time.delta_seconds());
+    let transform = query.p2().single_mut().update(time.delta_seconds());
 
-    let mut q0 = query.q0();
+    let mut q0 = query.p0();
     let (mut cam, _) = q0.single_mut();
 
     cam.update(transform);
