@@ -24,10 +24,10 @@ fn main() {
         .add_state(Camera::FollowSheep)
         .add_system(switch_camera_rig)
         .add_system_set(
-            SystemSet::on_update(Camera::FollowPlayer).with_system(follow_player.system()),
+            SystemSet::on_update(Camera::FollowPlayer).with_system(follow_player),
         )
         .add_system_set(
-            SystemSet::on_update(Camera::FollowSheep).with_system(follow_sheep.system()),
+            SystemSet::on_update(Camera::FollowSheep).with_system(follow_sheep),
         )
         .run();
 }
@@ -57,7 +57,10 @@ fn setup(
             GlobalTransform::identity(),
         ))
         .with_children(|cell| {
-            cell.spawn_scene(asset_server.load("poly_dolly.gltf#Scene0"));
+            cell.spawn_bundle(SceneBundle {
+                scene: asset_server.load("poly_dolly.gltf#Scene0"),
+                ..Default::default()
+            });
         })
         .insert(Rotates);
 
@@ -77,7 +80,7 @@ fn setup(
     );
 
     commands
-        .spawn_bundle(PerspectiveCameraBundle {
+        .spawn_bundle(Camera3dBundle {
             transform: Transform::from_xyz(-2.0, 1., 5.0)
                 .looking_at(bevy::math::Vec3::ZERO, bevy::math::Vec3::Y),
             ..Default::default()
@@ -96,16 +99,16 @@ fn setup(
 
 fn follow_player(
     time: Res<Time>,
-    mut query: QuerySet<(
-        QueryState<(&mut Transform, With<MainCamera>)>,
-        QueryState<(&Transform, With<DollyPosCtrlMove>)>,
-        QueryState<&mut CameraRig>,
+    mut query: ParamSet<(
+        Query<(&mut Transform, With<MainCamera>)>,
+        Query<(&Transform, With<DollyPosCtrlMove>)>,
+        Query<&mut CameraRig>,
     )>,
 ) {
-    let q1 = query.q1();
+    let q1 = query.p1();
     let player = q1.single().0.to_owned();
 
-    let mut q2 = query.q2();
+    let mut q2 = query.p2();
     let mut rig = q2.single_mut();
 
     rig.driver_mut::<Position>().translation = player.translation;
@@ -114,7 +117,7 @@ fn follow_player(
 
     let transform = rig.update(time.delta_seconds());
 
-    let mut q0 = query.q0();
+    let mut q0 = query.p0();
     q0.single_mut().0.update(transform);
 }
 

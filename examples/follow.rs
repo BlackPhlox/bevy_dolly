@@ -39,7 +39,10 @@ fn setup(
             GlobalTransform::identity(),
         ))
         .with_children(|cell| {
-            cell.spawn_scene(asset_server.load("poly_dolly.gltf#Scene0"));
+            cell.spawn_bundle(SceneBundle {
+                scene: asset_server.load("poly_dolly.gltf#Scene0"),
+                ..Default::default()
+            });
         })
         .insert(Rotates);
 
@@ -59,7 +62,7 @@ fn setup(
     );
 
     commands
-        .spawn_bundle(PerspectiveCameraBundle {
+        .spawn_bundle(Camera3dBundle {
             transform: Transform::from_xyz(-2.0, 1., 5.0)
                 .looking_at(bevy::math::Vec3::ZERO, bevy::math::Vec3::Y),
             ..Default::default()

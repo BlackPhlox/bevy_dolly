@@ -10,8 +10,8 @@ fn main() {
         .insert_resource(Msaa { samples: 4 })
         .add_plugins(DefaultPlugins)
         .add_plugin(DollyCursorGrab)
-        .add_startup_system(setup.system())
-        .add_system(update_camera.system())
+        .add_startup_system(setup)
+        .add_system(update_camera)
         .run();
 }
 
@@ -38,9 +38,11 @@ fn setup(
             GlobalTransform::identity(),
         ))
         .with_children(|cell| {
-            cell.spawn_scene(asset_server.load("poly_dolly.gltf#Scene0"));
-        })
-        .id();
+            cell.spawn_bundle(SceneBundle {
+                scene: asset_server.load("poly_dolly.gltf#Scene0"),
+                ..Default::default()
+            });        
+        });
 
     let translation = [-2.0f32, 2.0f32, 5.0f32];
     let transform = Transform::from_translation(bevy::math::Vec3::from_slice(&translation))
@@ -62,7 +64,7 @@ fn setup(
     );
 
     commands
-        .spawn_bundle(PerspectiveCameraBundle {
+        .spawn_bundle(Camera3dBundle {
             transform,
             ..Default::default()
         })
