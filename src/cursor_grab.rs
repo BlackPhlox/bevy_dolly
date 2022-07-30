@@ -1,15 +1,15 @@
 use bevy::{ecs::schedule::ShouldRun, prelude::*};
-use leafwing_input_manager::{
-    prelude::{ActionState, InputMap},
-    Actionlike, InputManagerBundle,
-};
+// use leafwing_input_manager::{
+//     prelude::{ActionState, InputMap},
+//     Actionlike, InputManagerBundle,
+// };
 
 pub struct DollyCursorGrab;
 impl Plugin for DollyCursorGrab {
     fn build(&self, app: &mut App) {
         app.init_resource::<DollyCursorGrabConfig>()
             .add_startup_system(initial_grab_cursor)
-            .add_startup_system(dolly_cursor_grab_input_setup)
+            //.add_startup_system(dolly_cursor_grab_input_setup)
             .add_system_set(
                 SystemSet::new()
                     .with_run_criteria(use_grab)
@@ -36,42 +36,42 @@ fn use_grab(config: Res<DollyCursorGrabConfig>) -> ShouldRun {
     }
 }
 
-#[derive(Component)]
-struct DollyCursorGrabAction;
+// #[derive(Component)]
+// struct DollyCursorGrabAction;
 
-fn dolly_cursor_grab_input_setup(mut commands: Commands) {
-    commands
-        .spawn()
-        .insert(DollyCursorGrabAction)
-        .insert_bundle(DollyCursorGrabInputBundle::default());
-}
+// fn dolly_cursor_grab_input_setup(mut commands: Commands) {
+//     commands
+//         .spawn()
+//         .insert(DollyCursorGrabAction)
+//         .insert_bundle(DollyCursorGrabInputBundle::default());
+// }
 
-#[derive(Actionlike, PartialEq, Eq, Clone, Copy, Hash, Debug)]
-enum GrabAction {
-    Exit,
-}
+// #[derive(Actionlike, PartialEq, Eq, Clone, Copy, Hash, Debug)]
+// enum GrabAction {
+//     Exit,
+// }
 
-#[derive(Bundle)]
-struct DollyCursorGrabInputBundle {
-    #[bundle]
-    input_manager: InputManagerBundle<GrabAction>,
-}
+// #[derive(Bundle)]
+// struct DollyCursorGrabInputBundle {
+//     #[bundle]
+//     input_manager: InputManagerBundle<GrabAction>,
+// }
 
-impl Default for DollyCursorGrabInputBundle {
-    fn default() -> Self {
-        use GrabAction::*;
-        let mut input_map = InputMap::default();
+// impl Default for DollyCursorGrabInputBundle {
+//     fn default() -> Self {
+//         use GrabAction::*;
+//         let mut input_map = InputMap::default();
 
-        input_map.insert(Exit, KeyCode::Escape);
+//         input_map.insert(Exit, KeyCode::Escape);
 
-        let input_manager = InputManagerBundle {
-            input_map,
-            action_state: ActionState::default(),
-        };
+//         let input_manager = InputManagerBundle {
+//             input_map,
+//             action_state: ActionState::default(),
+//         };
 
-        Self { input_manager }
-    }
-}
+//         Self { input_manager }
+//     }
+// }
 
 /// Grabs/ungrabs mouse cursor
 fn toggle_grab_cursor(window: &mut Window) {
@@ -89,11 +89,15 @@ fn initial_grab_cursor(mut windows: ResMut<Windows>, config: Res<DollyCursorGrab
 
 fn cursor_grab(
     mut windows: ResMut<Windows>,
-    act_query: Query<&ActionState<GrabAction>, With<DollyCursorGrabAction>>,
+    keys: Res<Input<KeyCode>>,
+    //act_query: Query<&ActionState<GrabAction>, With<DollyCursorGrabAction>>,
 ) {
     let window = windows.get_primary_mut().unwrap();
-    let grab_action = act_query.single();
-    if grab_action.pressed(&GrabAction::Exit) {
+    if keys.pressed(KeyCode::Escape){
         toggle_grab_cursor(window);
     }
+    // let grab_action = act_query.single();
+    // if grab_action.pressed(&GrabAction::Exit) {
+    //     toggle_grab_cursor(window);
+    // }
 }

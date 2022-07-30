@@ -77,12 +77,12 @@ fn update_camera(
     time: Res<Time>,
     mut pan: ResMut<State<Pan>>,
     mut mouse_motion_events: EventReader<MouseMotion>,
-    mut query: QuerySet<(
-        QueryState<(&mut Transform, With<MainCamera>)>,
-        QueryState<&mut CameraRig>,
+    mut query: ParamSet<(
+        Query<(&mut Transform, With<MainCamera>)>,
+        Query<&mut CameraRig>,
     )>,
 ) {
-    let mut q1 = query.q1();
+    let mut q1 = query.p1();
     let mut rig = q1.single_mut();
     let camera_driver = rig.driver_mut::<YawPitch>();
     let sensitivity = Vec2::splat(2.0);
@@ -117,7 +117,7 @@ fn update_camera(
     }
 
     let transform = rig.update(time.delta_seconds());
-    let mut q0 = query.q0();
+    let mut q0 = query.p0();
     let (mut cam, _) = q0.single_mut();
 
     cam.update(transform);

@@ -1,24 +1,26 @@
 use bevy::{
-    core::Time,
+    //core::Time,
     ecs::schedule::ShouldRun,
     math::{Quat, Vec3},
     pbr::PbrBundle,
-    prelude::{
-        App, Assets, BuildChildren, Bundle, Color, Commands, Component, GamepadButtonType,
-        GlobalTransform, KeyCode, Mesh, Plugin, Query, Res, ResMut, StandardMaterial, SystemSet,
-        Transform, With,
-    },
+    // prelude::{
+    //     App, Assets, BuildChildren, Bundle, Color, Commands, Component, GamepadButtonType,
+    //     GlobalTransform, KeyCode, Mesh, Plugin, Query, Res, ResMut, StandardMaterial, SystemSet,
+    //     Transform, With,
+    // },
+    prelude::*,
 };
-use leafwing_input_manager::prelude::*;
+//use bevy::bevy_asset::Assets;
+//use leafwing_input_manager::prelude::*;
 
 use crate::cone::Cone;
 
 pub struct DollyPosCtrl;
 impl Plugin for DollyPosCtrl {
     fn build(&self, app: &mut App) {
-        app.add_plugin(InputManagerPlugin::<MoveAction>::default());
+        //app.add_plugin(InputManagerPlugin::<MoveAction>::default());
         app.init_resource::<DollyPosCtrlConfig>();
-        app.add_startup_system(dolly_pos_ctrl_config_input_setup);
+       // app.add_startup_system(dolly_pos_ctrl_config_input_setup);
         app.add_startup_system(dolly_pos_ctrl_config_entity_setup);
         app.add_system_set(
             SystemSet::new()
@@ -28,7 +30,7 @@ impl Plugin for DollyPosCtrl {
     }
 }
 
-#[derive(Actionlike, PartialEq, Eq, Clone, Copy, Hash, Debug)]
+#[derive(PartialEq, Eq, Clone, Copy, Hash, Debug)]
 enum MoveAction {
     Forward,
     Backward,
@@ -40,10 +42,10 @@ enum MoveAction {
     RotateRight,
 }
 
-struct DollyPosCtrlConfig {
-    enabled: bool,
-    speed: f32,
-    position: Vec3,
+pub struct DollyPosCtrlConfig {
+    pub enabled: bool,
+    pub speed: f32,
+    pub position: Vec3,
 }
 
 impl Default for DollyPosCtrlConfig {
@@ -64,91 +66,91 @@ fn use_dolly_pos_ctrl_config(config: Res<DollyPosCtrlConfig>) -> ShouldRun {
     }
 }
 
-#[derive(Component)]
-struct DollyPosCtrlAction;
+// #[derive(Component)]
+// struct DollyPosCtrlAction;
 
-fn dolly_pos_ctrl_config_input_setup(mut commands: Commands) {
-    commands
-        .spawn()
-        .insert(DollyPosCtrlAction)
-        .insert_bundle(DollyPosCtrlInputBundle::default());
-}
+// fn dolly_pos_ctrl_config_input_setup(mut commands: Commands) {
+//     commands
+//         .spawn()
+//         .insert(DollyPosCtrlAction)
+//         .insert_bundle(DollyPosCtrlInputBundle::default());
+// }
 
 #[derive(Component)]
 pub struct DollyPosCtrlMove;
 
-#[derive(Bundle)]
-struct DollyPosCtrlInputBundle {
-    #[bundle]
-    input_manager: InputManagerBundle<MoveAction>,
-}
+// #[derive(Bundle)]
+// struct DollyPosCtrlInputBundle {
+//     #[bundle]
+//     input_manager: InputManagerBundle<MoveAction>,
+// }
 
-impl Default for DollyPosCtrlInputBundle {
-    fn default() -> Self {
-        use MoveAction::*;
-        let mut input_map = InputMap::default();
-        //TODO: Impl. when added to input-manager
-        //input_map.assign_gamepad(Gamepad(0));
+// impl Default for DollyPosCtrlInputBundle {
+//     fn default() -> Self {
+//         use MoveAction::*;
+//         let mut input_map = InputMap::default();
+//         //TODO: Impl. when added to input-manager
+//         //input_map.assign_gamepad(Gamepad(0));
 
-        input_map.insert(Forward, KeyCode::W);
-        input_map.insert(Forward, KeyCode::Up);
-        //input_map.insert(Forward, GamepadAxisType::LeftStickY); +Y
+//         input_map.insert(Forward, KeyCode::W);
+//         input_map.insert(Forward, KeyCode::Up);
+//         //input_map.insert(Forward, GamepadAxisType::LeftStickY); +Y
 
-        input_map.insert(Backward, KeyCode::S);
-        input_map.insert(Backward, KeyCode::Down);
-        //input_map.insert(Forward, GamepadAxisType::LeftStickY); -Y
+//         input_map.insert(Backward, KeyCode::S);
+//         input_map.insert(Backward, KeyCode::Down);
+//         //input_map.insert(Forward, GamepadAxisType::LeftStickY); -Y
 
-        input_map.insert(StrafeLeft, KeyCode::A);
-        input_map.insert(StrafeLeft, KeyCode::Left);
-        //input_map.insert(StrafeLeft, GamepadAxisType::LeftStickX); +X
+//         input_map.insert(StrafeLeft, KeyCode::A);
+//         input_map.insert(StrafeLeft, KeyCode::Left);
+//         //input_map.insert(StrafeLeft, GamepadAxisType::LeftStickX); +X
 
-        input_map.insert(StrafeRight, KeyCode::D);
-        input_map.insert(StrafeRight, KeyCode::Right);
-        //input_map.insert(StrafeLeft, GamepadAxisType::LeftStickX); -X
+//         input_map.insert(StrafeRight, KeyCode::D);
+//         input_map.insert(StrafeRight, KeyCode::Right);
+//         //input_map.insert(StrafeLeft, GamepadAxisType::LeftStickX); -X
 
-        input_map.insert(Up, KeyCode::Space);
-        input_map.insert(Up, GamepadButtonType::DPadUp);
+//         input_map.insert(Up, KeyCode::Space);
+//         input_map.insert(Up, GamepadButtonType::DPadUp);
 
-        input_map.insert(Down, KeyCode::LShift);
-        input_map.insert(Down, GamepadButtonType::DPadDown);
+//         input_map.insert(Down, KeyCode::LShift);
+//         input_map.insert(Down, GamepadButtonType::DPadDown);
 
-        input_map.insert(RotateLeft, KeyCode::Comma);
+//         input_map.insert(RotateLeft, KeyCode::Comma);
 
-        input_map.insert(RotateRight, KeyCode::Period);
+//         input_map.insert(RotateRight, KeyCode::Period);
 
-        for v in input_map.map.keys() {
-            print!("Action: {:?} -> ", v);
-            if let Some(a) = input_map.map.get(v) {
-                for (i, b) in a.iter().enumerate() {
-                    let str = match b {
-                        UserInput::Single(x) => {
-                            format!("Press {}", &x)
-                        }
-                        UserInput::Chord(x) => {
-                            format!("Press and hold {:?}", &x)
-                        }
-                        UserInput::Null => "Null".to_string(),
-                    };
-                    print!("{}", str);
-                    if a.len() > 1 && i != a.len() - 1 {
-                        print!(" or ");
-                    }
+//         for v in input_map.map.keys() {
+//             print!("Action: {:?} -> ", v);
+//             if let Some(a) = input_map.map.get(v) {
+//                 for (i, b) in a.iter().enumerate() {
+//                     let str = match b {
+//                         UserInput::Single(x) => {
+//                             format!("Press {}", &x)
+//                         }
+//                         UserInput::Chord(x) => {
+//                             format!("Press and hold {:?}", &x)
+//                         }
+//                         UserInput::Null => "Null".to_string(),
+//                     };
+//                     print!("{}", str);
+//                     if a.len() > 1 && i != a.len() - 1 {
+//                         print!(" or ");
+//                     }
 
-                    if i == a.len() - 1 {
-                        println!();
-                    }
-                }
-            }
-        }
+//                     if i == a.len() - 1 {
+//                         println!();
+//                     }
+//                 }
+//             }
+//         }
 
-        let input_manager = InputManagerBundle {
-            input_map,
-            action_state: ActionState::default(),
-        };
+//         let input_manager = InputManagerBundle {
+//             input_map,
+//             action_state: ActionState::default(),
+//         };
 
-        Self { input_manager }
-    }
-}
+//         Self { input_manager }
+//     }
+// }
 
 fn dolly_pos_ctrl_config_entity_setup(
     mut commands: Commands,
@@ -194,9 +196,10 @@ fn dolly_pos_ctrl_move_update(
     time: Res<Time>,
     config: Res<DollyPosCtrlConfig>,
     mut transforms: Query<(&DollyPosCtrlMove, &mut Transform)>,
-    act_query: Query<&ActionState<MoveAction>, With<DollyPosCtrlAction>>,
+    keys: Res<Input<KeyCode>>,
+    //act_query: Query<&ActionState<MoveAction>, With<DollyPosCtrlAction>>,
 ) {
-    let action_state = act_query.single();
+    //let action_state = act_query.single();
 
     for (_player, mut transform) in transforms.iter_mut() {
         let (_, mut rotation) = transform.rotation.to_axis_angle();
@@ -205,32 +208,32 @@ fn dolly_pos_ctrl_move_update(
         let forward = Vec3::new(local_z.x, 0., local_z.z);
         let right = transform.rotation * -Vec3::X;
 
-        if action_state.pressed(&MoveAction::Forward) {
+        if keys.pressed(KeyCode::W){
             velocity += forward
         }
-        if action_state.pressed(&MoveAction::Backward) {
+        if keys.pressed(KeyCode::S){
             velocity -= forward
         }
-        if action_state.pressed(&MoveAction::Up) {
+        if keys.pressed(KeyCode::Up){
             velocity += Vec3::Y
         }
-        if action_state.pressed(&MoveAction::Down) {
+        if keys.pressed(KeyCode::Down){
             velocity -= Vec3::Y
         }
-        if action_state.pressed(&MoveAction::StrafeLeft) {
+        if keys.pressed(KeyCode::A){
             velocity -= right
         }
-        if action_state.pressed(&MoveAction::StrafeRight) {
+        if keys.pressed(KeyCode::D){
             velocity += right
         }
-        if action_state.pressed(&MoveAction::RotateLeft) {
+        if keys.pressed(KeyCode::Comma){
             //Wrapping around
             if rotation > std::f32::consts::FRAC_PI_2 * 4.0 - 0.05 {
                 rotation = 0.0;
             }
             rotation += 0.1
         }
-        if action_state.pressed(&MoveAction::RotateRight) {
+        if keys.pressed(KeyCode::Period){
             //Wrapping around
             if rotation < 0.05 {
                 rotation = std::f32::consts::FRAC_PI_2 * 4.0;

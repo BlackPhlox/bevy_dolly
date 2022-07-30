@@ -120,16 +120,16 @@ fn follow_player(
 
 fn follow_sheep(
     time: Res<Time>,
-    mut query: QuerySet<(
-        QueryState<(&mut Transform, With<MainCamera>)>,
-        QueryState<(&Transform, With<Rotates>)>,
-        QueryState<&mut CameraRig>,
+    mut query: ParamSet<(
+        Query<(&mut Transform, With<MainCamera>)>,
+        Query<(&Transform, With<Rotates>)>,
+        Query<&mut CameraRig>,
     )>,
 ) {
-    let q1 = query.q1();
+    let q1 = query.p1();
     let player = q1.single().0.to_owned();
 
-    let mut q2 = query.q2();
+    let mut q2 = query.p2();
     let mut rig = q2.single_mut();
 
     rig.driver_mut::<Position>().translation = player.translation;
@@ -138,7 +138,7 @@ fn follow_sheep(
 
     let transform = rig.update(time.delta_seconds());
 
-    query.q0().single_mut().0.update(transform);
+    query.p0().single_mut().0.update(transform);
 }
 
 #[derive(Component)]
