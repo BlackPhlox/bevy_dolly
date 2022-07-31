@@ -1,7 +1,4 @@
-use bevy::{
-    math::{Quat, Vec3},
-    prelude::{Deref, DerefMut},
-};
+use bevy::prelude::{Deref, DerefMut};
 use dolly::{driver::RigDriver, prelude::*};
 
 impl MovableLookAt {

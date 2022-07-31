@@ -4,8 +4,8 @@ use bevy::{
     pbr::PbrBundle,
     prelude::{
         default, App, Assets, BuildChildren, Bundle, Color, Commands, Component, GamepadButtonType,
-        GlobalTransform, KeyCode, Mesh, Plugin, Query, Res, ResMut, StandardMaterial, SystemSet,
-        Time, Transform, With, SpatialBundle,
+        GlobalTransform, KeyCode, Mesh, Plugin, Query, Res, ResMut, SpatialBundle,
+        StandardMaterial, SystemSet, Time, Transform, With,
     },
 };
 use leafwing_input_manager::{prelude::*, user_input::InputKind};
@@ -89,31 +89,31 @@ impl Default for DollyPosCtrlInputBundle {
         //TODO: Impl. when added to input-manager
         //input_map.assign_gamepad(Gamepad(0));
 
-        input_map.insert(KeyCode::W, Forward );
-        input_map.insert( KeyCode::Up, Forward);
+        input_map.insert(KeyCode::W, Forward);
+        input_map.insert(KeyCode::Up, Forward);
         //input_map.insert(Forward, GamepadAxisType::LeftStickY); +Y
 
-        input_map.insert( KeyCode::S,Backward);
-        input_map.insert( KeyCode::Down, Backward);
+        input_map.insert(KeyCode::S, Backward);
+        input_map.insert(KeyCode::Down, Backward);
         //input_map.insert(Forward, GamepadAxisType::LeftStickY); -Y
 
-        input_map.insert( KeyCode::A,StrafeLeft);
-        input_map.insert( KeyCode::Left,StrafeLeft);
+        input_map.insert(KeyCode::A, StrafeLeft);
+        input_map.insert(KeyCode::Left, StrafeLeft);
         //input_map.insert(StrafeLeft, GamepadAxisType::LeftStickX); +X
 
-        input_map.insert( KeyCode::D,StrafeRight);
-        input_map.insert( KeyCode::Right,StrafeRight);
+        input_map.insert(KeyCode::D, StrafeRight);
+        input_map.insert(KeyCode::Right, StrafeRight);
         //input_map.insert(StrafeLeft, GamepadAxisType::LeftStickX); -X
 
-        input_map.insert( KeyCode::Space, Up);
-        input_map.insert( GamepadButtonType::DPadUp,Up);
+        input_map.insert(KeyCode::Space, Up);
+        input_map.insert(GamepadButtonType::DPadUp, Up);
 
-        input_map.insert( KeyCode::LShift,Down);
-        input_map.insert( GamepadButtonType::DPadDown,Down);
+        input_map.insert(KeyCode::LShift, Down);
+        input_map.insert(GamepadButtonType::DPadDown, Down);
 
-        input_map.insert(KeyCode::Comma,RotateLeft);
+        input_map.insert(KeyCode::Comma, RotateLeft);
 
-        input_map.insert( KeyCode::Period,RotateRight);
+        input_map.insert(KeyCode::Period, RotateRight);
 
         for (v, ma) in input_map.iter() {
             print!("Action: {:?} -> ", ma);
@@ -123,13 +123,17 @@ impl Default for DollyPosCtrlInputBundle {
                         format!("Press {}", &x)
                     }
                     UserInput::Chord(x) => {
-                        let k = x.iter().map(|f| f.to_string()).collect::<Vec<String>>().join(" + ");
+                        let k = x
+                            .iter()
+                            .map(|f| f.to_string())
+                            .collect::<Vec<String>>()
+                            .join(" + ");
 
                         format!("Press and hold {}", &k)
                     }
-                    x => format!("Unknown input {:?}", &x)
+                    x => format!("Unknown input {:?}", &x),
                 };
-                
+
                 print!("{}", str);
                 if v.len() > 1 && i != v.len() - 1 {
                     print!(" or ");

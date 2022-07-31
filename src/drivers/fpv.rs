@@ -1,7 +1,4 @@
-use bevy::{
-    math::Quat,
-    prelude::{Deref, DerefMut, Transform},
-};
+use bevy::prelude::{Deref, DerefMut, Transform};
 use dolly::{driver::RigDriver, prelude::*};
 
 use crate::prelude::Transform2Dolly;
