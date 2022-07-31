@@ -5,10 +5,10 @@ use bevy::{
     prelude::{
         default, App, Assets, BuildChildren, Bundle, Color, Commands, Component, GamepadButtonType,
         GlobalTransform, KeyCode, Mesh, Plugin, Query, Res, ResMut, StandardMaterial, SystemSet,
-        Time, Transform, With,
+        Time, Transform, With, SpatialBundle,
     },
 };
-use leafwing_input_manager::prelude::*;
+use leafwing_input_manager::{prelude::*, user_input::InputKind};
 
 use super::cone::Cone;
 
@@ -89,52 +89,54 @@ impl Default for DollyPosCtrlInputBundle {
         //TODO: Impl. when added to input-manager
         //input_map.assign_gamepad(Gamepad(0));
 
-        input_map.insert(Forward, KeyCode::W);
-        input_map.insert(Forward, KeyCode::Up);
+        input_map.insert(KeyCode::W, Forward );
+        input_map.insert( KeyCode::Up, Forward);
         //input_map.insert(Forward, GamepadAxisType::LeftStickY); +Y
 
-        input_map.insert(Backward, KeyCode::S);
-        input_map.insert(Backward, KeyCode::Down);
+        input_map.insert( KeyCode::S,Backward);
+        input_map.insert( KeyCode::Down, Backward);
         //input_map.insert(Forward, GamepadAxisType::LeftStickY); -Y
 
-        input_map.insert(StrafeLeft, KeyCode::A);
-        input_map.insert(StrafeLeft, KeyCode::Left);
+        input_map.insert( KeyCode::A,StrafeLeft);
+        input_map.insert( KeyCode::Left,StrafeLeft);
         //input_map.insert(StrafeLeft, GamepadAxisType::LeftStickX); +X
 
-        input_map.insert(StrafeRight, KeyCode::D);
-        input_map.insert(StrafeRight, KeyCode::Right);
+        input_map.insert( KeyCode::D,StrafeRight);
+        input_map.insert( KeyCode::Right,StrafeRight);
         //input_map.insert(StrafeLeft, GamepadAxisType::LeftStickX); -X
 
-        input_map.insert(Up, KeyCode::Space);
-        input_map.insert(Up, GamepadButtonType::DPadUp);
+        input_map.insert( KeyCode::Space, Up);
+        input_map.insert( GamepadButtonType::DPadUp,Up);
 
-        input_map.insert(Down, KeyCode::LShift);
-        input_map.insert(Down, GamepadButtonType::DPadDown);
+        input_map.insert( KeyCode::LShift,Down);
+        input_map.insert( GamepadButtonType::DPadDown,Down);
 
-        input_map.insert(RotateLeft, KeyCode::Comma);
+        input_map.insert(KeyCode::Comma,RotateLeft);
 
-        input_map.insert(RotateRight, KeyCode::Period);
+        input_map.insert( KeyCode::Period,RotateRight);
 
-        for (v, _) in input_map.iter() {
-            print!("Action: {:?} -> ", v);
-            if let a = input_map.get(v) {
-                for (i, b) in a.iter().enumerate() {
-                    let str = match b {
-                        UserInput::Single(x) => {
-                            format!("Press {}", &x)
-                        }
-                        UserInput::Chord(x) => {
-                            format!("Press and hold {:?}", &x)
-                        }
-                    };
-                    print!("{}", str);
-                    if a.len() > 1 && i != a.len() - 1 {
-                        print!(" or ");
+        for (v, ma) in input_map.iter() {
+            print!("Action: {:?} -> ", ma);
+            for (i, b) in v.iter().enumerate() {
+                let str = match b {
+                    UserInput::Single(x) => {
+                        format!("Press {}", &x)
                     }
+                    UserInput::Chord(x) => {
+                        let k = x.iter().map(|f| f.to_string()).collect::<Vec<String>>().join(" + ");
 
-                    if i == a.len() - 1 {
-                        println!();
+                        format!("Press and hold {}", &k)
                     }
+                    x => format!("Unknown input {:?}", &x)
+                };
+                
+                print!("{}", str);
+                if v.len() > 1 && i != v.len() - 1 {
+                    print!(" or ");
+                }
+
+                if i == v.len() - 1 {
+                    println!();
                 }
             }
         }
@@ -167,14 +169,11 @@ fn dolly_pos_ctrl_config_entity_setup(
     });
 
     commands
-        .spawn_bundle((
-            Transform {
-                rotation: Quat::IDENTITY,
-                translation: config.position,
-                ..default()
-            },
-            GlobalTransform::identity(),
-        ))
+        .spawn_bundle(SpatialBundle::from_transform(Transform {
+            rotation: Quat::IDENTITY,
+            translation: config.position,
+            ..default()
+        }))
         .with_children(|cell| {
             cell.spawn_bundle(PbrBundle {
                 mesh: cone_mesh.clone(),

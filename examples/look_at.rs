@@ -97,5 +97,5 @@ fn update_camera(
     let mut p0 = query.p0();
     let (mut cam, _) = p0.single_mut();
 
-    cam = transform;
+    cam.transform_2_bevy(transform);
 }

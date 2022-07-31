@@ -62,7 +62,7 @@ impl Default for DollyCursorGrabInputBundle {
         use GrabAction::*;
         let mut input_map = InputMap::default();
 
-        input_map.insert(Exit, KeyCode::Escape);
+        input_map.insert(KeyCode::Escape, Exit);
 
         let input_manager = InputManagerBundle {
             input_map,

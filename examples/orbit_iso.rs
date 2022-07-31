@@ -39,17 +39,14 @@ fn setup(
         ..default()
     });
 
-    commands
-        .spawn_bundle((
-            Transform {
-                translation: Vec3::new(0., 0.2, 0.),
-                ..default()
-            },
-            GlobalTransform::identity(),
-        ))
-        .with_children(|cell| {
-            cell.spawn_scene(asset_server.load("poly_dolly.gltf#Scene0"));
-        });
+    commands.spawn_bundle(SceneBundle {
+        scene: asset_server.load("poly_dolly.gltf#Scene0"),
+        transform: Transform {
+            translation: Vec3::new(0., 0.2, 0.),
+            ..default()
+        },
+        ..default()
+    });
 
     commands.spawn().insert(
         Rig::builder()

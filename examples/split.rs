@@ -168,10 +168,16 @@ fn update_camera_2(
     let camera_driver = rig.driver_mut::<YawPitch>();
 
     camera_driver.rotate_yaw_pitch(-1.0, 0.0);
-    
+
     let a = rig.driver_mut::<Arm>();
-    a.offset = dolly::glam::Vec3::Z * ((time.seconds_since_startup() as f32 * 0.2).sin().cos().abs() * 400. - 200.);
-    
+    a.offset = dolly::glam::Vec3::Z
+        * ((time.seconds_since_startup() as f32 * 0.2)
+            .sin()
+            .cos()
+            .abs()
+            * 400.
+            - 200.);
+
     let transform = rig.update(time.delta_seconds());
     let mut p0 = query.p0();
     let (mut cam, _) = p0.single_mut();

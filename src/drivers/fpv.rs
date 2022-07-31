@@ -53,7 +53,8 @@ impl Fpv {
             self.final_transform.rotation = dolly::glam::Quat::from_axis_angle(euler, a);
         }
         self.final_transform.rotation
-            * dolly::glam::Vec3::new(player_position.x, player_position.y, player_position.z).clamp_length_max(1.0)
+            * dolly::glam::Vec3::new(player_position.x, player_position.y, player_position.z)
+                .clamp_length_max(1.0)
             * boost_mult.powf(boost)
     }
 }
