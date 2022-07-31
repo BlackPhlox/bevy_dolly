@@ -44,11 +44,14 @@ fn setup(
         })
         .insert(Rotates);
 
-    commands.spawn().insert(
-        Rig::builder()
-            .with(MovableLookAt::from_position_target(start_pos))
-            .build(),
-    ).insert(MainCamera);
+    commands
+        .spawn()
+        .insert(
+            Rig::builder()
+                .with(MovableLookAt::from_position_target(start_pos))
+                .build(),
+        )
+        .insert(MainCamera);
 
     commands
         .spawn_bundle(Camera3dBundle {
@@ -64,12 +67,7 @@ fn setup(
     });
 }
 
-fn update_camera(
-    mut query: ParamSet<(
-        Query<(&Transform, With<Rotates>)>,
-        Query<&mut Rig>,
-    )>,
-) {
+fn update_camera(mut query: ParamSet<(Query<(&Transform, With<Rotates>)>, Query<&mut Rig>)>) {
     let p0 = query.p0();
     let player = p0.single().0.to_owned();
 
@@ -78,7 +76,6 @@ fn update_camera(
 
     rig.driver_mut::<MovableLookAt>()
         .set_position_target(player.translation, player.rotation);
-
 }
 
 #[derive(Component)]

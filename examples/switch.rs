@@ -63,20 +63,23 @@ fn setup(
         })
         .insert(Rotates);
 
-    commands.spawn().insert(
-        Rig::builder()
-            .with(Position::new(start_pos))
-            .with(Rotation::new(Quat::IDENTITY))
-            .with(Smooth::new_position(1.25).predictive(true))
-            .with(Arm::new(Vec3::new(0.0, 1.5, -3.5)))
-            .with(Smooth::new_position(2.5))
-            .with(
-                LookAt::new(start_pos + Vec3::Y)
-                    .tracking_smoothness(1.25)
-                    .tracking_predictive(true),
-            )
-            .build(),
-    ).insert(MainCamera);
+    commands
+        .spawn()
+        .insert(
+            Rig::builder()
+                .with(Position::new(start_pos))
+                .with(Rotation::new(Quat::IDENTITY))
+                .with(Smooth::new_position(1.25).predictive(true))
+                .with(Arm::new(Vec3::new(0.0, 1.5, -3.5)))
+                .with(Smooth::new_position(2.5))
+                .with(
+                    LookAt::new(start_pos + Vec3::Y)
+                        .tracking_smoothness(1.25)
+                        .tracking_predictive(true),
+                )
+                .build(),
+        )
+        .insert(MainCamera);
 
     commands
         .spawn_bundle(Camera3dBundle {

@@ -1,16 +1,17 @@
-use bevy::{prelude::{App, Camera, Changed, Entity, Query, Res, Time, Transform, Component, With, ParallelSystemDescriptorCoercion}, ecs::schedule::IntoSystemDescriptor};
-use crate::prelude::{Transform2Bevy, Rig};
+use crate::prelude::{Rig, Transform2Bevy};
+use bevy::prelude::{App, Camera, Changed, Component, Entity, Query, Res, Time, Transform, With};
 
 pub trait DollyComponent {
     fn add_dolly_component<T: Component>(&mut self, _: T) -> &mut Self;
 }
 
 impl DollyComponent for App {
-    fn add_dolly_component<T: Component>(&mut self, _ : T) -> &mut Self {
+    fn add_dolly_component<T: Component>(&mut self, _: T) -> &mut Self {
         self.add_system(dolly_component_cam_change_detection::<T>)
     }
 }
 
+#[allow(clippy::type_complexity)]
 fn dolly_component_cam_change_detection<T: Component>(
     mut cameras: Query<(&mut Transform, &Camera), With<T>>,
     time: Res<Time>,

@@ -138,9 +138,7 @@ fn set_camera_viewports(
     }
 }
 
-fn update_camera_1(
-    mut query: Query<&mut Rig, (With<LeftCamera>, Without<RightCamera>)>,
-) {
+fn update_camera_1(mut query: Query<&mut Rig, (With<LeftCamera>, Without<RightCamera>)>) {
     let mut rig = query.single_mut();
     let camera_driver = rig.driver_mut::<YawPitch>();
 

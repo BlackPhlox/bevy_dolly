@@ -55,11 +55,14 @@ fn setup(
     let transform =
         Transform::from_translation(Vec3::from_slice(&translation)).looking_at(Vec3::ZERO, Vec3::Y);
 
-    commands.spawn().insert(
-        Rig::builder()
-            .with(Fpv::from_position_target(transform))
-            .build(),
-    ).insert(MainCamera);
+    commands
+        .spawn()
+        .insert(
+            Rig::builder()
+                .with(Fpv::from_position_target(transform))
+                .build(),
+        )
+        .insert(MainCamera);
 
     commands
         .spawn_bundle(Camera3dBundle {

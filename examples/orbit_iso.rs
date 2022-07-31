@@ -49,13 +49,16 @@ fn setup(
         ..default()
     });
 
-    commands.spawn().insert(
-        Rig::builder()
-            .with(YawPitch::new().yaw_degrees(45.0).pitch_degrees(-30.0))
-            .with(Smooth::new_rotation(1.5))
-            .with(Arm::new(Vec3::Z * 4.0))
-            .build(),
-    ).insert(MainCamera);
+    commands
+        .spawn()
+        .insert(
+            Rig::builder()
+                .with(YawPitch::new().yaw_degrees(45.0).pitch_degrees(-30.0))
+                .with(Smooth::new_rotation(1.5))
+                .with(Arm::new(Vec3::Z * 4.0))
+                .build(),
+        )
+        .insert(MainCamera);
 
     let camera = Camera3dBundle {
         projection: OrthographicProjection {
