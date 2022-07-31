@@ -10,6 +10,7 @@ fn main() {
     App::new()
         .insert_resource(Msaa { samples: 4 })
         .add_plugins(DefaultPlugins)
+        .add_dolly_component(MainCamera)
         .add_startup_system(setup)
         .add_system(rotator_system)
         .add_system(update_camera)
@@ -47,7 +48,7 @@ fn setup(
         Rig::builder()
             .with(MovableLookAt::from_position_target(start_pos))
             .build(),
-    );
+    ).insert(MainCamera);
 
     commands
         .spawn_bundle(Camera3dBundle {
@@ -64,25 +65,20 @@ fn setup(
 }
 
 fn update_camera(
-    time: Res<Time>,
     mut query: ParamSet<(
-        Query<(&mut Transform, With<MainCamera>)>,
         Query<(&Transform, With<Rotates>)>,
         Query<&mut Rig>,
     )>,
 ) {
-    let p1 = query.p1();
-    let player = p1.single().0.to_owned();
+    let p0 = query.p0();
+    let player = p0.single().0.to_owned();
 
-    let mut p2 = query.p2();
-    let mut rig = p2.single_mut();
+    let mut p1 = query.p1();
+    let mut rig = p1.single_mut();
 
     rig.driver_mut::<MovableLookAt>()
         .set_position_target(player.translation, player.rotation);
 
-    let transform = rig.update(time.delta_seconds());
-
-    query.p0().single_mut().0.transform_2_bevy(transform);
 }
 
 #[derive(Component)]

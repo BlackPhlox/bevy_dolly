@@ -21,6 +21,7 @@ fn main() {
         .add_plugins(DefaultPlugins)
         .add_plugin(DollyCursorGrab)
         .add_state(MovementType::FirstPerson)
+        .add_dolly_component(MainCamera)
         .add_startup_system(setup)
         .add_system(update_fpvtype)
         .add_system(update_camera)
@@ -58,7 +59,7 @@ fn setup(
         Rig::builder()
             .with(Fpv::from_position_target(transform))
             .build(),
-    );
+    ).insert(MainCamera);
 
     commands
         .spawn_bundle(Camera3dBundle {
@@ -153,10 +154,4 @@ fn update_camera(
         rig.driver_mut::<Fpv>()
             .set_rotation(delta, sensitivity, move_vec, time_delta_seconds);
     }
-
-    let transform = rig.update(time_delta_seconds);
-    let mut p0 = query.p0();
-    let (mut cam, _) = p0.single_mut();
-
-    cam.transform_2_bevy(transform);
 }

@@ -12,6 +12,7 @@ fn main() {
         .insert_resource(Msaa { samples: 4 })
         .add_plugins(DefaultPlugins)
         .add_startup_system(setup)
+        .add_dolly_component(MainCamera)
         .add_system(update_camera)
         .run();
 }
@@ -45,7 +46,7 @@ fn setup(
             .with(Smooth::new_rotation(1.5))
             .with(Arm::new(Vec3::Z * 4.0))
             .build(),
-    );
+    ).insert(MainCamera);
 
     commands
         .spawn_bundle(Camera3dBundle {
@@ -63,7 +64,6 @@ fn setup(
 
 fn update_camera(
     keys: Res<Input<KeyCode>>,
-    time: Res<Time>,
     mut query: ParamSet<(Query<(&mut Transform, With<MainCamera>)>, Query<&mut Rig>)>,
 ) {
     let mut p1 = query.p1();
@@ -76,10 +76,4 @@ fn update_camera(
     if keys.just_pressed(KeyCode::X) {
         camera_driver.rotate_yaw_pitch(90.0, 0.0);
     }
-
-    let transform = rig.update(time.delta_seconds());
-    let mut p0 = query.p0();
-    let (mut cam, _) = p0.single_mut();
-
-    cam.transform_2_bevy(transform);
 }

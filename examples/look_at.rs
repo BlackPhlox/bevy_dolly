@@ -13,6 +13,7 @@ fn main() {
         .insert_resource(Msaa { samples: 4 })
         .add_plugins(DefaultPlugins)
         .add_plugin(DollyPosCtrl)
+        .add_dolly_component(MainCamera)
         .add_startup_system(setup)
         .add_system(update_camera)
         .run();
@@ -62,7 +63,7 @@ fn setup(
                 Vec3::new(0., 0., 2.),
             ))
             .build(),
-    );
+    ).insert(MainCamera);
 
     commands
         .spawn_bundle(Camera3dBundle {
@@ -91,11 +92,4 @@ fn update_camera(
     let mut p1 = query.p1();
     let (player, _) = p1.single_mut();
     query.p2().single_mut().driver_mut::<LookAt>().target = player.translation;
-
-    let transform = query.p2().single_mut().update(time.delta_seconds());
-
-    let mut p0 = query.p0();
-    let (mut cam, _) = p0.single_mut();
-
-    cam.transform_2_bevy(transform);
 }

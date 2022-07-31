@@ -11,12 +11,20 @@ use bevy_dolly::prelude::*;
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
+        .add_dolly_component(LeftCamera)
+        .add_dolly_component(RightCamera)
         .add_startup_system(setup)
         .add_system(set_camera_viewports)
         .add_system(update_camera_1)
         .add_system(update_camera_2)
         .run();
 }
+
+#[derive(Component)]
+struct LeftCamera;
+
+#[derive(Component)]
+struct RightCamera;
 
 /// set up a simple 3D scene
 fn setup(
@@ -104,12 +112,6 @@ fn setup(
         .insert(RightCamera);
 }
 
-#[derive(Component)]
-struct LeftCamera;
-
-#[derive(Component)]
-struct RightCamera;
-
 fn set_camera_viewports(
     windows: Res<Windows>,
     mut resize_events: EventReader<WindowResized>,
@@ -137,34 +139,19 @@ fn set_camera_viewports(
 }
 
 fn update_camera_1(
-    time: Res<Time>,
-    mut query: ParamSet<(
-        Query<(&mut Transform, (With<LeftCamera>, Without<RightCamera>))>,
-        Query<&mut Rig, (With<LeftCamera>, Without<RightCamera>)>,
-    )>,
+    mut query: Query<&mut Rig, (With<LeftCamera>, Without<RightCamera>)>,
 ) {
-    let mut p1 = query.p1();
-    let mut rig = p1.single_mut();
+    let mut rig = query.single_mut();
     let camera_driver = rig.driver_mut::<YawPitch>();
 
     camera_driver.rotate_yaw_pitch(1.0, 0.0);
-
-    let transform = rig.update(time.delta_seconds());
-    let mut p0 = query.p0();
-    let (mut cam, _) = p0.single_mut();
-
-    cam.transform_2_bevy(transform);
 }
 
 fn update_camera_2(
     time: Res<Time>,
-    mut query: ParamSet<(
-        Query<(&mut Transform, (With<RightCamera>, Without<LeftCamera>))>,
-        Query<(&mut Rig, (With<RightCamera>, Without<LeftCamera>))>,
-    )>,
+    mut query: Query<(&mut Rig, (With<RightCamera>, Without<LeftCamera>))>,
 ) {
-    let mut p1 = query.p1();
-    let (mut rig, _a) = p1.single_mut();
+    let (mut rig, _a) = query.single_mut();
     let camera_driver = rig.driver_mut::<YawPitch>();
 
     camera_driver.rotate_yaw_pitch(-1.0, 0.0);
@@ -177,10 +164,4 @@ fn update_camera_2(
             .abs()
             * 400.
             - 200.);
-
-    let transform = rig.update(time.delta_seconds());
-    let mut p0 = query.p0();
-    let (mut cam, _) = p0.single_mut();
-
-    cam.transform_2_bevy(transform);
 }

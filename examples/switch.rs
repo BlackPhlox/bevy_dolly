@@ -26,6 +26,7 @@ fn main() {
         .insert_resource(Msaa { samples: 4 })
         .add_plugins(DefaultPlugins)
         .add_plugin(DollyPosCtrl)
+        .add_dolly_component(MainCamera)
         .add_startup_system(setup)
         .add_system(rotator_system)
         .add_state(Camera::FollowSheep)
@@ -75,7 +76,7 @@ fn setup(
                     .tracking_predictive(true),
             )
             .build(),
-    );
+    ).insert(MainCamera);
 
     commands
         .spawn_bundle(Camera3dBundle {
@@ -95,7 +96,6 @@ fn setup(
 }
 
 fn follow_player(
-    time: Res<Time>,
     mut query: ParamSet<(
         Query<(&mut Transform, With<MainCamera>)>,
         Query<(&Transform, With<DollyPosCtrlMove>)>,
@@ -111,15 +111,9 @@ fn follow_player(
     rig.driver_mut::<Position>().position = player.translation;
     rig.driver_mut::<Rotation>().rotation = player.rotation;
     rig.driver_mut::<LookAt>().target = player.translation + Vec3::Y + Vec3::new(0., -1., 0.);
-
-    let transform = rig.update(time.delta_seconds());
-
-    let mut p0 = query.p0();
-    p0.single_mut().0.transform_2_bevy(transform);
 }
 
 fn follow_sheep(
-    time: Res<Time>,
     mut query: ParamSet<(
         Query<(&mut Transform, With<MainCamera>)>,
         Query<(&Transform, With<Rotates>)>,
@@ -135,10 +129,6 @@ fn follow_sheep(
     rig.driver_mut::<Position>().position = player.translation;
     rig.driver_mut::<Rotation>().rotation = player.rotation;
     rig.driver_mut::<LookAt>().target = player.translation + Vec3::Y;
-
-    let transform = rig.update(time.delta_seconds());
-
-    query.p0().single_mut().0.transform_2_bevy(transform);
 }
 
 #[derive(Component)]

@@ -13,6 +13,7 @@ fn main() {
         .insert_resource(Msaa { samples: 4 })
         .add_plugins(DefaultPlugins)
         .add_plugin(DollyCursorGrab)
+        .add_dolly_component(MainCamera)
         .add_state(Pan::Keys)
         .add_startup_system(setup)
         .add_system(update_camera)
@@ -54,9 +55,9 @@ fn setup(
             .with(Smooth::new_rotation(1.5))
             .with(Arm::new(Vec3::Z * 4.0))
             .build(),
-    );
+    ).insert(MainCamera);
 
-    let mut camera = Camera3dBundle {
+    let camera = Camera3dBundle {
         projection: OrthographicProjection {
             scale: 3.0,
             scaling_mode: ScalingMode::FixedVertical(2.0),
@@ -79,7 +80,6 @@ fn setup(
 #[allow(unused_must_use)]
 fn update_camera(
     keys: Res<Input<KeyCode>>,
-    time: Res<Time>,
     mut pan: ResMut<State<Pan>>,
     mut mouse_motion_events: EventReader<MouseMotion>,
     mut query: ParamSet<(Query<(&mut Transform, With<MainCamera>)>, Query<&mut Rig>)>,
@@ -117,10 +117,4 @@ fn update_camera(
         pan.overwrite_set(result);
         println!("State:{:?}", result);
     }
-
-    let transform = rig.update(time.delta_seconds());
-    let mut p0 = query.p0();
-    let (mut cam, _) = p0.single_mut();
-
-    cam.transform_2_bevy(transform);
 }
