@@ -36,7 +36,7 @@ features = ["render"]
 default-features = false
 
 [dev-dependencies]
-leafwing_input_manager = { git = "https://github.com/Leafwing-Studios/leafwing-input-manager", rev = "fe94e96008ae8ca9b0ad56b5b7d089e42d3dd085" } #0.5, dev branch
+leafwing-input-manager = "0.5"
 
 [dev-dependencies.bevy]
 version = "0.8"
