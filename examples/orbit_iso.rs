@@ -1,6 +1,9 @@
-use bevy::input::mouse::MouseMotion;
 use bevy::prelude::*;
+use bevy::{input::mouse::MouseMotion, render::camera::ScalingMode};
 use bevy_dolly::prelude::*;
+
+pub mod helpers;
+use helpers::cursor_grab::DollyCursorGrab;
 
 #[derive(Component)]
 struct MainCamera;
@@ -10,6 +13,7 @@ fn main() {
         .insert_resource(Msaa { samples: 4 })
         .add_plugins(DefaultPlugins)
         .add_plugin(DollyCursorGrab)
+        .add_dolly_component(MainCamera)
         .add_state(Pan::Keys)
         .add_startup_system(setup)
         .add_system(update_camera)
@@ -33,57 +37,58 @@ fn setup(
     commands.spawn_bundle(PbrBundle {
         mesh: meshes.add(Mesh::from(shape::Plane { size: 5.0 })),
         material: materials.add(Color::rgb(0.3, 0.5, 0.3).into()),
-        ..Default::default()
+        ..default()
+    });
+
+    commands.spawn_bundle(SceneBundle {
+        scene: asset_server.load("poly_dolly.gltf#Scene0"),
+        transform: Transform {
+            translation: Vec3::new(0., 0.2, 0.),
+            ..default()
+        },
+        ..default()
     });
 
     commands
-        .spawn_bundle((
-            Transform {
-                translation: bevy::math::Vec3::new(0., 0.2, 0.),
-                ..Default::default()
-            },
-            GlobalTransform::identity(),
-        ))
-        .with_children(|cell| {
-            cell.spawn_scene(asset_server.load("poly_dolly.gltf#Scene0"));
-        })
-        .id();
+        .spawn()
+        .insert(
+            Rig::builder()
+                .with(YawPitch::new().yaw_degrees(45.0).pitch_degrees(-30.0))
+                .with(Smooth::new_rotation(1.5))
+                .with(Arm::new(Vec3::Z * 4.0))
+                .build(),
+        )
+        .insert(MainCamera);
 
-    commands.spawn().insert(
-        CameraRig::builder()
-            .with(YawPitch::new().yaw_degrees(45.0).pitch_degrees(-30.0))
-            .with(Smooth::new_rotation(1.5))
-            .with(Arm::new(Vec3::Z * 4.0))
-            .build(),
-    );
-
-    let mut camera = OrthographicCameraBundle::new_3d();
-    camera.orthographic_projection.scale = 3.0;
-    camera.transform =
-        Transform::from_xyz(5.0, 5.0, 5.0).looking_at(bevy::math::Vec3::ZERO, bevy::math::Vec3::Y);
+    let camera = Camera3dBundle {
+        projection: OrthographicProjection {
+            scale: 3.0,
+            scaling_mode: ScalingMode::FixedVertical(2.0),
+            ..default()
+        }
+        .into(),
+        transform: Transform::from_xyz(5.0, 5.0, 5.0).looking_at(Vec3::ZERO, Vec3::Y),
+        ..default()
+    };
 
     commands.spawn_bundle(camera).insert(MainCamera);
 
     // light
     commands.spawn_bundle(PointLightBundle {
         transform: Transform::from_xyz(4.0, 8.0, 4.0),
-        ..Default::default()
+        ..default()
     });
 }
 
 #[allow(unused_must_use)]
 fn update_camera(
     keys: Res<Input<KeyCode>>,
-    time: Res<Time>,
     mut pan: ResMut<State<Pan>>,
     mut mouse_motion_events: EventReader<MouseMotion>,
-    mut query: QuerySet<(
-        QueryState<(&mut Transform, With<MainCamera>)>,
-        QueryState<&mut CameraRig>,
-    )>,
+    mut query: ParamSet<(Query<(&mut Transform, With<MainCamera>)>, Query<&mut Rig>)>,
 ) {
-    let mut q1 = query.q1();
-    let mut rig = q1.single_mut();
+    let mut p1 = query.p1();
+    let mut rig = p1.single_mut();
     let camera_driver = rig.driver_mut::<YawPitch>();
     let sensitivity = Vec2::splat(2.0);
 
@@ -115,10 +120,4 @@ fn update_camera(
         pan.overwrite_set(result);
         println!("State:{:?}", result);
     }
-
-    let transform = rig.update(time.delta_seconds());
-    let mut q0 = query.q0();
-    let (mut cam, _) = q0.single_mut();
-
-    cam.update(transform);
 }

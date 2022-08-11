@@ -8,12 +8,10 @@
 It is important to note that dolly is a way to translate the camera and thus, not the camera component itself. </br>
 
 Dolly requires two steps to function:
-1. Setup - Using `CameraRig` we are able to define drivers on which the dolly can enact, these drivers can both be constraints and functionality.
-2. Update - Querying for `CameraRig` allows us to mutate its drivers and update the cameras translation to reflect the mutated changes.
+1. Creating a `CameraRig` we are able to define drivers on which the dolly can enact, these drivers can both be constraints and functionality.
+2. A marker component that is inserted on both the Camera and the Rig
 
 To see how this is done in bevy, please look at this repository's [examples](/examples/).
-
-_Calling `dolly.clone()` is not recommended._
 
 ## How to run
 
@@ -24,7 +22,7 @@ _Calling `dolly.clone()` is not recommended._
 
 |bevy|bevy_dolly|
 |---|---|
-|0.6| 0.0.X |
+|0.8| 0.0.X |
 ## Licensing
 The project is under dual license MIT and Apache 2.0, so joink to your hearts content, just remember the license agreements.
 

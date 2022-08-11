@@ -1,6 +1,10 @@
 use bevy::prelude::*;
 use bevy_dolly::prelude::*;
 
+pub mod helpers;
+use helpers::pos_ctrl::DollyPosCtrl;
+use helpers::pos_ctrl::DollyPosCtrlMove;
+
 #[derive(Component)]
 struct MainCamera;
 
@@ -8,7 +12,8 @@ fn main() {
     App::new()
         .insert_resource(Msaa { samples: 4 })
         .add_plugins(DefaultPlugins)
-        .add_plugins(DollyPlugins)
+        .add_plugin(DollyPosCtrl)
+        .add_dolly_component(MainCamera)
         .add_startup_system(setup)
         .add_system(update_camera)
         .run();
@@ -27,10 +32,10 @@ fn setup(
     commands.spawn_bundle(PbrBundle {
         mesh: meshes.add(Mesh::from(shape::Plane { size: 20.0 })),
         material: materials.add(Color::rgb(0.3, 0.5, 0.3).into()),
-        ..Default::default()
+        ..default()
     });
 
-    Transform::from_translation(bevy::math::Vec3::new(0., 0., 2.));
+    Transform::from_translation(Vec3::new(0., 0., 2.));
 
     /*
     config.entity = Some(
@@ -38,7 +43,7 @@ fn setup(
             .spawn_bundle((
                 Transform {
                     translation: bevy::math::Vec3::new(0., 0.2, 0.),
-                    ..Default::default()
+                    ..default()
                 },
                 GlobalTransform::identity(),
             ))
@@ -50,23 +55,24 @@ fn setup(
     );
     */
 
-    commands.spawn().insert(
-        CameraRig::builder()
-            .with(Position::new(Vec3::Y * 3.0))
-            .with(LookAt::new(
-                /*start_pos.transform_2_dolly().position*/
-                Vec3::new(0., 0., 2.),
-            ))
-            .build(),
-    );
+    commands
+        .spawn()
+        .insert(
+            Rig::builder()
+                .with(Position::new(Vec3::Y * 3.0))
+                .with(LookAt::new(
+                    /*start_pos.transform_2_dolly().position*/
+                    Vec3::new(0., 0., 2.),
+                ))
+                .build(),
+        )
+        .insert(MainCamera);
 
     commands
-        .spawn_bundle(PerspectiveCameraBundle {
-            transform: Transform::from_xyz(-2.0, 1., 2.0).looking_at(
-                /*start_pos.translation*/ bevy::math::Vec3::new(0., 0., 0.),
-                bevy::math::Vec3::Y,
-            ),
-            ..Default::default()
+        .spawn_bundle(Camera3dBundle {
+            transform: Transform::from_xyz(-2.0, 1., 2.0)
+                .looking_at(Vec3::new(0., 0., 0.), Vec3::Y),
+            ..default()
         })
         .insert(MainCamera);
 
@@ -74,26 +80,19 @@ fn setup(
     // light
     commands.spawn_bundle(PointLightBundle {
         transform: Transform::from_xyz(4.0, 8.0, 4.0),
-        ..Default::default()
+        ..default()
     });
 }
 
 fn update_camera(
     time: Res<Time>,
-    mut query: QuerySet<(
-        QueryState<(&mut Transform, With<MainCamera>)>,
-        QueryState<(&mut Transform, With<DollyPosCtrlMove>)>,
-        QueryState<&mut CameraRig>,
+    mut query: ParamSet<(
+        Query<(&mut Transform, With<MainCamera>)>,
+        Query<(&mut Transform, With<DollyPosCtrlMove>)>,
+        Query<&mut Rig>,
     )>,
 ) {
-    let mut q1 = query.q1();
-    let (player, _) = q1.single_mut();
-    query.q2().single_mut().driver_mut::<LookAt>().target = player.translation;
-
-    let transform = query.q2().single_mut().update(time.delta_seconds());
-
-    let mut q0 = query.q0();
-    let (mut cam, _) = q0.single_mut();
-
-    cam.update(transform);
+    let mut p1 = query.p1();
+    let (player, _) = p1.single_mut();
+    query.p2().single_mut().driver_mut::<LookAt>().target = player.translation;
 }
