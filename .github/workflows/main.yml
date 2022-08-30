@@ -9,16 +9,16 @@ jobs:
     steps:
       - name: Checkout sources
         uses: actions/checkout@v2
-      - name: Cache
-        uses: actions/cache@v2
-        with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            target/
-          key: ${{ runner.os }}-cargo-test-${{ hashFiles('**/Cargo.toml') }}
+      #- name: Cache
+      #  uses: actions/cache@v2
+      #  with:
+      #    path: |
+      #      ~/.cargo/bin/
+      #      ~/.cargo/registry/index/
+      #      ~/.cargo/registry/cache/
+      #      ~/.cargo/git/db/
+      #      target/
+      #    key: ${{ runner.os }}-cargo-test-${{ hashFiles('**/Cargo.toml') }}
       - name: Install stable toolchain
         uses: actions-rs/toolchain@v1
         with:
@@ -26,7 +26,7 @@ jobs:
           toolchain: stable
           override: true
       - name: Install Dependencies
-        run: sudo apt-get update; sudo apt-get install pkg-config libx11-dev libasound2-dev libudev-dev libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev wayland-client
+        run: sudo apt-get update; sudo apt-get install pkg-config libx11-dev libasound2-dev libudev-dev libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev
       - name: Run cargo test
         uses: actions-rs/cargo@v1
         with:
