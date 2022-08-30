@@ -1,9 +1,7 @@
 use bevy::prelude::*;
 use bevy::{input::mouse::MouseMotion, render::camera::ScalingMode};
+use bevy_dolly::prelude::cursor_grab::DollyCursorGrab;
 use bevy_dolly::prelude::*;
-
-pub mod helpers;
-use helpers::cursor_grab::DollyCursorGrab;
 
 #[derive(Component)]
 struct MainCamera;

@@ -3,11 +3,6 @@ use std::f32::consts::PI;
 use bevy::prelude::*;
 use bevy_dolly::prelude::*;
 
-pub mod helpers;
-use helpers::cursor_grab::DollyCursorGrab;
-use helpers::pos_ctrl::DollyPosCtrl;
-use helpers::pos_ctrl::DollyPosCtrlMove;
-
 #[derive(Component)]
 struct MainCamera;
 
