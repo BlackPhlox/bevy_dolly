@@ -1,5 +1,5 @@
 use crate::prelude::{Rig, Transform2Bevy};
-use bevy::prelude::{App, Camera, Changed, Component, Entity, Query, Res, Time, Transform, With, ParallelSystemDescriptorCoercion};
+use bevy::prelude::{App, Camera, Changed, Component, Entity, Query, Res, Time, Transform, With};
 
 pub trait DollyComponent {
     fn add_dolly_component<T: Component>(&mut self, _: T) -> &mut Self;
