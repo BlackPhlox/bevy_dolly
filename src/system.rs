@@ -1,5 +1,5 @@
 use crate::prelude::{Rig, Transform2Bevy};
-use bevy::prelude::{App, Camera, Changed, Component, Entity, Query, Res, Time, Transform, With};
+use bevy::prelude::{App, Camera, Changed, Component, Entity, Query, Res, Time, Transform, With, ParallelSystemDescriptorCoercion};
 
 pub trait DollyComponent {
     fn add_dolly_component<T: Component>(&mut self, _: T) -> &mut Self;
@@ -17,7 +17,7 @@ impl DollyComponent for App {
 }
 
 #[allow(clippy::type_complexity)]
-fn dolly_component_cam_change_detection<T: Component>(
+pub fn dolly_component_cam_change_detection<T: Component>(
     mut cameras: Query<(&mut Transform, &Camera), With<T>>,
     time: Res<Time>,
     mut query: Query<(Entity, &mut Rig), (Changed<Rig>, With<T>)>,
@@ -37,7 +37,7 @@ fn dolly_component_cam_change_detection<T: Component>(
 }
 
 #[allow(clippy::type_complexity)]
-fn dolly_component_change_detection<T: Component>(
+pub fn dolly_component_change_detection<T: Component>(
     mut transforms: Query<&mut Transform, With<T>>,
     time: Res<Time>,
     mut query: Query<(Entity, &mut Rig), (Changed<Rig>, With<T>)>,
