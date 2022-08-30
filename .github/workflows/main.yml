@@ -11,9 +11,7 @@ jobs:
       - name: Update apt
         run: sudo apt update
       - name: Install libudev
-        run: sudo apt-get install g++ pkg-config libx11-dev libasound2-dev libudev-dev
-      - name: Install libwaylandb & libxkbcommon
-        run: sudo apt-get install libwayland-dev libxkbcommon-dev
+        run: sudo apt-get install g++ pkg-config libx11-dev libasound2-dev libudev-dev libwayland-dev libxkbcommon-dev
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
@@ -47,7 +45,7 @@ jobs:
       - name: Update
         run: sudo apt update
       - name: Install dependencies
-        run: sudo apt install pkg-config libwayland-dev libxkbcommon-dev libudev-dev libxcb-shape0-dev libxcb-xfixes0-dev
+        run: sudo apt-get install g++ pkg-config libx11-dev libasound2-dev libwayland-dev libxkbcommon-dev libudev-dev   libxcb-shape0-dev libxcb-xfixes0-dev
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
@@ -85,6 +83,8 @@ jobs:
           toolchain: stable
           override: true
       - run: rustup component add clippy
+      - name: Install dependencies
+        run: sudo apt-get install g++ pkg-config libx11-dev libasound2-dev libwayland-dev libxkbcommon-dev libudev-dev   libxcb-shape0-dev libxcb-xfixes0-dev
       - uses: actions-rs/cargo@v1
         with:
           command: clippy
