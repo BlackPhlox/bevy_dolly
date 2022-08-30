@@ -2,10 +2,6 @@ use bevy::input::mouse::MouseMotion;
 use bevy::prelude::*;
 use bevy_dolly::prelude::*;
 
-pub mod helpers;
-use bevy_dolly::prelude::fpv::Fpv;
-use helpers::cursor_grab::DollyCursorGrab;
-
 #[derive(Component)]
 struct MainCamera;
 

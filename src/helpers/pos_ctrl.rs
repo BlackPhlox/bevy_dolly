@@ -4,11 +4,11 @@ use bevy::{
     pbr::PbrBundle,
     prelude::{
         default, App, Assets, BuildChildren, Bundle, Color, Commands, Component, GamepadButtonType,
-        GlobalTransform, KeyCode, Mesh, Plugin, Query, Res, ResMut, SpatialBundle,
-        StandardMaterial, SystemSet, Time, Transform, With,
+        KeyCode, Mesh, Plugin, Query, Res, ResMut, SpatialBundle, StandardMaterial, SystemSet,
+        Time, Transform, With,
     },
 };
-use leafwing_input_manager::{prelude::*, user_input::InputKind};
+use leafwing_input_manager::prelude::*;
 
 use super::cone::Cone;
 
