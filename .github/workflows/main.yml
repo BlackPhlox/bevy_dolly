@@ -4,7 +4,7 @@ name: CI
 
 jobs:
   update:
-    name: Update
+    name: Clean
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
@@ -16,7 +16,7 @@ jobs:
           override: true
       - uses: actions-rs/cargo@v1
         with:
-          command: update
+          command: clean
   test:
     name: Test Suite
     runs-on: ubuntu-latest
