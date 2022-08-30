@@ -3,12 +3,12 @@ use bevy::{
     math::{Quat, Vec3},
     pbr::PbrBundle,
     prelude::{
-        default, App, Assets, BuildChildren, Bundle, Color, Commands, Component, GamepadButtonType,
-        GlobalTransform, KeyCode, Mesh, Plugin, Query, Res, ResMut, SpatialBundle,
-        StandardMaterial, SystemSet, Time, Transform, With,
+        default, App, BuildChildren, Bundle, Color, Commands, Component, GamepadButtonType,
+        KeyCode, Mesh, Plugin, Query, Res, ResMut, SpatialBundle,
+        StandardMaterial, SystemSet, Time, Transform, With, Assets,
     },
 };
-use leafwing_input_manager::{prelude::*, user_input::InputKind};
+use leafwing_input_manager::prelude::*;
 
 use super::cone::Cone;
 

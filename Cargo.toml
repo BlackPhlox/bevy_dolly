@@ -24,11 +24,13 @@ opt-level = 3
 name = "bevy_dolly"
 
 [features]
-default = ["drivers"]
+default = ["drivers", "helpers"]
 drivers = []
+helpers = ["dep:leafwing-input-manager"]
 
 [dependencies]
 dolly = "0.3"
+leafwing-input-manager = { version = "0.5", optional = true }
 
 [dependencies.bevy]
 version = "0.8"
