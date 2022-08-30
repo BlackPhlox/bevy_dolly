@@ -3,22 +3,37 @@ on: [push, pull_request]
 name: CI
 
 jobs:
+  update:
+    name: Update
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: nightly
+          override: true
+      - uses: actions-rs/cargo@v1
+        with:
+          command: update
   test:
     name: Test Suite
     runs-on: ubuntu-latest
+    needs: update
     steps:
       - name: Checkout sources
         uses: actions/checkout@v2
-      #- name: Cache
-      #  uses: actions/cache@v2
-      #  with:
-      #    path: |
-      #      ~/.cargo/bin/
-      #      ~/.cargo/registry/index/
-      #      ~/.cargo/registry/cache/
-      #      ~/.cargo/git/db/
-      #      target/
-      #    key: ${{ runner.os }}-cargo-test-${{ hashFiles('**/Cargo.toml') }}
+      - name: Cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-test-${{ hashFiles('**/Cargo.toml') }}
       - name: Install stable toolchain
         uses: actions-rs/toolchain@v1
         with:
@@ -51,6 +66,7 @@ jobs:
   clippy:
     name: Clippy
     runs-on: ubuntu-latest
+    needs: update
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
