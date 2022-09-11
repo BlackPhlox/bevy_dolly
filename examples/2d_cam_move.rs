@@ -31,7 +31,6 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         .insert(
             Rig::builder()
                 .with(Position::new(Vec3::new(0., 0., 0.)))
-                .with(Rotation::new(Quat::IDENTITY))
                 .build(),
         )
         .insert(MainCamera);
@@ -40,10 +39,14 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         .spawn_bundle(Camera2dBundle::default())
         .insert(MainCamera);
 
-    // light
-    commands.spawn_bundle(PointLightBundle {
-        transform: Transform::from_xyz(4.0, 8.0, 4.0),
-        ..default()
+    commands.spawn_bundle(SpriteBundle {
+        texture: asset_server.load("room.png"),
+        transform: Transform::from_xyz(100., 0., 0.),
+        sprite: Sprite {
+            custom_size: Some(Vec2::new(2.6 * 800., 800.)),
+            ..Default::default()
+        },
+        ..Default::default()
     });
 }
 
@@ -54,19 +57,20 @@ fn update_camera(
     let mut p1 = query.p1();
     let mut rig = p1.single_mut();
     let camera_driver = rig.driver_mut::<Position>();
+    let speed = 2.5;
 
     for &key in keys.get_pressed() {
         if key == KeyCode::W {
-            camera_driver.translate(Vec3::new(0., -1., 0.));
+            camera_driver.translate(speed * Vec3::new(0., 1., 0.));
         }
         if key == KeyCode::A {
-            camera_driver.translate(Vec3::new(1., 0., 0.));
+            camera_driver.translate(speed * Vec3::new(-1., 0., 0.));
         }
         if key == KeyCode::S {
-            camera_driver.translate(Vec3::new(0., 1., 0.));
+            camera_driver.translate(speed * Vec3::new(0., -1., 0.));
         }
         if key == KeyCode::D {
-            camera_driver.translate(Vec3::new(-1., 0., 0.));
+            camera_driver.translate(speed * Vec3::new(1., 0., 0.));
         }
     }
 }
