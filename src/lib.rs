@@ -15,7 +15,7 @@ pub mod prelude {
         dolly_type::*,
         drivers::{follow::*, fpv::*},
         helpers::*,
-        helpers::{cursor_grab::*, pos_ctrl::*, cone::*},
+        helpers::{cone::*, cursor_grab::*, pos_ctrl::*},
         map::*,
         system::*,
     };

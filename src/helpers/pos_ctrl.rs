@@ -207,36 +207,36 @@ fn dolly_pos_ctrl_move_update(
         let right = transform.rotation * -Vec3::X;
 
         if action_state.pressed(MoveAction::Forward) {
-            velocity += forward
+            velocity += forward;
         }
         if action_state.pressed(MoveAction::Backward) {
-            velocity -= forward
+            velocity -= forward;
         }
         if action_state.pressed(MoveAction::Up) {
-            velocity += Vec3::Y
+            velocity += Vec3::Y;
         }
         if action_state.pressed(MoveAction::Down) {
-            velocity -= Vec3::Y
+            velocity -= Vec3::Y;
         }
         if action_state.pressed(MoveAction::StrafeLeft) {
-            velocity -= right
+            velocity -= right;
         }
         if action_state.pressed(MoveAction::StrafeRight) {
-            velocity += right
+            velocity += right;
         }
         if action_state.pressed(MoveAction::RotateLeft) {
             //Wrapping around
             if rotation > std::f32::consts::FRAC_PI_2 * 4.0 - 0.05 {
                 rotation = 0.0;
             }
-            rotation += 0.1
+            rotation += 0.1;
         }
         if action_state.pressed(MoveAction::RotateRight) {
             //Wrapping around
             if rotation < 0.05 {
                 rotation = std::f32::consts::FRAC_PI_2 * 4.0;
             }
-            rotation -= 0.1
+            rotation -= 0.1;
         }
 
         velocity = velocity.normalize();
