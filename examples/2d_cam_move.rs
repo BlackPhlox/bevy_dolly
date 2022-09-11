@@ -51,14 +51,10 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     });
 }
 
-fn update_camera(
-    keys: Res<Input<KeyCode>>,
-    mut query: ParamSet<(Query<(&mut Transform, With<MainCamera>)>, Query<&mut Rig>)>,
-) {
-    let mut p1 = query.p1();
-    let mut rig = p1.single_mut();
+fn update_camera(keys: Res<Input<KeyCode>>, mut query: Query<&mut Rig>) {
+    let mut rig = query.single_mut();
     let camera_driver = rig.driver_mut::<Position>();
-    let speed = 2.5;
+    let speed = 4.5;
 
     for &key in keys.get_pressed() {
         if key == KeyCode::W {

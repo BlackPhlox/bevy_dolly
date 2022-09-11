@@ -72,7 +72,7 @@ fn setup(
         })
         .insert(MainCamera);
 
-    info!(" Use Q and E to turn the sheep");
+    info!("Use Q and E to turn the sheep");
     // light
     commands.spawn_bundle(PointLightBundle {
         transform: Transform::from_xyz(4.0, 8.0, 4.0),
@@ -81,14 +81,12 @@ fn setup(
 }
 
 fn update_camera(
-    time: Res<Time>,
     mut query: ParamSet<(
-        Query<(&mut Transform, With<MainCamera>)>,
         Query<(&mut Transform, With<DollyPosCtrlMove>)>,
         Query<&mut Rig>,
     )>,
 ) {
-    let mut p1 = query.p1();
-    let (player, _) = p1.single_mut();
-    query.p2().single_mut().driver_mut::<LookAt>().target = player.translation;
+    let mut p0 = query.p0();
+    let (player, _) = p0.single_mut();
+    query.p1().single_mut().driver_mut::<LookAt>().target = player.translation;
 }

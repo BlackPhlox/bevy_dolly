@@ -76,6 +76,9 @@ fn setup(
         transform: Transform::from_xyz(4.0, 8.0, 4.0),
         ..default()
     });
+
+    info!("Use Z and X to orbit the sheep");
+    info!("Press E to toggle to use the mouse to orbit the sheep");
 }
 
 #[allow(unused_must_use)]
@@ -83,10 +86,9 @@ fn update_camera(
     keys: Res<Input<KeyCode>>,
     mut pan: ResMut<State<Pan>>,
     mut mouse_motion_events: EventReader<MouseMotion>,
-    mut query: ParamSet<(Query<(&mut Transform, With<MainCamera>)>, Query<&mut Rig>)>,
+    mut rig_q: Query<&mut Rig>,
 ) {
-    let mut p1 = query.p1();
-    let mut rig = p1.single_mut();
+    let mut rig = rig_q.single_mut();
     let camera_driver = rig.driver_mut::<YawPitch>();
     let sensitivity = Vec2::splat(2.0);
 

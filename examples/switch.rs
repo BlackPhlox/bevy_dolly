@@ -91,38 +91,29 @@ fn setup(
 
     //info!(" Use 1, 2, 3, 4 to target different sheep");
     //info!(" Use Q and E to turn the sheep");
+    info!("Press C to toggle between the default player and the sheep");
 }
 
 fn follow_player(
-    mut query: ParamSet<(
-        Query<(&mut Transform, With<MainCamera>)>,
-        Query<(&Transform, With<DollyPosCtrlMove>)>,
-        Query<&mut Rig>,
-    )>,
+    mut query: ParamSet<(Query<(&Transform, With<DollyPosCtrlMove>)>, Query<&mut Rig>)>,
 ) {
-    let p1 = query.p1();
-    let player = p1.single().0.to_owned();
+    let p0 = query.p0();
+    let player = p0.single().0.to_owned();
 
-    let mut p2 = query.p2();
-    let mut rig = p2.single_mut();
+    let mut p1 = query.p1();
+    let mut rig = p1.single_mut();
 
     rig.driver_mut::<Position>().position = player.translation;
     rig.driver_mut::<Rotation>().rotation = player.rotation;
     rig.driver_mut::<LookAt>().target = player.translation + Vec3::Y + Vec3::new(0., -1., 0.);
 }
 
-fn follow_sheep(
-    mut query: ParamSet<(
-        Query<(&mut Transform, With<MainCamera>)>,
-        Query<(&Transform, With<Rotates>)>,
-        Query<&mut Rig>,
-    )>,
-) {
-    let p1 = query.p1();
-    let player = p1.single().0.to_owned();
+fn follow_sheep(mut query: ParamSet<(Query<(&Transform, With<Rotates>)>, Query<&mut Rig>)>) {
+    let p0 = query.p0();
+    let player = p0.single().0.to_owned();
 
-    let mut p2 = query.p2();
-    let mut rig = p2.single_mut();
+    let mut p1 = query.p1();
+    let mut rig = p1.single_mut();
 
     rig.driver_mut::<Position>().position = player.translation;
     rig.driver_mut::<Rotation>().rotation = player.rotation;

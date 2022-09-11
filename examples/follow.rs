@@ -67,12 +67,9 @@ fn setup(
     });
 }
 
-fn update_camera(mut query: ParamSet<(Query<(&Transform, With<Rotates>)>, Query<&mut Rig>)>) {
-    let p0 = query.p0();
-    let player = p0.single().0.to_owned();
-
-    let mut p1 = query.p1();
-    let mut rig = p1.single_mut();
+fn update_camera(q0: Query<(&Transform, With<Rotates>)>, mut q1: Query<&mut Rig>) {
+    let player = q0.single().0.to_owned();
+    let mut rig = q1.single_mut();
 
     rig.driver_mut::<MovableLookAt>()
         .set_position_target(player.translation, player.rotation);

@@ -97,7 +97,7 @@ fn update_camera(
     windows: Res<Windows>,
     fps_state: Res<State<MovementType>>,
     mut mouse_motion_events: EventReader<MouseMotion>,
-    mut query: ParamSet<(Query<(&mut Transform, With<MainCamera>)>, Query<&mut Rig>)>,
+    mut rig_q: Query<&mut Rig>,
 ) {
     let time_delta_seconds: f32 = time.delta_seconds();
     let boost_mult = 5.0f32;
@@ -137,8 +137,7 @@ fn update_camera(
         delta += event.delta;
     }
 
-    let mut p1 = query.p1();
-    let mut rig = p1.single_mut();
+    let mut rig = rig_q.single_mut();
 
     let move_vec = rig.driver_mut::<Fpv>().set_position(
         move_vec,

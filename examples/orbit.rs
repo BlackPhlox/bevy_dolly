@@ -60,14 +60,12 @@ fn setup(
         transform: Transform::from_xyz(4.0, 8.0, 4.0),
         ..default()
     });
+
+    info!("Use Z and X to orbit the sheep");
 }
 
-fn update_camera(
-    keys: Res<Input<KeyCode>>,
-    mut query: ParamSet<(Query<(&mut Transform, With<MainCamera>)>, Query<&mut Rig>)>,
-) {
-    let mut p1 = query.p1();
-    let mut rig = p1.single_mut();
+fn update_camera(keys: Res<Input<KeyCode>>, mut rig_q: Query<&mut Rig>) {
+    let mut rig = rig_q.single_mut();
     let camera_driver = rig.driver_mut::<YawPitch>();
 
     if keys.just_pressed(KeyCode::Z) {
