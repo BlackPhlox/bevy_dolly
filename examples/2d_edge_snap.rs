@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 use bevy_dolly::{
-    prelude::{Position, Rig, Rotation},
+    prelude::{Position, Rig, Rotation, Smooth},
     system::DollyComponent,
 };
 
@@ -50,7 +50,6 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         texture: asset_server.load("room_end.png"),
         transform: Transform::from_xyz(1116., -104.5, 0.),
         sprite: Sprite {
-            //custom_size: Some(Vec2::new(1.33 * 800., 800.)),
             ..Default::default()
         },
         ..Default::default()
@@ -60,7 +59,6 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         texture: asset_server.load("room_end.png"),
         transform: Transform::from_xyz(-916., -104.5, 0.),
         sprite: Sprite {
-            //custom_size: Some(Vec2::new(1.33 * 800., 800.)),
             flip_x: true,
             ..Default::default()
         },
@@ -73,6 +71,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
             Rig::builder()
                 .with(Position::new(Vec3::new(0., 0., 0.)))
                 .with(Rotation::new(Quat::IDENTITY))
+                .with(Smooth::new_position(1.2))
                 .build(),
         )
         .insert(MainCamera);

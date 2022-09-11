@@ -31,6 +31,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         .insert(
             Rig::builder()
                 .with(Position::new(Vec3::new(0., 0., 0.)))
+                .with(Smooth::new_position(1.2))
                 .build(),
         )
         .insert(MainCamera);
