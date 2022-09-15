@@ -42,8 +42,8 @@ struct DollyCursorGrabAction;
 fn dolly_cursor_grab_input_setup(mut commands: Commands) {
     commands
         .spawn()
-        .insert(DollyCursorGrabAction)
-        .insert_bundle(DollyCursorGrabInputBundle::default());
+        .insert_bundle(DollyCursorGrabInputBundle::default())
+        .insert(DollyCursorGrabAction);
 }
 
 #[derive(Actionlike, PartialEq, Eq, Clone, Copy, Hash, Debug)]
@@ -81,22 +81,28 @@ fn toggle_grab_cursor(window: &mut Window) {
 
 /// Grabs the cursor when game first starts
 fn initial_grab_cursor(mut windows: ResMut<Windows>, config: Res<DollyCursorGrabConfig>) {
-    toggle_grab_cursor(windows.get_primary_mut().unwrap());
-    if !config.enabled {
-        toggle_grab_cursor(windows.get_primary_mut().unwrap());
+    if !config.enabled && let Some(window) = windows.get_primary_mut() {
+        toggle_grab_cursor(window);
+    }
+    if let Some(window) = windows.get_primary_mut(){
+        toggle_grab_cursor(window);
+    } else {
+        warn!("Primary window not found for `initial_grab_cursor`!");
     }
 }
 
 fn cursor_grab(
     mut windows: ResMut<Windows>,
+    keys: Res<Input<KeyCode>>,
     act_query: Query<&ActionState<GrabAction>, With<DollyCursorGrabAction>>,
 ) {
-    let window = windows.get_primary_mut();
-    if let Some(window) = window {
-        let grab_action = act_query.single();
-        if grab_action.pressed(GrabAction::Exit) {
-            println!("Cursor Grab");
-            toggle_grab_cursor(window);
+    if let Some(window) = windows.get_primary_mut() {
+        if let Ok(grab_action) = act_query.get_single(){
+            if keys.pressed(KeyCode::Escape) {
+            // This doesn't work:
+            //if grab_action.pressed(GrabAction::Exit) {
+                toggle_grab_cursor(window);
+            }
         }
     }
 }
