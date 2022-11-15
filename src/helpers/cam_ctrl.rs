@@ -1,4 +1,4 @@
-use bevy::prelude::{App, Plugin};
+use bevy::prelude::{App, Plugin, Resource};
 
 pub struct DollyCamCtrl;
 impl Plugin for DollyCamCtrl {
@@ -8,6 +8,7 @@ impl Plugin for DollyCamCtrl {
 }
 
 #[allow(dead_code)]
+#[derive(Resource)]
 struct DollyCamCtrlConfig {
     enabled: bool,
 }

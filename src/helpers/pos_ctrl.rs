@@ -4,8 +4,8 @@ use bevy::{
     pbr::PbrBundle,
     prelude::{
         default, App, Assets, BuildChildren, Bundle, Color, Commands, Component, GamepadButtonType,
-        KeyCode, Mesh, Plugin, Query, Res, ResMut, SpatialBundle, StandardMaterial, SystemSet,
-        Time, Transform, With,
+        KeyCode, Mesh, Plugin, Query, Res, ResMut, Resource, SpatialBundle, StandardMaterial,
+        SystemSet, Time, Transform, With,
     },
 };
 use leafwing_input_manager::prelude::*;
@@ -39,6 +39,7 @@ enum MoveAction {
     RotateRight,
 }
 
+#[derive(Resource)]
 struct DollyPosCtrlConfig {
     enabled: bool,
     speed: f32,
@@ -67,10 +68,7 @@ fn use_dolly_pos_ctrl_config(config: Res<DollyPosCtrlConfig>) -> ShouldRun {
 struct DollyPosCtrlAction;
 
 fn dolly_pos_ctrl_config_input_setup(mut commands: Commands) {
-    commands
-        .spawn()
-        .insert(DollyPosCtrlAction)
-        .insert_bundle(DollyPosCtrlInputBundle::default());
+    commands.spawn((DollyPosCtrlAction, DollyPosCtrlInputBundle::default()));
 }
 
 #[derive(Component)]
@@ -173,13 +171,13 @@ fn dolly_pos_ctrl_config_entity_setup(
     });
 
     commands
-        .spawn_bundle(SpatialBundle::from_transform(Transform {
+        .spawn(SpatialBundle::from_transform(Transform {
             rotation: Quat::IDENTITY,
             translation: config.position,
             ..default()
         }))
         .with_children(|cell| {
-            cell.spawn_bundle(PbrBundle {
+            cell.spawn(PbrBundle {
                 mesh: cone_mesh.clone(),
                 material: player_mat.clone(),
                 transform: Transform::from_rotation(Quat::from_rotation_x(

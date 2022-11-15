@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 use bevy_dolly::{
-    prelude::{Position, Rig, Rotation, Smooth},
+    prelude::{Position, Rig, Smooth},
     system::DollyComponent,
 };
 
@@ -25,7 +25,7 @@ enum Direction {
 
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands
-        .spawn_bundle(SpriteBundle {
+        .spawn(SpriteBundle {
             texture: asset_server.load("bevy_dolly.png"),
             transform: Transform::from_xyz(100., 0., 0.),
             sprite: Sprite {
@@ -36,7 +36,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         })
         .insert(Direction::Right);
 
-    commands.spawn_bundle(SpriteBundle {
+    commands.spawn(SpriteBundle {
         texture: asset_server.load("room.png"),
         transform: Transform::from_xyz(100., 200., 0.),
         sprite: Sprite {
@@ -46,7 +46,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         ..Default::default()
     });
 
-    commands.spawn_bundle(SpriteBundle {
+    commands.spawn(SpriteBundle {
         texture: asset_server.load("room_end.png"),
         transform: Transform::from_xyz(1116., -104.5, 0.),
         sprite: Sprite {
@@ -55,7 +55,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         ..Default::default()
     });
 
-    commands.spawn_bundle(SpriteBundle {
+    commands.spawn(SpriteBundle {
         texture: asset_server.load("room_end.png"),
         transform: Transform::from_xyz(-916., -104.5, 0.),
         sprite: Sprite {
@@ -65,20 +65,15 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         ..Default::default()
     });
 
-    commands
-        .spawn()
-        .insert(
-            Rig::builder()
-                .with(Position::new(Vec3::new(0., 0., 0.)))
-                .with(Rotation::new(Quat::IDENTITY))
-                .with(Smooth::new_position(1.2))
-                .build(),
-        )
-        .insert(MainCamera);
+    commands.spawn((
+        MainCamera,
+        Rig::builder()
+            .with(Position::new(Vec3::new(0., 0., 0.)))
+            .with(Smooth::new_position(1.2))
+            .build(),
+    ));
 
-    commands
-        .spawn_bundle(Camera2dBundle::default())
-        .insert(MainCamera);
+    commands.spawn((MainCamera, Camera2dBundle::default()));
 }
 
 /// The sprite is animated by changing its translation depending on the time that has passed since

@@ -16,7 +16,7 @@ fn main() {
 
 /// set up a simple 3D scene
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
-    commands.spawn_bundle(SpriteBundle {
+    commands.spawn(SpriteBundle {
         texture: asset_server.load("bevy_dolly.png"),
         transform: Transform::from_xyz(100., 0., 0.),
         sprite: Sprite {
@@ -26,21 +26,17 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         ..Default::default()
     });
 
-    commands
-        .spawn()
-        .insert(
-            Rig::builder()
-                .with(Position::new(Vec3::new(0., 0., 0.)))
-                .with(Smooth::new_position(1.2))
-                .build(),
-        )
-        .insert(MainCamera);
+    commands.spawn((
+        MainCamera,
+        Rig::builder()
+            .with(Position::new(Vec3::new(0., 0., 0.)))
+            .with(Smooth::new_position(1.2))
+            .build(),
+    ));
 
-    commands
-        .spawn_bundle(Camera2dBundle::default())
-        .insert(MainCamera);
+    commands.spawn(Camera2dBundle::default()).insert(MainCamera);
 
-    commands.spawn_bundle(SpriteBundle {
+    commands.spawn(SpriteBundle {
         texture: asset_server.load("room.png"),
         transform: Transform::from_xyz(100., 0., 0.),
         sprite: Sprite {
