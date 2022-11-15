@@ -34,24 +34,24 @@ fn setup(
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
     // plane
-    commands.spawn_bundle(PbrBundle {
+    commands.spawn(PbrBundle {
         mesh: meshes.add(Mesh::from(shape::Plane { size: 100.0 })),
         material: materials.add(Color::rgb(0.3, 0.5, 0.3).into()),
         ..default()
     });
 
-    commands.spawn_bundle(SceneBundle {
+    commands.spawn(SceneBundle {
         scene: asset_server.load("poly_fox.glb#Scene0"),
         ..default()
     });
 
-    commands.spawn_bundle(SceneBundle {
+    commands.spawn(SceneBundle {
         scene: asset_server.load("poly_dolly.gltf#Scene0"),
         ..default()
     });
 
     // Light
-    commands.spawn_bundle(DirectionalLightBundle {
+    commands.spawn(DirectionalLightBundle {
         transform: Transform::from_rotation(Quat::from_euler(
             EulerRot::ZYX,
             0.0,
@@ -66,38 +66,35 @@ fn setup(
     });
 
     // camera
-    commands
-        .spawn_bundle(Camera3dBundle {
+    commands.spawn((
+        LeftCamera,
+        Camera3dBundle {
             transform: Transform::from_xyz(0.0, 200.0, -100.0).looking_at(Vec3::ZERO, Vec3::Y),
             ..default()
-        })
-        .insert(LeftCamera);
+        },
+    ));
 
-    commands
-        .spawn()
-        .insert(
-            Rig::builder()
-                .with(YawPitch::new().yaw_degrees(45.0).pitch_degrees(-30.0))
-                .with(Smooth::new_rotation(1.5))
-                .with(Arm::new(dolly::glam::Vec3::Z * 4.0))
-                .build(),
-        )
-        .insert(LeftCamera);
+    commands.spawn((
+        LeftCamera,
+        Rig::builder()
+            .with(YawPitch::new().yaw_degrees(45.0).pitch_degrees(-30.0))
+            .with(Smooth::new_rotation(1.5))
+            .with(Arm::new(dolly::glam::Vec3::Z * 4.0))
+            .build(),
+    ));
 
-    commands
-        .spawn()
-        .insert(
-            Rig::builder()
-                .with(YawPitch::new().yaw_degrees(45.0).pitch_degrees(-30.0))
-                .with(Smooth::new_rotation(1.5))
-                .with(Arm::new(dolly::glam::Vec3::Z * 200.0))
-                .build(),
-        )
-        .insert(RightCamera);
+    commands.spawn((
+        RightCamera,
+        Rig::builder()
+            .with(YawPitch::new().yaw_degrees(45.0).pitch_degrees(-30.0))
+            .with(Smooth::new_rotation(1.5))
+            .with(Arm::new(dolly::glam::Vec3::Z * 200.0))
+            .build(),
+    ));
 
     // camera
     commands
-        .spawn_bundle(Camera3dBundle {
+        .spawn(Camera3dBundle {
             transform: Transform::from_xyz(100.0, 100., 150.0).looking_at(Vec3::ZERO, Vec3::Y),
             camera_3d: Camera3d {
                 clear_color: ClearColorConfig::None,
@@ -156,10 +153,5 @@ fn update_camera_2(
 
     let a = rig.driver_mut::<Arm>();
     a.offset = dolly::glam::Vec3::Z
-        * ((time.seconds_since_startup() as f32 * 0.2)
-            .sin()
-            .cos()
-            .abs()
-            * 400.
-            - 200.);
+        * ((time.delta_seconds() as f32 * 0.2).sin().cos().abs() * 400. - 200.);
 }

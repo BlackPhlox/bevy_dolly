@@ -32,13 +32,13 @@ fn setup(
     asset_server: Res<AssetServer>,
 ) {
     // plane
-    commands.spawn_bundle(PbrBundle {
+    commands.spawn(PbrBundle {
         mesh: meshes.add(Mesh::from(shape::Plane { size: 5.0 })),
         material: materials.add(Color::rgb(0.3, 0.5, 0.3).into()),
         ..default()
     });
 
-    commands.spawn_bundle(SceneBundle {
+    commands.spawn(SceneBundle {
         scene: asset_server.load("poly_dolly.gltf#Scene0"),
         transform: Transform {
             translation: Vec3::new(0., 0.2, 0.),
@@ -47,16 +47,14 @@ fn setup(
         ..default()
     });
 
-    commands
-        .spawn()
-        .insert(
-            Rig::builder()
-                .with(YawPitch::new().yaw_degrees(45.0).pitch_degrees(-30.0))
-                .with(Smooth::new_rotation(1.5))
-                .with(Arm::new(Vec3::Z * 4.0))
-                .build(),
-        )
-        .insert(MainCamera);
+    commands.spawn((
+        MainCamera,
+        Rig::builder()
+            .with(YawPitch::new().yaw_degrees(45.0).pitch_degrees(-30.0))
+            .with(Smooth::new_rotation(1.5))
+            .with(Arm::new(Vec3::Z * 4.0))
+            .build(),
+    ));
 
     let camera = Camera3dBundle {
         projection: OrthographicProjection {
@@ -69,10 +67,10 @@ fn setup(
         ..default()
     };
 
-    commands.spawn_bundle(camera).insert(MainCamera);
+    commands.spawn(camera).insert(MainCamera);
 
     // light
-    commands.spawn_bundle(PointLightBundle {
+    commands.spawn(PointLightBundle {
         transform: Transform::from_xyz(4.0, 8.0, 4.0),
         ..default()
     });

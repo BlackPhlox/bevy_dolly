@@ -1,4 +1,4 @@
-use bevy::{ecs::schedule::ShouldRun, prelude::*};
+use bevy::{ecs::schedule::ShouldRun, prelude::*, window::CursorGrabMode};
 use leafwing_input_manager::{
     prelude::{ActionState, InputMap},
     Actionlike, InputManagerBundle,
@@ -18,6 +18,7 @@ impl Plugin for DollyCursorGrab {
     }
 }
 
+#[derive(Resource)]
 pub struct DollyCursorGrabConfig {
     pub enabled: bool,
 }
@@ -40,10 +41,7 @@ fn use_grab(config: Res<DollyCursorGrabConfig>) -> ShouldRun {
 struct DollyCursorGrabAction;
 
 fn dolly_cursor_grab_input_setup(mut commands: Commands) {
-    commands
-        .spawn()
-        .insert_bundle(DollyCursorGrabInputBundle::default())
-        .insert(DollyCursorGrabAction);
+    commands.spawn((DollyCursorGrabInputBundle::default(), DollyCursorGrabAction));
 }
 
 #[derive(Actionlike, PartialEq, Eq, Clone, Copy, Hash, Debug)]
@@ -75,16 +73,26 @@ impl Default for DollyCursorGrabInputBundle {
 
 /// Grabs/ungrabs mouse cursor
 fn toggle_grab_cursor(window: &mut Window) {
-    window.set_cursor_lock_mode(!window.cursor_locked());
-    window.set_cursor_visibility(!window.cursor_visible());
+    match window.cursor_grab_mode() {
+        CursorGrabMode::None => {
+            window.set_cursor_grab_mode(CursorGrabMode::Confined);
+            window.set_cursor_visibility(false);
+        }
+        _ => {
+            window.set_cursor_grab_mode(CursorGrabMode::None);
+            window.set_cursor_visibility(true);
+        }
+    }
 }
 
 /// Grabs the cursor when game first starts
 fn initial_grab_cursor(mut windows: ResMut<Windows>, config: Res<DollyCursorGrabConfig>) {
-    if !config.enabled && let Some(window) = windows.get_primary_mut() {
-        toggle_grab_cursor(window);
+    if !config.enabled {
+        if let Some(window) = windows.get_primary_mut() {
+            toggle_grab_cursor(window);
+        }
     }
-    if let Some(window) = windows.get_primary_mut(){
+    if let Some(window) = windows.get_primary_mut() {
         toggle_grab_cursor(window);
     } else {
         warn!("Primary window not found for `initial_grab_cursor`!");
@@ -97,10 +105,12 @@ fn cursor_grab(
     act_query: Query<&ActionState<GrabAction>, With<DollyCursorGrabAction>>,
 ) {
     if let Some(window) = windows.get_primary_mut() {
-        if let Ok(grab_action) = act_query.get_single(){
-            if keys.pressed(KeyCode::Escape) {
+        if let Ok(grab_action) = act_query.get_single() {
+            if keys.just_pressed(KeyCode::Escape) {
+                toggle_grab_cursor(window);
+            }
             // This doesn't work:
-            //if grab_action.pressed(GrabAction::Exit) {
+            if grab_action.pressed(GrabAction::Exit) {
                 toggle_grab_cursor(window);
             }
         }

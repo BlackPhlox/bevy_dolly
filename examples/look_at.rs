@@ -25,7 +25,7 @@ fn setup(
     //mut config: ResMut<CtrlConfig>,
 ) {
     // plane
-    commands.spawn_bundle(PbrBundle {
+    commands.spawn(PbrBundle {
         mesh: meshes.add(Mesh::from(shape::Plane { size: 20.0 })),
         material: materials.add(Color::rgb(0.3, 0.5, 0.3).into()),
         ..default()
@@ -51,30 +51,29 @@ fn setup(
     );
     */
 
-    commands
-        .spawn()
-        .insert(
-            Rig::builder()
-                .with(Position::new(Vec3::Y * 3.0))
-                .with(LookAt::new(
-                    /*start_pos.transform_2_dolly().position*/
-                    Vec3::new(0., 0., 2.),
-                ))
-                .build(),
-        )
-        .insert(MainCamera);
+    commands.spawn((
+        MainCamera,
+        Rig::builder()
+            .with(Position::new(Vec3::Y * 3.0))
+            .with(LookAt::new(
+                /*start_pos.transform_2_dolly().position*/
+                Vec3::new(0., 0., 2.),
+            ))
+            .build(),
+    ));
 
-    commands
-        .spawn_bundle(Camera3dBundle {
+    commands.spawn((
+        MainCamera,
+        Camera3dBundle {
             transform: Transform::from_xyz(-2.0, 1., 2.0)
                 .looking_at(Vec3::new(0., 0., 0.), Vec3::Y),
             ..default()
-        })
-        .insert(MainCamera);
+        },
+    ));
 
     info!("Use Q and E to turn the sheep");
     // light
-    commands.spawn_bundle(PointLightBundle {
+    commands.spawn(PointLightBundle {
         transform: Transform::from_xyz(4.0, 8.0, 4.0),
         ..default()
     });
