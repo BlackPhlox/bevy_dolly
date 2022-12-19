@@ -9,7 +9,7 @@ fn main() {
         .insert_resource(Msaa { samples: 4 })
         .add_plugins(DefaultPlugins)
         .add_startup_system(setup)
-        .add_dolly_component(MainCamera)
+        .add_dolly_2d_component(MainCamera)
         .add_system(update_camera)
         .run();
 }
@@ -29,7 +29,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.spawn((
         MainCamera,
         Rig::builder()
-            .with(Position::new(Vec3::new(0., 0., 0.)))
+            .with(Position::new(Vec3::new(0., 0., 400.)))
             .with(Smooth::new_position(1.2))
             .build(),
     ));
@@ -64,6 +64,12 @@ fn update_camera(keys: Res<Input<KeyCode>>, mut query: Query<&mut Rig>) {
         }
         if key == KeyCode::D {
             camera_driver.translate(speed * Vec3::new(1., 0., 0.));
+        }
+        if key == KeyCode::Z {
+            camera_driver.translate(speed * Vec3::new(0., 0., -1.));
+        }
+        if key == KeyCode::X {
+            camera_driver.translate(speed * Vec3::new(0., 0., 1.));
         }
     }
 }
