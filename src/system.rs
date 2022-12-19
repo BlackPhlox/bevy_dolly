@@ -1,5 +1,8 @@
 use crate::prelude::{Rig, Transform2Bevy};
-use bevy::prelude::{App, Camera, Changed, Component, Entity, Query, Res, Time, Transform, With, OrthographicProjection};
+use bevy::prelude::{
+    App, Camera, Changed, Component, Entity, OrthographicProjection, Query, Res, Time, Transform,
+    With,
+};
 
 pub trait DollyComponent {
     fn add_dolly_component<T: Component>(&mut self, _: T) -> &mut Self;
@@ -55,7 +58,7 @@ pub fn dolly_2d_component_cam_change_detection<T: Component>(
 
         cameras.for_each_mut(|(mut t, mut orth, camera)| {
             if camera.is_active {
-                orth.scale = transform.position.z * 0.0025;//.clamp(0.0, 0.5);
+                orth.scale = transform.position.z * 0.0025; //.clamp(0.0, 0.5);
                 let xy = transform.position.truncate().extend(0 as f32);
                 transform.position = xy;
                 t.transform_2_bevy(transform);
