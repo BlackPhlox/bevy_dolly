@@ -1,3 +1,4 @@
+use bevy::input::mouse::MouseWheel;
 use bevy::prelude::*;
 use bevy::{input::mouse::MouseMotion, render::camera::ScalingMode};
 use bevy_dolly::prelude::cursor_grab::DollyCursorGrab;
@@ -15,10 +16,11 @@ fn main() {
         .add_plugins(DefaultPlugins)
         .add_plugin(DollyCursorGrab)
         .add_dolly_component(MainCamera)
-        .add_state(Pan::Keys)
+        .add_state(Pan::Mouse)
         .add_startup_system(setup)
         .add_system(update_camera)
         .add_system(swap_camera)
+        .add_system(handle_mouse_scroll)
         .run();
 }
 
@@ -94,7 +96,10 @@ fn setup(
     });
 
     info!("Use Z and X to orbit the sheep");
+    info!("Press T to toggle between orthographic and perspective camera");
+    info!("Scroll to Zoom (change fov for perspective and scale for orthographic)");
     info!("Press E to toggle to use the mouse to orbit the sheep");
+    info!("Press Esc to toggle cursor focus");
 }
 
 fn swap_camera(
@@ -112,6 +117,24 @@ fn swap_camera(
                 commands.entity(e_sec.clone()).insert(MainCamera);
                 cam_sec.is_active = true;
                 cam_main.is_active = false;
+            }
+        }
+    }
+}
+
+fn handle_mouse_scroll(
+    mut mouse_wheel_events: EventReader<MouseWheel>,
+    mut q_main: Query<&mut Projection, With<MainCamera>>,
+) {
+    for mouse_wheel_event in mouse_wheel_events.iter() {
+        for mut projection in &mut q_main.iter_mut() {
+            match &mut projection.as_mut() {
+                Projection::Perspective(pers) => {
+                    pers.fov = (pers.fov - mouse_wheel_event.y * 0.01).abs();
+                }
+                Projection::Orthographic(orth) => {
+                    orth.scale = (orth.scale - mouse_wheel_event.y * 0.1).abs();
+                }
             }
         }
     }
