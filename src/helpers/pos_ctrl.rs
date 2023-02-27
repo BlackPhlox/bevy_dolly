@@ -4,13 +4,16 @@ use bevy::{
     pbr::PbrBundle,
     prelude::{
         default, App, Assets, BuildChildren, Bundle, Color, Commands, Component, GamepadButtonType,
-        KeyCode, Mesh, Plugin, Query, Res, ResMut, Resource, SpatialBundle, StandardMaterial,
-        SystemSet, Time, Transform, With,
+        IntoSystemDescriptor, KeyCode, Mesh, Plugin, Query, Res, ResMut, Resource, SpatialBundle,
+        StandardMaterial, SystemLabel, SystemSet, Time, Transform, With,
     },
 };
 use leafwing_input_manager::prelude::*;
 
 use super::cone::Cone;
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, SystemLabel)]
+pub struct DollyPosCtrlMoveLabel;
 
 pub struct DollyPosCtrl;
 impl Plugin for DollyPosCtrl {
@@ -22,13 +25,13 @@ impl Plugin for DollyPosCtrl {
         app.add_system_set(
             SystemSet::new()
                 .with_run_criteria(use_dolly_pos_ctrl_config)
-                .with_system(dolly_pos_ctrl_move_update),
+                .with_system(dolly_pos_ctrl_move_update.label(DollyPosCtrlMoveLabel)),
         );
     }
 }
 
 #[derive(Actionlike, PartialEq, Eq, Clone, Copy, Hash, Debug)]
-enum MoveAction {
+pub enum MoveAction {
     Forward,
     Backward,
     StrafeLeft,
@@ -40,10 +43,12 @@ enum MoveAction {
 }
 
 #[derive(Resource)]
-struct DollyPosCtrlConfig {
-    enabled: bool,
-    speed: f32,
-    position: Vec3,
+pub struct DollyPosCtrlConfig {
+    pub enabled: bool,
+    pub speed: f32,
+    pub position: Vec3,
+    pub rotation: Quat,
+    pub default_player: bool,
 }
 
 impl Default for DollyPosCtrlConfig {
@@ -52,6 +57,8 @@ impl Default for DollyPosCtrlConfig {
             enabled: true,
             speed: 1.2,
             position: bevy::math::Vec3::new(0., 0.5, 0.),
+            rotation: bevy::math::Quat::IDENTITY,
+            default_player: true,
         }
     }
 }
@@ -114,7 +121,7 @@ impl Default for DollyPosCtrlInputBundle {
         input_map.insert(KeyCode::Period, RotateRight);
 
         for (v, ma) in input_map.iter() {
-            print!("Action: {:?} -> ", ma);
+            print!("Action: {ma:?} -> ");
             for (i, b) in v.iter().enumerate() {
                 let str = match b {
                     UserInput::Single(x) => {
@@ -132,7 +139,7 @@ impl Default for DollyPosCtrlInputBundle {
                     x => format!("Unknown input {:?}", &x),
                 };
 
-                print!("{}", str);
+                print!("{str}");
                 if v.len() > 1 && i != v.len() - 1 {
                     print!(" or ");
                 }
@@ -158,6 +165,10 @@ fn dolly_pos_ctrl_config_entity_setup(
     mut materials: ResMut<Assets<StandardMaterial>>,
     config: Res<DollyPosCtrlConfig>,
 ) {
+    if !config.default_player {
+        return;
+    }
+
     let cone_mesh = meshes.add(Mesh::from(Cone {
         height: 0.2,
         radius: 0.1,
@@ -227,14 +238,14 @@ fn dolly_pos_ctrl_move_update(
             if rotation > std::f32::consts::FRAC_PI_2 * 4.0 - 0.05 {
                 rotation = 0.0;
             }
-            rotation += 0.1;
+            rotation += 0.05;
         }
         if action_state.pressed(MoveAction::RotateRight) {
             //Wrapping around
             if rotation < 0.05 {
                 rotation = std::f32::consts::FRAC_PI_2 * 4.0;
             }
-            rotation -= 0.1;
+            rotation -= 0.05;
         }
 
         velocity = velocity.normalize();

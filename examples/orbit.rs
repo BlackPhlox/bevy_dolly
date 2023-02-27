@@ -14,7 +14,12 @@ fn main() {
     App::new()
         .insert_resource(Msaa { samples: 4 })
         .add_plugins(DefaultPlugins)
+        .add_plugin(DollyPosCtrl)
         .add_plugin(DollyCursorGrab)
+        .insert_resource(DollyPosCtrlConfig {
+            default_player: false,
+            ..Default::default()
+        })
         .add_dolly_component(MainCamera)
         .add_state(Pan::Mouse)
         .add_startup_system(setup)
@@ -44,19 +49,23 @@ fn setup(
         ..default()
     });
 
-    commands.spawn(SceneBundle {
-        scene: asset_server.load("poly_dolly.gltf#Scene0"),
-        transform: Transform {
-            translation: Vec3::new(0., 0.2, 0.),
+    commands
+        .spawn(SceneBundle {
+            scene: asset_server.load("poly_dolly.gltf#Scene0"),
+            transform: Transform {
+                translation: Vec3::new(0., 0.2, 0.),
+                ..default()
+            },
             ..default()
-        },
-        ..default()
-    });
+        })
+        .insert(DollyPosCtrlMove);
 
     commands.spawn((
         MainCamera,
         Rig::builder()
+            .with(dolly::drivers::Position::new(Vec3::ZERO))
             .with(YawPitch::new().yaw_degrees(45.0).pitch_degrees(-30.0))
+            .with(Smooth::new_position(0.3))
             .with(Smooth::new_rotation(1.5))
             .with(Arm::new(Vec3::Z * 4.0))
             .build(),
@@ -146,6 +155,8 @@ fn update_camera(
     mut pan: ResMut<State<Pan>>,
     mut mouse_motion_events: EventReader<MouseMotion>,
     mut rig_q: Query<&mut Rig>,
+    trans: Query<&Transform, With<DollyPosCtrlMove>>,
+    mut config: ResMut<DollyPosCtrlConfig>,
 ) {
     let mut rig = rig_q.single_mut();
     let camera_driver = rig.driver_mut::<YawPitch>();
@@ -155,6 +166,8 @@ fn update_camera(
     for event in mouse_motion_events.iter() {
         delta += event.delta;
     }
+
+    config.rotation = Quat::from_rotation_y(delta.angle_between(Vec2::X));
 
     if pan.current().eq(&Pan::Keys) {
         if keys.just_pressed(KeyCode::Z) {
@@ -179,4 +192,7 @@ fn update_camera(
         pan.overwrite_set(result);
         println!("State:{:?}", result);
     }
+
+    let camera_driver_2 = rig.driver_mut::<Position>();
+    camera_driver_2.position = trans.single().translation;
 }

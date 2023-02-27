@@ -1,8 +1,11 @@
 use crate::prelude::{Rig, Transform2Bevy};
 use bevy::prelude::{
-    App, Camera, Changed, Component, Entity, OrthographicProjection, Query, Res, Time, Transform,
-    With,
+    App, Camera, Changed, Component, Entity, IntoSystemDescriptor, OrthographicProjection, Query,
+    Res, SystemLabel, Time, Transform, With,
 };
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, SystemLabel)]
+pub struct DollyComponentLabel;
 
 pub trait DollyComponent {
     fn add_dolly_component<T: Component>(&mut self, _: T) -> &mut Self;
@@ -12,15 +15,15 @@ pub trait DollyComponent {
 
 impl DollyComponent for App {
     fn add_dolly_component<T: Component>(&mut self, _: T) -> &mut Self {
-        self.add_system(dolly_component_cam_change_detection::<T>)
+        self.add_system(dolly_component_cam_change_detection::<T>.label(DollyComponentLabel))
     }
 
     fn add_rig_component<T: Component>(&mut self, _: T) -> &mut Self {
-        self.add_system(dolly_component_change_detection::<T>)
+        self.add_system(dolly_component_change_detection::<T>.label(DollyComponentLabel))
     }
 
     fn add_dolly_2d_component<T: Component>(&mut self, _: T) -> &mut Self {
-        self.add_system(dolly_2d_component_cam_change_detection::<T>)
+        self.add_system(dolly_2d_component_cam_change_detection::<T>.label(DollyComponentLabel))
     }
 }
 
