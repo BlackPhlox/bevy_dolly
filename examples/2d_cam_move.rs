@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 use bevy_dolly::prelude::*;
+use dolly::glam;
 
 #[derive(Component)]
 struct MainCamera;
@@ -29,7 +30,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.spawn((
         MainCamera,
         Rig::builder()
-            .with(Position::new(Vec3::new(0., 0., 400.)))
+            .with(Position::new(glam::Vec3::new(0., 0., 400.)))
             .with(Smooth::new_position(1.2))
             .build(),
     ));
@@ -54,22 +55,22 @@ fn update_camera(keys: Res<Input<KeyCode>>, mut query: Query<&mut Rig>) {
 
     for &key in keys.get_pressed() {
         if key == KeyCode::W {
-            camera_driver.translate(speed * Vec3::new(0., 1., 0.));
+            camera_driver.translate(speed * glam::Vec3::new(0., 1., 0.));
         }
         if key == KeyCode::A {
-            camera_driver.translate(speed * Vec3::new(-1., 0., 0.));
+            camera_driver.translate(speed * glam::Vec3::new(-1., 0., 0.));
         }
         if key == KeyCode::S {
-            camera_driver.translate(speed * Vec3::new(0., -1., 0.));
+            camera_driver.translate(speed * glam::Vec3::new(0., -1., 0.));
         }
         if key == KeyCode::D {
-            camera_driver.translate(speed * Vec3::new(1., 0., 0.));
+            camera_driver.translate(speed * glam::Vec3::new(1., 0., 0.));
         }
         if key == KeyCode::Z {
-            camera_driver.translate(speed * Vec3::new(0., 0., -1.));
+            camera_driver.translate(speed * glam::Vec3::new(0., 0., -1.));
         }
         if key == KeyCode::X {
-            camera_driver.translate(speed * Vec3::new(0., 0., 1.));
+            camera_driver.translate(speed * glam::Vec3::new(0., 0., 1.));
         }
     }
 }
