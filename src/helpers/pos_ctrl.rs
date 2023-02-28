@@ -1,11 +1,13 @@
+use std::fmt::Display;
+
 use bevy::{
     ecs::schedule::ShouldRun,
     math::{Quat, Vec3},
     pbr::PbrBundle,
     prelude::{
-        default, App, Assets, BuildChildren, Bundle, Color, Commands, Component, GamepadButtonType,
-        IntoSystemDescriptor, KeyCode, Mesh, Plugin, Query, Res, ResMut, Resource, SpatialBundle,
-        StandardMaterial, SystemLabel, SystemSet, Time, Transform, With,
+        default, App, Assets, BuildChildren, Bundle, Color, Commands, Component, GamepadAxisType,
+        GamepadButtonType, IntoSystemDescriptor, KeyCode, Mesh, Plugin, Query, Res, ResMut,
+        Resource, SpatialBundle, StandardMaterial, SystemLabel, SystemSet, Time, Transform, With,
     },
 };
 use leafwing_input_manager::prelude::*;
@@ -15,13 +17,23 @@ use super::cone::Cone;
 #[derive(Debug, Clone, PartialEq, Eq, Hash, SystemLabel)]
 pub struct DollyPosCtrlMoveLabel;
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash, SystemLabel)]
+pub struct DollyPosCtrlInputSetupLabel;
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, SystemLabel)]
+pub struct DollyPosCtrlEntitySetupLabel;
+
 pub struct DollyPosCtrl;
 impl Plugin for DollyPosCtrl {
     fn build(&self, app: &mut App) {
         app.add_plugin(InputManagerPlugin::<MoveAction>::default());
         app.init_resource::<DollyPosCtrlConfig>();
-        app.add_startup_system(dolly_pos_ctrl_config_input_setup);
-        app.add_startup_system(dolly_pos_ctrl_config_entity_setup);
+        app.add_startup_system(
+            dolly_pos_ctrl_config_input_setup.label(DollyPosCtrlInputSetupLabel),
+        );
+        app.add_startup_system(
+            dolly_pos_ctrl_config_entity_setup.label(DollyPosCtrlEntitySetupLabel),
+        );
         app.add_system_set(
             SystemSet::new()
                 .with_run_criteria(use_dolly_pos_ctrl_config)
@@ -40,12 +52,15 @@ pub enum MoveAction {
     Down,
     RotateLeft,
     RotateRight,
+    None,
 }
 
 #[derive(Resource)]
 pub struct DollyPosCtrlConfig {
     pub enabled: bool,
-    pub speed: f32,
+    pub move_speed: f32,
+    pub rot_speed: f32,
+    pub pin: bool,
     pub position: Vec3,
     pub rotation: Quat,
     pub default_player: bool,
@@ -55,7 +70,9 @@ impl Default for DollyPosCtrlConfig {
     fn default() -> Self {
         DollyPosCtrlConfig {
             enabled: true,
-            speed: 1.2,
+            move_speed: 1.2,
+            rot_speed: 0.05,
+            pin: true,
             position: bevy::math::Vec3::new(0., 0.5, 0.),
             rotation: bevy::math::Quat::IDENTITY,
             default_player: true,
@@ -87,41 +104,11 @@ struct DollyPosCtrlInputBundle {
     input_manager: InputManagerBundle<MoveAction>,
 }
 
-impl Default for DollyPosCtrlInputBundle {
-    fn default() -> Self {
-        use MoveAction::*;
-        let mut input_map = InputMap::default();
-        //TODO: Impl. when added to input-manager
-        //input_map.assign_gamepad(Gamepad(0));
-
-        input_map.insert(KeyCode::W, Forward);
-        input_map.insert(KeyCode::Up, Forward);
-        //input_map.insert(Forward, GamepadAxisType::LeftStickY); +Y
-
-        input_map.insert(KeyCode::S, Backward);
-        input_map.insert(KeyCode::Down, Backward);
-        //input_map.insert(Forward, GamepadAxisType::LeftStickY); -Y
-
-        input_map.insert(KeyCode::A, StrafeLeft);
-        input_map.insert(KeyCode::Left, StrafeLeft);
-        //input_map.insert(StrafeLeft, GamepadAxisType::LeftStickX); +X
-
-        input_map.insert(KeyCode::D, StrafeRight);
-        input_map.insert(KeyCode::Right, StrafeRight);
-        //input_map.insert(StrafeLeft, GamepadAxisType::LeftStickX); -X
-
-        input_map.insert(KeyCode::Space, Up);
-        input_map.insert(GamepadButtonType::DPadUp, Up);
-
-        input_map.insert(KeyCode::LShift, Down);
-        input_map.insert(GamepadButtonType::DPadDown, Down);
-
-        input_map.insert(KeyCode::Comma, RotateLeft);
-
-        input_map.insert(KeyCode::Period, RotateRight);
-
+impl Display for DollyPosCtrlInputBundle {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let input_map = &self.input_manager.input_map;
         for (v, ma) in input_map.iter() {
-            print!("Action: {ma:?} -> ");
+            let _ = write!(f, "Action: {ma:?} -> ");
             for (i, b) in v.iter().enumerate() {
                 let str = match b {
                     UserInput::Single(x) => {
@@ -139,16 +126,70 @@ impl Default for DollyPosCtrlInputBundle {
                     x => format!("Unknown input {:?}", &x),
                 };
 
-                print!("{str}");
+                let _ = write!(f, "{str}");
                 if v.len() > 1 && i != v.len() - 1 {
-                    print!(" or ");
+                    let _ = write!(f, " or ");
                 }
 
                 if i == v.len() - 1 {
-                    println!();
+                    let _ = writeln!(f);
                 }
             }
         }
+        Ok(())
+    }
+}
+
+impl Default for DollyPosCtrlInputBundle {
+    fn default() -> Self {
+        use MoveAction::*;
+        let mut input_map = InputMap::default();
+        //TODO: Impl. when added to input-manager
+        //input_map.assign_gamepad(Gamepad(0));
+
+        input_map.insert(KeyCode::W, Forward);
+        input_map.insert(KeyCode::Up, Forward);
+
+        input_map.insert(GamepadButtonType::DPadUp, Forward);
+        //input_map.insert(SingleAxis::symmetric(GamepadAxisType::LeftStickY, 0.1), Forward); // + Y / - Y
+
+        input_map.insert(KeyCode::S, Backward);
+        input_map.insert(KeyCode::Down, Backward);
+        input_map.insert(GamepadButtonType::DPadDown, Backward);
+
+        input_map.insert(KeyCode::A, StrafeLeft);
+        input_map.insert(KeyCode::Left, StrafeLeft);
+        input_map.insert(GamepadButtonType::DPadLeft, StrafeLeft);
+
+        input_map.insert(KeyCode::D, StrafeRight);
+        input_map.insert(KeyCode::Right, StrafeRight);
+        input_map.insert(GamepadButtonType::DPadRight, StrafeRight);
+
+        //input_map.insert(SingleAxis::symmetric(GamepadAxisType::LeftStickX, 0.1), StrafeRight); // + X / - X
+
+        input_map.insert(KeyCode::Space, Up);
+        input_map.insert(
+            SingleAxis::positive_only(GamepadAxisType::LeftStickY, 0.1),
+            Up,
+        );
+
+        input_map.insert(KeyCode::LShift, Down);
+        input_map.insert(
+            SingleAxis::negative_only(GamepadAxisType::LeftStickY, 0.1),
+            Down,
+        );
+
+        input_map.insert(KeyCode::Comma, RotateLeft);
+        input_map.insert(
+            SingleAxis::negative_only(GamepadAxisType::LeftStickX, 0.1),
+            RotateLeft,
+        );
+
+        input_map.insert(KeyCode::Period, RotateRight);
+        input_map.insert(
+            SingleAxis::positive_only(GamepadAxisType::LeftStickX, 0.1),
+            RotateRight,
+        );
 
         let input_manager = InputManagerBundle {
             input_map,
@@ -215,45 +256,40 @@ fn dolly_pos_ctrl_move_update(
         let forward = Vec3::new(local_z.x, 0., local_z.z);
         let right = transform.rotation * -Vec3::X;
 
-        if action_state.pressed(MoveAction::Forward) {
-            velocity += forward;
-        }
-        if action_state.pressed(MoveAction::Backward) {
-            velocity -= forward;
-        }
-        if action_state.pressed(MoveAction::Up) {
-            velocity += Vec3::Y;
-        }
-        if action_state.pressed(MoveAction::Down) {
-            velocity -= Vec3::Y;
-        }
-        if action_state.pressed(MoveAction::StrafeLeft) {
-            velocity -= right;
-        }
-        if action_state.pressed(MoveAction::StrafeRight) {
-            velocity += right;
-        }
-        if action_state.pressed(MoveAction::RotateLeft) {
-            //Wrapping around
-            if rotation > std::f32::consts::FRAC_PI_2 * 4.0 - 0.05 {
-                rotation = 0.0;
-            }
-            rotation += 0.05;
-        }
+        velocity += forward * action_state.clamped_value(MoveAction::Forward);
+        velocity += forward * -action_state.clamped_value(MoveAction::Backward);
+
+        velocity += right * action_state.clamped_value(MoveAction::StrafeRight);
+        velocity += right * -action_state.clamped_value(MoveAction::StrafeLeft);
+
+        velocity += Vec3::Y * action_state.clamped_value(MoveAction::Up);
+        velocity += Vec3::Y * action_state.clamped_value(MoveAction::Down);
+
         if action_state.pressed(MoveAction::RotateRight) {
             //Wrapping around
-            if rotation < 0.05 {
+            if rotation > std::f32::consts::FRAC_PI_2 * 4.0 - config.rot_speed {
+                rotation = 0.0;
+            }
+            rotation += action_state.clamped_value(MoveAction::RotateRight) * config.rot_speed;
+        } else if action_state.pressed(MoveAction::RotateLeft) {
+            //Wrapping around
+            if rotation < config.rot_speed {
                 rotation = std::f32::consts::FRAC_PI_2 * 4.0;
             }
-            rotation -= 0.05;
+            let mut delta_value = action_state.clamped_value(MoveAction::RotateLeft);
+            if delta_value.is_sign_positive() {
+                delta_value *= -1.;
+            }
+            rotation += delta_value * config.rot_speed;
         }
 
+        transform.rotation = Quat::from_rotation_y(rotation * -1.);
+
+        //Normalize vel vector
         velocity = velocity.normalize();
 
-        transform.rotation = Quat::from_rotation_y(rotation);
-
         if !velocity.is_nan() {
-            transform.translation += velocity * time.delta_seconds() * config.speed;
+            transform.translation += velocity * time.delta_seconds() * config.move_speed;
         }
     }
 }

@@ -3,6 +3,7 @@ use bevy::prelude::*;
 use bevy::{input::mouse::MouseMotion, render::camera::ScalingMode};
 use bevy_dolly::prelude::cursor_grab::DollyCursorGrab;
 use bevy_dolly::prelude::*;
+use leafwing_input_manager::prelude::InputMap;
 
 #[derive(Component)]
 struct MainCamera;
@@ -107,6 +108,7 @@ fn setup(
     info!("Use Z and X to orbit the sheep");
     info!("Press T to toggle between orthographic and perspective camera");
     info!("Scroll to Zoom (change fov for perspective and scale for orthographic)");
+    info!("Press P to toggle pinned to entity with DollyPosCtrlMove component");
     info!("Press E to toggle to use the mouse to orbit the sheep");
     info!("Press Esc to toggle cursor focus");
 }
@@ -167,7 +169,7 @@ fn update_camera(
         delta += event.delta;
     }
 
-    config.rotation = Quat::from_rotation_y(delta.angle_between(Vec2::X));
+    config.rotation = Quat::from_rotation_y(delta.x);
 
     if pan.current().eq(&Pan::Keys) {
         if keys.just_pressed(KeyCode::Z) {
@@ -193,6 +195,13 @@ fn update_camera(
         println!("State:{:?}", result);
     }
 
-    let camera_driver_2 = rig.driver_mut::<Position>();
-    camera_driver_2.position = trans.single().translation;
+    if keys.just_pressed(KeyCode::P) {
+        config.pin = if config.pin { false } else { true };
+        println!("Pinned:{:?}", config.pin);
+    }
+
+    if config.pin {
+        let camera_driver_2 = rig.driver_mut::<Position>();
+        camera_driver_2.position = trans.single().translation;
+    }
 }
