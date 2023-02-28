@@ -3,6 +3,7 @@ use bevy::prelude::*;
 use bevy::{input::mouse::MouseMotion, render::camera::ScalingMode};
 use bevy_dolly::prelude::cursor_grab::DollyCursorGrab;
 use bevy_dolly::prelude::*;
+use dolly::glam;
 
 #[derive(Component)]
 struct MainCamera;
@@ -63,11 +64,11 @@ fn setup(
     commands.spawn((
         MainCamera,
         Rig::builder()
-            .with(dolly::drivers::Position::new(Vec3::ZERO))
+            .with(dolly::drivers::Position::new(glam::Vec3::ZERO))
             .with(YawPitch::new().yaw_degrees(45.0).pitch_degrees(-30.0))
             .with(Smooth::new_position(0.3))
             .with(Smooth::new_rotation(1.5))
-            .with(Arm::new(Vec3::Z * 4.0))
+            .with(Arm::new(glam::Vec3::Z * 4.0))
             .build(),
     ));
 
@@ -194,5 +195,5 @@ fn update_camera(
     }
 
     let camera_driver_2 = rig.driver_mut::<Position>();
-    camera_driver_2.position = trans.single().translation;
+    camera_driver_2.position = trans.single().transform_2_dolly().position;
 }

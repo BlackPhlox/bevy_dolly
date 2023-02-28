@@ -10,8 +10,7 @@ pub mod system;
 
 pub mod prelude {
     pub use crate::{
-        dolly::driver::*,
-        dolly::prelude::*,
+        dolly::{driver::*, drivers::*, handedness, transform, util},
         dolly_type::*,
         drivers::{follow::*, fpv::*},
         helpers::*,
