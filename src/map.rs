@@ -1,9 +1,37 @@
-use bevy::prelude::{default, Deref, DerefMut, Mut, Transform};
+use bevy::prelude::{default, Deref, DerefMut, Mut, Transform, Vec2};
 use dolly::prelude::RightHanded;
 use std::marker::PhantomData;
 
 pub trait Transform2Bevy {
     fn transform_2_bevy(&mut self, transform: dolly::transform::Transform<RightHanded>);
+}
+
+pub trait Vec2Bevy {
+    fn vector2d_2_bevy(&mut self, vec: dolly::glam::Vec2) -> Vec2;
+}
+
+impl Vec2Bevy for Vec2 {
+    fn vector2d_2_bevy(&mut self, vec: dolly::glam::Vec2) -> Vec2 {
+        Vec2{ x: vec.x, y: vec.y }
+    }
+}
+
+pub trait Vec2Dolly {
+    fn vector2d_2_dolly(&mut self) -> dolly::glam::Vec2;
+}
+
+impl Vec2Dolly for Vec2 {
+    fn vector2d_2_dolly(&mut self) -> dolly::glam::Vec2 {
+        dolly::glam::Vec2{ x: self.x, y: self.y }
+    }
+}
+
+impl Transform2Bevy for Transform {
+    fn transform_2_bevy(&mut self, transform: dolly::transform::Transform<RightHanded>) {
+        let (translation, rotation) = transform.into_position_rotation();
+        self.translation = bevy::math::Vec3::new(translation.x, translation.y, translation.z);
+        self.rotation = bevy::math::Quat::from_xyzw(rotation.x, rotation.y, rotation.z, rotation.w);
+    }
 }
 
 impl Transform2Bevy for Mut<'_, Transform> {
