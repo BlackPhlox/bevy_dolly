@@ -12,7 +12,7 @@ pub trait Vec2Bevy {
 
 impl Vec2Bevy for Vec2 {
     fn vector2d_2_bevy(&mut self, vec: dolly::glam::Vec2) -> Vec2 {
-        Vec2{ x: vec.x, y: vec.y }
+        Vec2 { x: vec.x, y: vec.y }
     }
 }
 
@@ -22,7 +22,10 @@ pub trait Vec2Dolly {
 
 impl Vec2Dolly for Vec2 {
     fn vector2d_2_dolly(&mut self) -> dolly::glam::Vec2 {
-        dolly::glam::Vec2{ x: self.x, y: self.y }
+        dolly::glam::Vec2 {
+            x: self.x,
+            y: self.y,
+        }
     }
 }
 
