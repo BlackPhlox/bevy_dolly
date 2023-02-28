@@ -44,7 +44,8 @@ jobs:
       - name: Run cargo test
         uses: actions-rs/cargo@v1
         with:
-          command: test --examples
+          command: test
+          args: --examples
 
   fmt:
     name: Rustfmt
