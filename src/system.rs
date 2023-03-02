@@ -38,7 +38,7 @@ pub fn dolly_component_cam_change_detection<T: Component>(
 
         cameras.for_each_mut(|(mut bevy_transform, camera)| {
             if camera.is_active {
-                *bevy_transform = DollyTransform::from(dolly_transform).into();
+                *bevy_transform = DollyTransformWrapper::from(dolly_transform).into();
             }
         });
     }
@@ -61,7 +61,7 @@ pub fn dolly_2d_component_cam_change_detection<T: Component>(
                 orth.scale = dolly_transform.position.z * 0.0025; //.clamp(0.0, 0.5);
                 let xy = dolly_transform.position.truncate().extend(0 as f32);
                 dolly_transform.position = xy;
-                *bevy_transform = DollyTransform::from(dolly_transform).into();
+                *bevy_transform = DollyTransformWrapper::from(dolly_transform).into();
             }
         });
     }
@@ -80,7 +80,7 @@ pub fn dolly_component_change_detection<T: Component>(
         let dolly_transform = rig.update(time.delta_seconds());
 
         transforms.for_each_mut(|mut bevy_transform| {
-                *bevy_transform = DollyTransform::from(dolly_transform).into();
+                *bevy_transform = DollyTransformWrapper::from(dolly_transform).into();
         });
     }
 }

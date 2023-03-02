@@ -1,18 +1,20 @@
-use bevy::prelude::{default, Deref, DerefMut, Mut, Transform};
+use bevy::prelude::*;
 use dolly::prelude::RightHanded;
 use std::marker::PhantomData;
 
-#[derive(Deref, DerefMut)]
-pub struct DollyTransform(dolly::transform::Transform<RightHanded>);
+pub type DollyTransform = dolly::transform::Transform<RightHanded>;
 
-impl From<dolly::transform::Transform<RightHanded>> for DollyTransform {
-    fn from(transform: dolly::transform::Transform<RightHanded>) -> Self {
+#[derive(Deref, DerefMut)]
+pub struct DollyTransformWrapper(dolly::transform::Transform<RightHanded>);
+
+impl From<DollyTransform> for DollyTransformWrapper {
+    fn from(transform: DollyTransform) -> Self {
         Self(transform)
     }
 }
 
-impl From<DollyTransform> for Transform {
-    fn from(transform: DollyTransform) -> Self {
+impl From<DollyTransformWrapper> for Transform {
+    fn from(transform: DollyTransformWrapper) -> Self {
         let (translation, rotation) = transform.into_position_rotation();
         Self {
             translation: bevy::math::Vec3::new(translation.x, translation.y, translation.z),
