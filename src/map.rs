@@ -26,11 +26,22 @@ impl From<DollyTransform> for Transform {
 
 impl From<Transform> for DollyTransform {
     fn from(transform: Transform) -> Self {
-        Self(dolly::transform::Transform {
+        Self(DollyTransformType {
             position: transform.translation,
             rotation: transform.rotation,
             phantom: PhantomData,
         })
+    }
+}
+
+impl From<&Transform> for DollyTransform {
+    fn from(transform: &Transform) -> Self {
+        Self::from(*transform)
+    }
+}
+impl From<Mut<'_, Transform>> for DollyTransform {
+    fn from(transform: Mut<'_, Transform>) -> Self {
+        Self::from(*transform.as_ref())
     }
 }
 
