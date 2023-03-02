@@ -80,7 +80,7 @@ pub fn dolly_component_change_detection<T: Component>(
         let dolly_transform = rig.update(time.delta_seconds());
 
         transforms.for_each_mut(|mut bevy_transform| {
-                *bevy_transform = DollyTransformWrapper::from(dolly_transform).into();
+            *bevy_transform = DollyTransformWrapper::from(dolly_transform).into();
         });
     }
 }
