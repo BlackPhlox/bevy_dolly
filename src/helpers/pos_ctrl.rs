@@ -73,8 +73,8 @@ impl Default for DollyPosCtrlConfig {
             move_speed: 1.2,
             rot_speed: 0.05,
             pin: true,
-            position: bevy::math::Vec3::new(0., 0.5, 0.),
-            rotation: bevy::math::Quat::IDENTITY,
+            position: Vec3::new(0., 0.5, 0.),
+            rotation: Quat::IDENTITY,
             default_player: true,
         }
     }

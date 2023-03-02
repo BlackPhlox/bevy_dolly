@@ -38,7 +38,7 @@ fn setup(
         commands
             .spawn_bundle((
                 Transform {
-                    translation: bevy::math::Vec3::new(0., 0.2, 0.),
+                    translation: Vec3::new(0., 0.2, 0.),
                     ..default()
                 },
                 GlobalTransform::identity(),

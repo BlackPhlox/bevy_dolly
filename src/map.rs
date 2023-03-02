@@ -44,17 +44,3 @@ impl From<Mut<'_, Transform>> for DollyTransform {
         Self::from(*transform.as_ref())
     }
 }
-
-#[derive(Deref, DerefMut)]
-struct DollyTransformInto(Transform);
-
-impl From<DollyTransformType> for DollyTransformInto {
-    fn from(transform: DollyTransformType) -> Self {
-        let (translation, rotation) = transform.into_position_rotation();
-        DollyTransformInto(Transform {
-            translation: bevy::math::Vec3::new(translation.x, translation.y, translation.z),
-            rotation: bevy::math::Quat::from_xyzw(rotation.x, rotation.y, rotation.z, rotation.w),
-            ..default()
-        })
-    }
-}

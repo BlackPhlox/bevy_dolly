@@ -38,7 +38,7 @@ impl Fpv {
 
     pub fn set_position(
         &mut self,
-        player_position: bevy::math::Vec3,
+        player_position: Vec3,
         boost: f32,
         boost_mult: f32,
         lock_y: bool,
