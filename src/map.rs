@@ -4,6 +4,16 @@ use std::marker::PhantomData;
 
 pub type DollyTransformType = dolly::transform::Transform<RightHanded>;
 
+/// Utility wrapper to convert between bevy and dolly transforms.
+/// Use it like this:
+/// ```
+/// use bevy::prelude::*;
+/// use bevy_dolly::prelude::*;
+///
+/// // Get the transform from a Bevy query
+/// let transform = Transform::default();
+/// let dolly_transform = DollyTransform::from(transform);
+/// ```
 #[derive(Deref, DerefMut)]
 pub struct DollyTransform(pub DollyTransformType);
 
