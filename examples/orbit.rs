@@ -1,3 +1,4 @@
+#![allow(clippy::type_complexity)]
 use bevy::input::mouse::MouseWheel;
 use bevy::prelude::*;
 use bevy::{input::mouse::MouseMotion, render::camera::ScalingMode};
@@ -120,10 +121,14 @@ fn swap_camera(
     if keys.just_pressed(KeyCode::T) {
         if let Ok((e_main, cam_main)) = &mut q_main.get_single_mut() {
             if let Ok((e_sec, cam_sec)) = &mut q_sec.get_single_mut() {
-                commands.entity(e_main.clone()).remove::<MainCamera>();
-                commands.entity(e_sec.clone()).remove::<SecondCamera>();
-                commands.entity(e_main.clone()).insert(SecondCamera);
-                commands.entity(e_sec.clone()).insert(MainCamera);
+                commands
+                    .entity(*e_main)
+                    .remove::<MainCamera>()
+                    .insert(SecondCamera);
+                commands
+                    .entity(*e_sec)
+                    .remove::<SecondCamera>()
+                    .insert(MainCamera);
                 cam_sec.is_active = true;
                 cam_main.is_active = false;
             }
@@ -194,7 +199,7 @@ fn update_camera(
     }
 
     if keys.just_pressed(KeyCode::P) {
-        config.pin = if config.pin { false } else { true };
+        config.pin = !config.pin;
         println!("Pinned:{:?}", config.pin);
     }
 

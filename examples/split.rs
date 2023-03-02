@@ -1,3 +1,4 @@
+#![allow(clippy::type_complexity)]
 //! Renders two cameras to the same window to accomplish "split screen".
 
 use bevy::{
@@ -152,5 +153,5 @@ fn update_camera_2(
     camera_driver.rotate_yaw_pitch(-1.0, 0.0);
 
     let a = rig.driver_mut::<Arm>();
-    a.offset = Vec3::Z * ((time.delta_seconds() as f32 * 0.2).sin().cos().abs() * 400. - 200.);
+    a.offset = Vec3::Z * ((time.delta_seconds() * 0.2).sin().cos().abs() * 400. - 200.);
 }
