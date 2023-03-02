@@ -14,7 +14,7 @@ pub type DollyTransformType = dolly::transform::Transform<RightHanded>;
 /// let transform = Transform::default();
 /// let dolly_transform = DollyTransform::from(transform);
 /// ```
-#[derive(Deref, DerefMut)]
+#[derive(Clone, Copy, Debug, Deref, DerefMut)]
 pub struct DollyTransform(pub DollyTransformType);
 
 impl From<DollyTransform> for Transform {
