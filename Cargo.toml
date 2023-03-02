@@ -49,3 +49,6 @@ default-features = false
 version = "0.9"
 features = ["x11", "wayland"]
 default-features = false
+
+[patch.crates-io]
+glam = { git = "https://github.com/bitshifter/glam-rs", tag = "0.22.0" } # keep in sync with bevy

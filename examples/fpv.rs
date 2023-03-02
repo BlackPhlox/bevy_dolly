@@ -151,7 +151,7 @@ fn update_camera(
 
     if window.is_some() && !window.unwrap().cursor_visible() {
         rig.driver_mut::<Fpv>().set_rotation(
-            delta.vector2d_2_dolly(),
+            delta,
             sensitivity,
             move_vec,
             time_delta_seconds,
