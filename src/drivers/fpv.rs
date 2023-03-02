@@ -5,7 +5,7 @@ use dolly::{driver::RigDriver, prelude::*};
 impl Fpv {
     pub fn from_position_target(target_transform: Transform) -> Self {
         let mut yp = YawPitch::new();
-        let dolly_transform = *DollyTransform::from(target_transform);
+        let dolly_transform = DollyTransform::from(target_transform);
         yp.set_rotation_quat(dolly_transform.rotation);
         Self(
             CameraRig::builder()

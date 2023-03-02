@@ -200,7 +200,7 @@ fn update_camera(
 
     if config.pin {
         let camera_driver_2 = rig.driver_mut::<Position>();
-        let dolly_transform = *DollyTransform::from(*trans.single());
+        let dolly_transform = DollyTransform::from(*trans.single());
         camera_driver_2.position = dolly_transform.position;
     }
 }

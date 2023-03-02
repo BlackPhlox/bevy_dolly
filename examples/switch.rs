@@ -103,7 +103,7 @@ fn follow_player(
     let mut p1 = query.p1();
     let mut rig = p1.single_mut();
 
-    let dolly_transform = *DollyTransform::from(player);
+    let dolly_transform = DollyTransform::from(player);
 
     rig.driver_mut::<Position>().position = dolly_transform.position;
     rig.driver_mut::<Rotation>().rotation = dolly_transform.rotation;
@@ -117,7 +117,7 @@ fn follow_sheep(mut query: ParamSet<(Query<(&Transform, With<Rotates>)>, Query<&
     let mut p1 = query.p1();
     let mut rig = p1.single_mut();
 
-    let dolly_transform = *DollyTransform::from(player);
+    let dolly_transform = DollyTransform::from(player);
 
     rig.driver_mut::<Position>().position = dolly_transform.position;
     rig.driver_mut::<Rotation>().rotation = dolly_transform.rotation;
