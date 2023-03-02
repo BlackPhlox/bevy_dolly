@@ -17,8 +17,8 @@ impl From<DollyTransformWrapper> for Transform {
     fn from(transform: DollyTransformWrapper) -> Self {
         let (translation, rotation) = transform.into_position_rotation();
         Self {
-            translation: bevy::math::Vec3::new(translation.x, translation.y, translation.z),
-            rotation: bevy::math::Quat::from_xyzw(rotation.x, rotation.y, rotation.z, rotation.w),
+            translation,
+            rotation,
             ..default()
         }
     }
