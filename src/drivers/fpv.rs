@@ -1,4 +1,4 @@
-use crate::prelude::DollyTransform;
+use crate::prelude::{DollyTransform, DollyTransformType};
 use bevy::prelude::*;
 use dolly::{driver::RigDriver, prelude::*};
 
@@ -62,10 +62,7 @@ pub struct Fpv(CameraRig<RightHanded>);
 
 // Turn the nested rig into a driver, so it can be used in another rig.
 impl RigDriver<RightHanded> for Fpv {
-    fn update(
-        &mut self,
-        params: dolly::rig::RigUpdateParams<RightHanded>,
-    ) -> dolly::transform::Transform<RightHanded> {
+    fn update(&mut self, params: dolly::rig::RigUpdateParams<RightHanded>) -> DollyTransformType {
         self.0.update(params.delta_time_seconds)
     }
 }

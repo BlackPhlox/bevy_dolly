@@ -5,7 +5,7 @@ use std::marker::PhantomData;
 pub type DollyTransformType = dolly::transform::Transform<RightHanded>;
 
 #[derive(Deref, DerefMut)]
-pub struct DollyTransform(dolly::transform::Transform<RightHanded>);
+pub struct DollyTransform(DollyTransformType);
 
 impl From<DollyTransformType> for DollyTransform {
     fn from(transform: DollyTransformType) -> Self {
@@ -48,8 +48,8 @@ impl From<Mut<'_, Transform>> for DollyTransform {
 #[derive(Deref, DerefMut)]
 struct DollyTransformInto(Transform);
 
-impl From<dolly::transform::Transform<RightHanded>> for DollyTransformInto {
-    fn from(transform: dolly::transform::Transform<RightHanded>) -> Self {
+impl From<DollyTransformType> for DollyTransformInto {
+    fn from(transform: DollyTransformType) -> Self {
         let (translation, rotation) = transform.into_position_rotation();
         DollyTransformInto(Transform {
             translation: bevy::math::Vec3::new(translation.x, translation.y, translation.z),
