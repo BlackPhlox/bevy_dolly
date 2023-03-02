@@ -1,8 +1,5 @@
-use crate::prelude::{Rig, Transform2Bevy};
-use bevy::prelude::{
-    App, Camera, Changed, Component, Entity, IntoSystemDescriptor, OrthographicProjection, Query,
-    Res, SystemLabel, Time, Transform, With,
-};
+use crate::prelude::*;
+use bevy::prelude::*;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, SystemLabel)]
 pub struct DollyComponentLabel;
@@ -37,11 +34,11 @@ pub fn dolly_component_cam_change_detection<T: Component>(
         //let d = rig.drivers.iter().map(|f| format!("{:?}", f)).collect::<Vec<String>>().join(", ");
         //info!("{:?} changed: {:?}", entity, d);
 
-        let transform = rig.update(time.delta_seconds());
+        let dolly_transform = rig.update(time.delta_seconds());
 
-        cameras.for_each_mut(|(mut t, camera)| {
+        cameras.for_each_mut(|(mut bevy_transform, camera)| {
             if camera.is_active {
-                t.transform_2_bevy(transform);
+                *bevy_transform = DollyTransform::from(dolly_transform).into();
             }
         });
     }
@@ -57,14 +54,14 @@ pub fn dolly_2d_component_cam_change_detection<T: Component>(
         //let d = rig.drivers.iter().map(|f| format!("{:?}", f)).collect::<Vec<String>>().join(", ");
         //info!("{:?} changed: {:?}", entity, d);
 
-        let mut transform = rig.update(time.delta_seconds());
+        let mut dolly_transform = rig.update(time.delta_seconds());
 
-        cameras.for_each_mut(|(mut t, mut orth, camera)| {
+        cameras.for_each_mut(|(mut bevy_transform, mut orth, camera)| {
             if camera.is_active {
-                orth.scale = transform.position.z * 0.0025; //.clamp(0.0, 0.5);
-                let xy = transform.position.truncate().extend(0 as f32);
-                transform.position = xy;
-                t.transform_2_bevy(transform);
+                orth.scale = dolly_transform.position.z * 0.0025; //.clamp(0.0, 0.5);
+                let xy = dolly_transform.position.truncate().extend(0 as f32);
+                dolly_transform.position = xy;
+                *bevy_transform = DollyTransform::from(dolly_transform).into();
             }
         });
     }
@@ -80,10 +77,10 @@ pub fn dolly_component_change_detection<T: Component>(
         //let d = rig.drivers.iter().map(|f| format!("{:?}", f)).collect::<Vec<String>>().join(", ");
         //info!("{:?} changed: {:?}", entity, d);
 
-        let transform = rig.update(time.delta_seconds());
+        let dolly_transform = rig.update(time.delta_seconds());
 
-        transforms.for_each_mut(|mut t| {
-            t.transform_2_bevy(transform);
+        transforms.for_each_mut(|mut bevy_transform| {
+                *bevy_transform = DollyTransform::from(dolly_transform).into();
         });
     }
 }

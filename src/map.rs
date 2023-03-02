@@ -2,24 +2,23 @@ use bevy::prelude::{default, Deref, DerefMut, Mut, Transform};
 use dolly::prelude::RightHanded;
 use std::marker::PhantomData;
 
-pub trait Transform2Bevy {
-    fn transform_2_bevy(&mut self, transform: dolly::transform::Transform<RightHanded>);
-}
+#[derive(Deref, DerefMut)]
+pub struct DollyTransform(dolly::transform::Transform<RightHanded>);
 
-
-impl Transform2Bevy for Transform {
-    fn transform_2_bevy(&mut self, transform: dolly::transform::Transform<RightHanded>) {
-        let (translation, rotation) = transform.into_position_rotation();
-        self.translation = bevy::math::Vec3::new(translation.x, translation.y, translation.z);
-        self.rotation = bevy::math::Quat::from_xyzw(rotation.x, rotation.y, rotation.z, rotation.w);
+impl From<dolly::transform::Transform<RightHanded>> for DollyTransform {
+    fn from(transform: dolly::transform::Transform<RightHanded>) -> Self {
+        Self(transform)
     }
 }
 
-impl Transform2Bevy for Mut<'_, Transform> {
-    fn transform_2_bevy(&mut self, transform: dolly::transform::Transform<RightHanded>) {
+impl From<DollyTransform> for Transform {
+    fn from(transform: DollyTransform) -> Self {
         let (translation, rotation) = transform.into_position_rotation();
-        self.translation = bevy::math::Vec3::new(translation.x, translation.y, translation.z);
-        self.rotation = bevy::math::Quat::from_xyzw(rotation.x, rotation.y, rotation.z, rotation.w);
+        Self {
+            translation: bevy::math::Vec3::new(translation.x, translation.y, translation.z),
+            rotation: bevy::math::Quat::from_xyzw(rotation.x, rotation.y, rotation.z, rotation.w),
+            ..default()
+        }
     }
 }
 
