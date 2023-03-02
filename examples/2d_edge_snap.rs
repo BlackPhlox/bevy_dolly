@@ -68,9 +68,8 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
             .with(Position::new(Vec3::new(0., 0., 0.)))
             .with(Smooth::new_position(1.2))
             .build(),
+        Camera2dBundle::default(),
     ));
-
-    commands.spawn((MainCamera, Camera2dBundle::default()));
 }
 
 /// The sprite is animated by changing its translation depending on the time that has passed since

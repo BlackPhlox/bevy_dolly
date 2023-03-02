@@ -56,10 +56,6 @@ fn setup(
         Rig::builder()
             .with(Fpv::from_position_target(transform))
             .build(),
-    ));
-
-    commands.spawn((
-        MainCamera,
         Camera3dBundle {
             transform,
             ..default()

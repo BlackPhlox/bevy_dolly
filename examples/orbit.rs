@@ -71,32 +71,34 @@ fn setup(
             .build(),
     ));
 
-    let camera_iso = Camera3dBundle {
-        projection: OrthographicProjection {
-            scale: 3.0,
-            scaling_mode: ScalingMode::FixedVertical(2.0),
+    commands.spawn((
+        MainCamera,
+        Camera3dBundle {
+            projection: OrthographicProjection {
+                scale: 3.0,
+                scaling_mode: ScalingMode::FixedVertical(2.0),
+                ..default()
+            }
+            .into(),
+            transform: Transform::from_xyz(10.0, 10.0, 10.0).looking_at(Vec3::ZERO, Vec3::Y),
             ..default()
-        }
-        .into(),
-        transform: Transform::from_xyz(10.0, 10.0, 10.0).looking_at(Vec3::ZERO, Vec3::Y),
-        ..default()
-    };
-
-    let camera_perspective = Camera3dBundle {
-        projection: PerspectiveProjection {
-            ..Default::default()
-        }
-        .into(),
-        transform: Transform::from_xyz(10.0, 10.0, 10.0).looking_at(Vec3::ZERO, Vec3::Y),
-        camera: Camera {
-            is_active: false,
+        },
+    ));
+    commands.spawn((
+        SecondCamera,
+        Camera3dBundle {
+            projection: PerspectiveProjection {
+                ..Default::default()
+            }
+            .into(),
+            transform: Transform::from_xyz(10.0, 10.0, 10.0).looking_at(Vec3::ZERO, Vec3::Y),
+            camera: Camera {
+                is_active: false,
+                ..Default::default()
+            },
             ..Default::default()
         },
-        ..Default::default()
-    };
-
-    commands.spawn(camera_iso).insert(MainCamera);
-    commands.spawn(camera_perspective).insert(SecondCamera);
+    ));
 
     // light
     commands.spawn(PointLightBundle {
