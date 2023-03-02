@@ -2,19 +2,19 @@ use bevy::prelude::*;
 use dolly::prelude::RightHanded;
 use std::marker::PhantomData;
 
-pub type DollyTransform = dolly::transform::Transform<RightHanded>;
+pub type DollyTransformType = dolly::transform::Transform<RightHanded>;
 
 #[derive(Deref, DerefMut)]
-pub struct DollyTransformWrapper(dolly::transform::Transform<RightHanded>);
+pub struct DollyTransform(dolly::transform::Transform<RightHanded>);
 
-impl From<DollyTransform> for DollyTransformWrapper {
-    fn from(transform: DollyTransform) -> Self {
+impl From<DollyTransformType> for DollyTransform {
+    fn from(transform: DollyTransformType) -> Self {
         Self(transform)
     }
 }
 
-impl From<DollyTransformWrapper> for Transform {
-    fn from(transform: DollyTransformWrapper) -> Self {
+impl From<DollyTransform> for Transform {
+    fn from(transform: DollyTransform) -> Self {
         let (translation, rotation) = transform.into_position_rotation();
         Self {
             translation,
@@ -24,35 +24,13 @@ impl From<DollyTransformWrapper> for Transform {
     }
 }
 
-pub trait Transform2DollyMut {
-    fn transform_2_dolly_mut(&self) -> dolly::transform::Transform<RightHanded>;
-}
-
-impl Transform2DollyMut for Mut<'_, Transform> {
-    fn transform_2_dolly_mut(&self) -> dolly::transform::Transform<RightHanded> {
-        let t = self.translation;
-        let r = self.rotation;
-        dolly::transform::Transform {
-            position: dolly::glam::Vec3::new(t.x, t.y, t.z),
-            rotation: dolly::glam::Quat::from_xyzw(r.x, r.y, r.z, r.w),
+impl From<Transform> for DollyTransform {
+    fn from(transform: Transform) -> Self {
+        Self(dolly::transform::Transform {
+            position: transform.translation,
+            rotation: transform.rotation,
             phantom: PhantomData,
-        }
-    }
-}
-
-pub trait Transform2Dolly {
-    fn transform_2_dolly(&self) -> dolly::transform::Transform<RightHanded>;
-}
-
-impl Transform2Dolly for Transform {
-    fn transform_2_dolly(&self) -> dolly::transform::Transform<RightHanded> {
-        let t = self.translation;
-        let r = self.rotation;
-        dolly::transform::Transform {
-            position: dolly::glam::Vec3::new(t.x, t.y, t.z),
-            rotation: dolly::glam::Quat::from_xyzw(r.x, r.y, r.z, r.w),
-            phantom: PhantomData,
-        }
+        })
     }
 }
 

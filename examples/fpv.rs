@@ -1,7 +1,6 @@
 use bevy::input::mouse::MouseMotion;
 use bevy::prelude::*;
 use bevy_dolly::prelude::*;
-use dolly::glam;
 
 #[derive(Component)]
 struct MainCamera;
@@ -102,7 +101,7 @@ fn update_camera(
 ) {
     let time_delta_seconds: f32 = time.delta_seconds();
     let boost_mult = 5.0f32;
-    let sensitivity = glam::Vec2::splat(1.0);
+    let sensitivity = Vec2::splat(1.0);
 
     let mut move_vec = Vec3::ZERO;
 
@@ -150,11 +149,7 @@ fn update_camera(
     let window = windows.get_primary();
 
     if window.is_some() && !window.unwrap().cursor_visible() {
-        rig.driver_mut::<Fpv>().set_rotation(
-            delta,
-            sensitivity,
-            move_vec,
-            time_delta_seconds,
-        );
+        rig.driver_mut::<Fpv>()
+            .set_rotation(delta, sensitivity, move_vec, time_delta_seconds);
     }
 }

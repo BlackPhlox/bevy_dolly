@@ -1,19 +1,19 @@
-use bevy::prelude::{Deref, DerefMut, Transform};
+use crate::prelude::DollyTransform;
+use bevy::prelude::*;
 use dolly::{driver::RigDriver, prelude::*};
-
-use crate::prelude::Transform2Dolly;
 
 impl Fpv {
     pub fn from_position_target(target_transform: Transform) -> Self {
         let mut yp = YawPitch::new();
-        yp.set_rotation_quat(target_transform.transform_2_dolly().rotation);
+        let dolly_transform = *DollyTransform::from(target_transform);
+        yp.set_rotation_quat(dolly_transform.rotation);
         Self(
             CameraRig::builder()
                 .with(Position {
-                    position: target_transform.transform_2_dolly().position,
+                    position: dolly_transform.position,
                 })
                 .with(Rotation {
-                    rotation: target_transform.transform_2_dolly().rotation,
+                    rotation: dolly_transform.rotation,
                 })
                 .with(yp)
                 .with(Smooth::new_position_rotation(1.0, 0.1))
@@ -23,9 +23,9 @@ impl Fpv {
 
     pub fn set_rotation(
         &mut self,
-        delta_mouse: dolly::glam::Vec2,
-        sensitivity: dolly::glam::Vec2,
-        player_position: dolly::glam::Vec3,
+        delta_mouse: Vec2,
+        sensitivity: Vec2,
+        player_position: Vec3,
         delta_time_sec: f32,
     ) {
         self.driver_mut::<YawPitch>().rotate_yaw_pitch(
@@ -42,15 +42,15 @@ impl Fpv {
         boost: f32,
         boost_mult: f32,
         lock_y: bool,
-    ) -> dolly::glam::Vec3 {
+    ) -> Vec3 {
         if lock_y {
             let (mut euler, a) = self.final_transform.rotation.to_axis_angle();
             euler.x = 0.;
             euler.z = 0.;
-            self.final_transform.rotation = dolly::glam::Quat::from_axis_angle(euler, a);
+            self.final_transform.rotation = Quat::from_axis_angle(euler, a);
         }
         self.final_transform.rotation
-            * dolly::glam::Vec3::new(player_position.x, player_position.y, player_position.z)
+            * Vec3::new(player_position.x, player_position.y, player_position.z)
                 .clamp_length_max(1.0)
             * boost_mult.powf(boost)
     }
