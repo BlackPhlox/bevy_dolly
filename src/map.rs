@@ -5,13 +5,7 @@ use std::marker::PhantomData;
 pub type DollyTransformType = dolly::transform::Transform<RightHanded>;
 
 #[derive(Deref, DerefMut)]
-pub struct DollyTransform(DollyTransformType);
-
-impl From<DollyTransformType> for DollyTransform {
-    fn from(transform: DollyTransformType) -> Self {
-        Self(transform)
-    }
-}
+pub struct DollyTransform(pub DollyTransformType);
 
 impl From<DollyTransform> for Transform {
     fn from(transform: DollyTransform) -> Self {
