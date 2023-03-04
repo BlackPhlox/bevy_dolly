@@ -1,12 +1,12 @@
 use bevy::prelude::{Component, Deref, DerefMut};
 use dolly::{
     driver::RigDriverTraits,
-    prelude::{CameraRig, RightHanded},
+    prelude::CameraRig,
     rig::CameraRigBuilder,
 };
 
 #[derive(Component, Deref, DerefMut)]
-pub struct Rig(CameraRig<RightHanded>);
+pub struct Rig(CameraRig);
 
 impl Rig {
     /// Use this to make a new rig
@@ -15,10 +15,10 @@ impl Rig {
     }
 }
 
-pub struct RigBuilder(CameraRigBuilder<RightHanded>);
+pub struct RigBuilder(CameraRigBuilder);
 
 impl RigBuilder {
-    pub fn with(mut self, driver: impl RigDriverTraits<RightHanded>) -> Self {
+    pub fn with(mut self, driver: impl RigDriverTraits) -> Self {
         let dolly_crb = self.0.with(driver);
         self.0 = dolly_crb;
         self

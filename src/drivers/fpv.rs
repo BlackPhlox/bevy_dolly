@@ -1,19 +1,17 @@
-use bevy::prelude::{Deref, DerefMut, Transform};
+use bevy::prelude::{Deref, DerefMut, Transform, Vec3, Vec2, Quat};
 use dolly::{driver::RigDriver, prelude::*};
-
-use crate::prelude::Transform2Dolly;
 
 impl Fpv {
     pub fn from_position_target(target_transform: Transform) -> Self {
         let mut yp = YawPitch::new();
-        yp.set_rotation_quat(target_transform.transform_2_dolly().rotation);
+        yp.set_rotation_quat(target_transform.rotation);
         Self(
             CameraRig::builder()
                 .with(Position {
-                    position: target_transform.transform_2_dolly().position,
+                    position: target_transform.translation,
                 })
                 .with(Rotation {
-                    rotation: target_transform.transform_2_dolly().rotation,
+                    rotation: target_transform.rotation,
                 })
                 .with(yp)
                 .with(Smooth::new_position_rotation(1.0, 0.1))
@@ -23,9 +21,9 @@ impl Fpv {
 
     pub fn set_rotation(
         &mut self,
-        delta_mouse: dolly::glam::Vec2,
-        sensitivity: dolly::glam::Vec2,
-        player_position: dolly::glam::Vec3,
+        delta_mouse: Vec2,
+        sensitivity: Vec2,
+        player_position: Vec3,
         delta_time_sec: f32,
     ) {
         self.driver_mut::<YawPitch>().rotate_yaw_pitch(
@@ -42,15 +40,15 @@ impl Fpv {
         boost: f32,
         boost_mult: f32,
         lock_y: bool,
-    ) -> dolly::glam::Vec3 {
+    ) -> Vec3 {
         if lock_y {
             let (mut euler, a) = self.final_transform.rotation.to_axis_angle();
             euler.x = 0.;
             euler.z = 0.;
-            self.final_transform.rotation = dolly::glam::Quat::from_axis_angle(euler, a);
+            self.final_transform.rotation = Quat::from_axis_angle(euler, a);
         }
         self.final_transform.rotation
-            * dolly::glam::Vec3::new(player_position.x, player_position.y, player_position.z)
+            * Vec3::new(player_position.x, player_position.y, player_position.z)
                 .clamp_length_max(1.0)
             * boost_mult.powf(boost)
     }
@@ -58,14 +56,14 @@ impl Fpv {
 
 /// A custom camera rig which combines smoothed movement with a look-at driver.
 #[derive(Debug, Deref, DerefMut)]
-pub struct Fpv(CameraRig<RightHanded>);
+pub struct Fpv(CameraRig);
 
 // Turn the nested rig into a driver, so it can be used in another rig.
-impl RigDriver<RightHanded> for Fpv {
+impl RigDriver for Fpv {
     fn update(
         &mut self,
-        params: dolly::rig::RigUpdateParams<RightHanded>,
-    ) -> dolly::transform::Transform<RightHanded> {
+        params: dolly::rig::RigUpdateParams,
+    ) -> Transform {
         self.0.update(params.delta_time_seconds)
     }
 }

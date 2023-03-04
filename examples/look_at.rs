@@ -1,6 +1,5 @@
 use bevy::prelude::*;
 use bevy_dolly::prelude::*;
-use dolly::glam;
 
 #[derive(Component)]
 struct MainCamera;
@@ -55,10 +54,10 @@ fn setup(
     commands.spawn((
         MainCamera,
         Rig::builder()
-            .with(Position::new(glam::Vec3::Y * 3.0))
+            .with(Position::new(Vec3::Y * 3.0))
             .with(LookAt::new(
                 /*start_pos.transform_2_dolly().position*/
-                glam::Vec3::new(0., 0., 2.),
+                Vec3::new(0., 0., 2.),
             ))
             .build(),
     ));
@@ -88,5 +87,5 @@ fn update_camera(
 ) {
     let mut p0 = query.p0();
     let (player, _) = p0.single_mut();
-    query.p1().single_mut().driver_mut::<LookAt>().target = player.transform_2_dolly_mut().position;
+    query.p1().single_mut().driver_mut::<LookAt>().target = player.translation;
 }
