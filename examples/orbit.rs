@@ -198,7 +198,7 @@ fn update_camera(
             Pan::Keys
         };
         pan.overwrite_set(result);
-        println!("State:{:?}", result);
+        println!("State:{result:?}");
     }
 
     if keys.just_pressed(KeyCode::P) {

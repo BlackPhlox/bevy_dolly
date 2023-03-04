@@ -141,7 +141,7 @@ fn switch_camera_rig(mut camera: ResMut<State<Camera>>, keyboard_input: Res<Inpu
             Camera::FollowPlayer
         };
 
-        println!("{:?}", result);
+        println!("{result:?}");
         camera.set(result);
     }
 }

@@ -29,7 +29,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.spawn((
         MainCamera,
         Rig::builder()
-            .with(Position::new(glam::Vec3::new(0., 0., 400.)))
+            .with(Position::new(Vec3::new(0., 0., 400.)))
             .with(Smooth::new_position(1.2))
             .build(),
     ));
