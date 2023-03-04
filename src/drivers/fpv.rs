@@ -1,4 +1,4 @@
-use bevy::prelude::{Deref, DerefMut, Transform, Vec3, Vec2, Quat};
+use bevy::prelude::{Deref, DerefMut, Quat, Transform, Vec2, Vec3};
 use dolly::{driver::RigDriver, prelude::*};
 
 impl Fpv {
@@ -60,10 +60,7 @@ pub struct Fpv(CameraRig);
 
 // Turn the nested rig into a driver, so it can be used in another rig.
 impl RigDriver for Fpv {
-    fn update(
-        &mut self,
-        params: dolly::rig::RigUpdateParams,
-    ) -> Transform {
+    fn update(&mut self, params: dolly::rig::RigUpdateParams) -> Transform {
         self.0.update(params.delta_time_seconds)
     }
 }

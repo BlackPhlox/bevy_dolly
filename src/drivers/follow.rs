@@ -1,4 +1,4 @@
-use bevy::prelude::{Deref, DerefMut, Vec3, Quat, Transform};
+use bevy::prelude::{Deref, DerefMut, Quat, Transform, Vec3};
 use dolly::{driver::RigDriver, prelude::*};
 
 impl MovableLookAt {
@@ -19,11 +19,7 @@ impl MovableLookAt {
         )
     }
 
-    pub fn set_position_target(
-        &mut self,
-        target_position: Vec3,
-        target_rotation: Quat,
-    ) {
+    pub fn set_position_target(&mut self, target_position: Vec3, target_rotation: Quat) {
         self.driver_mut::<Position>().position = target_position;
         self.driver_mut::<Rotation>().rotation = target_rotation;
         self.driver_mut::<LookAt>().target = target_position + Vec3::Y;
@@ -36,10 +32,7 @@ pub struct MovableLookAt(CameraRig);
 
 // Turn the nested rig into a driver, so it can be used in another rig.
 impl RigDriver for MovableLookAt {
-    fn update(
-        &mut self,
-        params: dolly::rig::RigUpdateParams,
-    ) -> Transform {
+    fn update(&mut self, params: dolly::rig::RigUpdateParams) -> Transform {
         self.0.update(params.delta_time_seconds)
     }
 }

@@ -149,11 +149,7 @@ fn update_camera(
     let window = windows.get_primary();
 
     if window.is_some() && !window.unwrap().cursor_visible() {
-        rig.driver_mut::<Fpv>().set_rotation(
-            delta,
-            sensitivity,
-            move_vec,
-            time_delta_seconds,
-        );
+        rig.driver_mut::<Fpv>()
+            .set_rotation(delta, sensitivity, move_vec, time_delta_seconds);
     }
 }
