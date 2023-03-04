@@ -1,4 +1,4 @@
-use bevy::prelude::{Deref, DerefMut, Quat, Transform, Vec2, Vec3};
+use bevy::prelude::*;
 use dolly::{driver::RigDriver, prelude::*};
 
 impl Fpv {
@@ -36,7 +36,7 @@ impl Fpv {
 
     pub fn set_position(
         &mut self,
-        player_position: bevy::math::Vec3,
+        player_position: Vec3,
         boost: f32,
         boost_mult: f32,
         lock_y: bool,

@@ -1,8 +1,5 @@
-use crate::prelude::Rig;
-use bevy::prelude::{
-    App, Camera, Changed, Component, Entity, IntoSystemDescriptor, OrthographicProjection, Query,
-    Res, SystemLabel, Time, Transform, With,
-};
+use crate::prelude::*;
+use bevy::prelude::*;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, SystemLabel)]
 pub struct DollyComponentLabel;

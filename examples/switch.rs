@@ -1,3 +1,4 @@
+#![allow(clippy::type_complexity)]
 use std::f32::consts::PI;
 
 use bevy::prelude::*;
@@ -98,12 +99,10 @@ fn follow_player(
     mut query: ParamSet<(Query<(&Transform, With<DollyPosCtrlMove>)>, Query<&mut Rig>)>,
 ) {
     let p0 = query.p0();
-    let player = p0.single().0.to_owned();
+    let p = p0.single().0.to_owned();
 
     let mut p1 = query.p1();
     let mut rig = p1.single_mut();
-
-    let p = player;
 
     rig.driver_mut::<Position>().position = p.translation;
     rig.driver_mut::<Rotation>().rotation = p.rotation;
@@ -112,12 +111,10 @@ fn follow_player(
 
 fn follow_sheep(mut query: ParamSet<(Query<(&Transform, With<Rotates>)>, Query<&mut Rig>)>) {
     let p0 = query.p0();
-    let player = p0.single().0.to_owned();
+    let p = p0.single().0.to_owned();
 
     let mut p1 = query.p1();
     let mut rig = p1.single_mut();
-
-    let p = player;
 
     rig.driver_mut::<Position>().position = p.translation;
     rig.driver_mut::<Rotation>().rotation = p.rotation;
@@ -144,7 +141,7 @@ fn switch_camera_rig(mut camera: ResMut<State<Camera>>, keyboard_input: Res<Inpu
             Camera::FollowPlayer
         };
 
-        println!("{:?}", result);
+        println!("{result:?}");
         camera.set(result);
     }
 }

@@ -50,10 +50,6 @@ fn setup(
         Rig::builder()
             .with(MovableLookAt::from_position_target(start_pos))
             .build(),
-    ));
-
-    commands.spawn((
-        MainCamera,
         Camera3dBundle {
             transform: Transform::from_xyz(-2.0, 1., 5.0).looking_at(Vec3::ZERO, Vec3::Y),
             ..default()

@@ -56,10 +56,6 @@ fn setup(
         Rig::builder()
             .with(Fpv::from_position_target(transform))
             .build(),
-    ));
-
-    commands.spawn((
-        MainCamera,
         Camera3dBundle {
             transform,
             ..default()
@@ -86,7 +82,7 @@ fn update_fpvtype(keys: Res<Input<KeyCode>>, mut fps_state: ResMut<State<Movemen
             MovementType::FirstPerson
         };
 
-        println!("State:{:?}", result);
+        println!("State:{result:?}");
         let _ = fps_state.overwrite_set(result);
     }
 }
