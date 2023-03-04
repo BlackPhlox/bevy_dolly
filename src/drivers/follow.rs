@@ -1,4 +1,4 @@
-use crate::prelude::DollyTransformType;
+use bevy::prelude::{Deref, DerefMut, Quat, Transform, Vec3};
 use bevy::prelude::*;
 use dolly::{driver::RigDriver, prelude::*};
 
@@ -29,11 +29,11 @@ impl MovableLookAt {
 
 /// A custom camera rig which combines smoothed movement with a look-at driver.
 #[derive(Debug, Deref, DerefMut)]
-pub struct MovableLookAt(CameraRig<RightHanded>);
+pub struct MovableLookAt(CameraRig);
 
 // Turn the nested rig into a driver, so it can be used in another rig.
-impl RigDriver<RightHanded> for MovableLookAt {
-    fn update(&mut self, params: dolly::rig::RigUpdateParams<RightHanded>) -> DollyTransformType {
+impl RigDriver for MovableLookAt {
+    fn update(&mut self, params: dolly::rig::RigUpdateParams) -> Transform {
         self.0.update(params.delta_time_seconds)
     }
 }

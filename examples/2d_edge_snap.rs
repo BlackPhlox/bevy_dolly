@@ -1,5 +1,8 @@
 use bevy::prelude::*;
-use bevy_dolly::{prelude::*, system::DollyComponent};
+use bevy_dolly::{
+    prelude::{Position, Rig, Smooth},
+    system::DollyComponent,
+};
 
 fn main() {
     App::new()
@@ -95,8 +98,7 @@ fn update_camera(sprite_position: Query<(&Direction, &Transform)>, mut q0: Query
 
     for (_dir, pos) in &sprite_position {
         if pos.translation.x < 495. && pos.translation.x > -295. {
-            let dolly_transform = DollyTransform::from(pos);
-            camera_driver.position = dolly_transform.position;
+            camera_driver.position = pos.translation;
         }
     }
 }

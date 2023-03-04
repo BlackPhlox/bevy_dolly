@@ -1,19 +1,17 @@
-use crate::prelude::{DollyTransform, DollyTransformType};
 use bevy::prelude::*;
 use dolly::{driver::RigDriver, prelude::*};
 
 impl Fpv {
     pub fn from_position_target(target_transform: Transform) -> Self {
         let mut yp = YawPitch::new();
-        let dolly_transform = DollyTransform::from(target_transform);
-        yp.set_rotation_quat(dolly_transform.rotation);
+        yp.set_rotation_quat(target_transform.rotation);
         Self(
             CameraRig::builder()
                 .with(Position {
-                    position: dolly_transform.position,
+                    position: target_transform.translation,
                 })
                 .with(Rotation {
-                    rotation: dolly_transform.rotation,
+                    rotation: target_transform.rotation,
                 })
                 .with(yp)
                 .with(Smooth::new_position_rotation(1.0, 0.1))
@@ -58,11 +56,11 @@ impl Fpv {
 
 /// A custom camera rig which combines smoothed movement with a look-at driver.
 #[derive(Debug, Deref, DerefMut)]
-pub struct Fpv(CameraRig<RightHanded>);
+pub struct Fpv(CameraRig);
 
 // Turn the nested rig into a driver, so it can be used in another rig.
-impl RigDriver<RightHanded> for Fpv {
-    fn update(&mut self, params: dolly::rig::RigUpdateParams<RightHanded>) -> DollyTransformType {
+impl RigDriver for Fpv {
+    fn update(&mut self, params: dolly::rig::RigUpdateParams) -> Transform {
         self.0.update(params.delta_time_seconds)
     }
 }

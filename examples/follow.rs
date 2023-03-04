@@ -67,10 +67,8 @@ fn update_camera(q0: Query<(&Transform, With<Rotates>)>, mut q1: Query<&mut Rig>
     let player = q0.single().0.to_owned();
     let mut rig = q1.single_mut();
 
-    let dolly_transform = DollyTransform::from(player);
-
     rig.driver_mut::<MovableLookAt>()
-        .set_position_target(dolly_transform.position, dolly_transform.rotation);
+        .set_position_target(player.translation, player.rotation);
 }
 
 #[derive(Component)]
