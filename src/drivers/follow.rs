@@ -27,7 +27,7 @@ impl MovableLookAt {
 }
 
 /// A custom camera rig which combines smoothed movement with a look-at driver.
-#[derive(Debug, Deref, DerefMut)]
+#[derive(Component, Debug, Deref, DerefMut)]
 pub struct MovableLookAt(CameraRig);
 
 // Turn the nested rig into a driver, so it can be used in another rig.
