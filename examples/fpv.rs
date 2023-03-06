@@ -86,7 +86,7 @@ fn update_fpvtype(keys: Res<Input<KeyCode>>, mut fps_state: ResMut<State<Movemen
         };
 
         println!("State:{result:?}");
-        let _ = fps_state.0 = result;
+        fps_state.0 = result;
     }
 }
 
