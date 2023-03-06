@@ -13,7 +13,7 @@ struct SecondCamera;
 
 fn main() {
     App::new()
-        .insert_resource(Msaa { samples: 4 })
+        .insert_resource(Msaa::default())
         .add_plugins(DefaultPlugins)
         .add_plugin(DollyPosCtrl)
         .add_plugin(DollyCursorGrab)
@@ -21,8 +21,8 @@ fn main() {
             default_player: false,
             ..Default::default()
         })
+        .add_state::<Pan>()
         .add_dolly_component(MainCamera)
-        .add_state(Pan::Mouse)
         .add_startup_system(setup)
         .add_system(update_camera)
         .add_system(swap_camera)
@@ -30,8 +30,9 @@ fn main() {
         .run();
 }
 
-#[derive(PartialEq, Eq, Debug, Clone, Copy, Hash)]
+#[derive(States, Default, PartialEq, Eq, Debug, Clone, Copy, Hash)]
 enum Pan {
+    #[default]
     Mouse,
     Keys,
 }
@@ -45,7 +46,10 @@ fn setup(
 ) {
     // plane
     commands.spawn(PbrBundle {
-        mesh: meshes.add(Mesh::from(shape::Plane { size: 5.0 })),
+        mesh: meshes.add(Mesh::from(shape::Plane {
+            size: 5.0,
+            ..Default::default()
+        })),
         material: materials.add(Color::rgb(0.3, 0.5, 0.3).into()),
         ..default()
     });
@@ -67,7 +71,7 @@ fn setup(
             .with(dolly::drivers::Position::new(Vec3::ZERO))
             .with(YawPitch::new().yaw_degrees(45.0).pitch_degrees(-30.0))
             .with(Smooth::new_position(0.3))
-            .with(Smooth::new_rotation(1.5))
+            .with(Smooth::new_rotation(0.3))
             .with(Arm::new(Vec3::Z * 4.0))
             .build(),
     ));
@@ -177,7 +181,7 @@ fn update_camera(
 
     config.rotation = Quat::from_rotation_y(delta.x);
 
-    if pan.current().eq(&Pan::Keys) {
+    if pan.0.eq(&Pan::Keys) {
         if keys.just_pressed(KeyCode::Z) {
             camera_driver.rotate_yaw_pitch(-90.0, 0.0);
         }
@@ -192,12 +196,12 @@ fn update_camera(
     }
 
     if keys.just_pressed(KeyCode::E) {
-        let result = if pan.current().eq(&Pan::Keys) {
+        let result = if pan.0.eq(&Pan::Keys) {
             Pan::Mouse
         } else {
             Pan::Keys
         };
-        pan.overwrite_set(result);
+        pan.0 = result;
         println!("State:{result:?}");
     }
 

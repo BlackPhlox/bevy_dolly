@@ -1,22 +1,22 @@
-use bevy::input::mouse::MouseMotion;
-use bevy::prelude::*;
+use bevy::{input::mouse::MouseMotion, prelude::*, window::PrimaryWindow};
 use bevy_dolly::prelude::*;
 
 #[derive(Component)]
 struct MainCamera;
 
-#[derive(Clone, Debug, Eq, PartialEq, Hash)]
+#[derive(States, Default, Clone, Debug, Eq, PartialEq, Hash)]
 enum MovementType {
+    #[default]
     FirstPerson,
     Free,
 }
 
 fn main() {
     App::new()
-        .insert_resource(Msaa { samples: 4 })
+        .insert_resource(Msaa::default())
         .add_plugins(DefaultPlugins)
         .add_plugin(DollyCursorGrab)
-        .add_state(MovementType::FirstPerson)
+        .add_state::<MovementType>()
         .add_dolly_component(MainCamera)
         .add_startup_system(setup)
         .add_system(update_fpvtype)
@@ -33,7 +33,10 @@ fn setup(
 ) {
     // plane
     commands.spawn(PbrBundle {
-        mesh: meshes.add(Mesh::from(shape::Plane { size: 5.0 })),
+        mesh: meshes.add(Mesh::from(shape::Plane {
+            size: 5.0,
+            ..Default::default()
+        })),
         material: materials.add(Color::rgb(0.3, 0.5, 0.3).into()),
         ..default()
     });
@@ -47,7 +50,7 @@ fn setup(
         ..default()
     });
 
-    let translation = [-2.0f32, 2.0f32, 5.0f32];
+    let translation = [2.0f32, 2.0f32, 5.0f32];
     let transform =
         Transform::from_translation(Vec3::from_slice(&translation)).looking_at(Vec3::ZERO, Vec3::Y);
 
@@ -76,21 +79,21 @@ fn setup(
 
 fn update_fpvtype(keys: Res<Input<KeyCode>>, mut fps_state: ResMut<State<MovementType>>) {
     if keys.just_pressed(KeyCode::F) {
-        let result = if fps_state.current().eq(&MovementType::FirstPerson) {
+        let result = if fps_state.0.eq(&MovementType::FirstPerson) {
             MovementType::Free
         } else {
             MovementType::FirstPerson
         };
 
         println!("State:{result:?}");
-        let _ = fps_state.overwrite_set(result);
+        let _ = fps_state.0 = result;
     }
 }
 
 fn update_camera(
     time: Res<Time>,
     keys: Res<Input<KeyCode>>,
-    windows: Res<Windows>,
+    windows: Query<&Window, With<PrimaryWindow>>,
     fps_state: Res<State<MovementType>>,
     mut mouse_motion_events: EventReader<MouseMotion>,
     mut rig_q: Query<&mut Rig>,
@@ -139,13 +142,13 @@ fn update_camera(
         move_vec,
         boost,
         boost_mult,
-        fps_state.current().eq(&MovementType::FirstPerson),
+        fps_state.0.eq(&MovementType::FirstPerson),
     );
 
-    let window = windows.get_primary();
-
-    if window.is_some() && !window.unwrap().cursor_visible() {
-        rig.driver_mut::<Fpv>()
-            .set_rotation(delta, sensitivity, move_vec, time_delta_seconds);
+    if let Ok(window) = windows.get_single() {
+        if !window.cursor.visible {
+            rig.driver_mut::<Fpv>()
+                .set_rotation(delta, sensitivity, move_vec, time_delta_seconds);
+        }
     }
 }

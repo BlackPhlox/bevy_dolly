@@ -5,7 +5,7 @@ use bevy::{
     core_pipeline::clear_color::ClearColorConfig,
     prelude::*,
     render::camera::Viewport,
-    window::{WindowId, WindowResized},
+    window::{PrimaryWindow, WindowResized},
 };
 use bevy_dolly::prelude::*;
 
@@ -36,7 +36,10 @@ fn setup(
 ) {
     // plane
     commands.spawn(PbrBundle {
-        mesh: meshes.add(Mesh::from(shape::Plane { size: 100.0 })),
+        mesh: meshes.add(Mesh::from(shape::Plane {
+            size: 100.0,
+            subdivisions: 0,
+        })),
         material: materials.add(Color::rgb(0.3, 0.5, 0.3).into()),
         ..default()
     });
@@ -102,7 +105,7 @@ fn setup(
                 ..default()
             },
             camera: Camera {
-                priority: 1,
+                order: 1,
                 ..default()
             },
             ..default()
@@ -111,27 +114,34 @@ fn setup(
 }
 
 fn set_camera_viewports(
-    windows: Res<Windows>,
+    windows: Query<(Entity, &Window), With<PrimaryWindow>>,
     mut resize_events: EventReader<WindowResized>,
     mut left_camera: Query<&mut Camera, (With<LeftCamera>, Without<RightCamera>)>,
     mut right_camera: Query<&mut Camera, With<RightCamera>>,
 ) {
     for resize_event in resize_events.iter() {
-        if resize_event.id == WindowId::primary() {
-            let window = windows.primary();
-            let mut left_camera = left_camera.single_mut();
-            left_camera.viewport = Some(Viewport {
-                physical_position: UVec2::new(0, 0),
-                physical_size: UVec2::new(window.physical_width() / 2, window.physical_height()),
-                depth: 0.0..1.0,
-            });
+        if let Ok((entity, window)) = windows.get_single() {
+            if resize_event.window == entity {
+                let mut left_camera = left_camera.single_mut();
+                left_camera.viewport = Some(Viewport {
+                    physical_position: UVec2::new(0, 0),
+                    physical_size: UVec2::new(
+                        window.physical_width() / 2,
+                        window.physical_height(),
+                    ),
+                    depth: 0.0..1.0,
+                });
 
-            let mut right_camera = right_camera.single_mut();
-            right_camera.viewport = Some(Viewport {
-                physical_position: UVec2::new(window.physical_width() / 2, 0),
-                physical_size: UVec2::new(window.physical_width() / 2, window.physical_height()),
-                depth: 0.0..1.0,
-            });
+                let mut right_camera = right_camera.single_mut();
+                right_camera.viewport = Some(Viewport {
+                    physical_position: UVec2::new(window.physical_width() / 2, 0),
+                    physical_size: UVec2::new(
+                        window.physical_width() / 2,
+                        window.physical_height(),
+                    ),
+                    depth: 0.0..1.0,
+                });
+            }
         }
     }
 }

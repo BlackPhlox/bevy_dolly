@@ -1,4 +1,7 @@
-use bevy::{ecs::schedule::ShouldRun, prelude::*, window::CursorGrabMode};
+use bevy::{
+    prelude::*,
+    window::{CursorGrabMode, PrimaryWindow},
+};
 use leafwing_input_manager::{
     prelude::{ActionState, InputMap},
     Actionlike, InputManagerBundle,
@@ -10,32 +13,27 @@ impl Plugin for DollyCursorGrab {
         app.init_resource::<DollyCursorGrabConfig>()
             .add_startup_system(initial_grab_cursor)
             .add_startup_system(dolly_cursor_grab_input_setup)
-            .add_system_set(
-                SystemSet::new()
-                    .with_run_criteria(use_grab)
-                    .with_system(cursor_grab),
-            );
+            .add_system(cursor_grab.run_if(use_grab));
     }
 }
 
 #[derive(Resource)]
 pub struct DollyCursorGrabConfig {
     pub enabled: bool,
-    pub visible: bool
+    pub visible: bool,
 }
 
 impl Default for DollyCursorGrabConfig {
     fn default() -> Self {
-        DollyCursorGrabConfig { enabled: true, visible: false }
+        DollyCursorGrabConfig {
+            enabled: true,
+            visible: false,
+        }
     }
 }
 
-fn use_grab(config: Res<DollyCursorGrabConfig>) -> ShouldRun {
-    if config.enabled {
-        ShouldRun::Yes
-    } else {
-        ShouldRun::No
-    }
+fn use_grab(config: Res<DollyCursorGrabConfig>) -> bool {
+    config.enabled
 }
 
 #[derive(Component)]
@@ -74,29 +72,32 @@ impl Default for DollyCursorGrabInputBundle {
 
 /// Grabs/ungrabs mouse cursor
 fn toggle_grab_cursor(window: &mut Window) -> bool {
-    match window.cursor_grab_mode() {
+    match window.cursor.grab_mode {
         CursorGrabMode::None => {
-            window.set_cursor_grab_mode(CursorGrabMode::Confined);
-            window.set_cursor_visibility(false);
+            window.cursor.grab_mode = CursorGrabMode::Confined;
+            window.cursor.visible = false;
             false
         }
         _ => {
-            window.set_cursor_grab_mode(CursorGrabMode::None);
-            window.set_cursor_visibility(true);
+            window.cursor.grab_mode = CursorGrabMode::None;
+            window.cursor.visible = true;
             true
         }
     }
 }
 
 /// Grabs the cursor when game first starts
-fn initial_grab_cursor(mut windows: ResMut<Windows>, mut config: ResMut<DollyCursorGrabConfig>) {
+fn initial_grab_cursor(
+    mut windows: Query<&mut Window, With<PrimaryWindow>>,
+    mut config: ResMut<DollyCursorGrabConfig>,
+) {
     config.visible = if !config.enabled {
-        if let Some(window) = windows.get_primary_mut() {
+        if let Ok(window) = &mut windows.get_single_mut() {
             toggle_grab_cursor(window)
         } else {
             false
         }
-    } else if let Some(window) = windows.get_primary_mut() {
+    } else if let Ok(window) = &mut windows.get_single_mut() {
         toggle_grab_cursor(window)
     } else {
         warn!("Primary window not found for `initial_grab_cursor`!");
@@ -105,20 +106,22 @@ fn initial_grab_cursor(mut windows: ResMut<Windows>, mut config: ResMut<DollyCur
 }
 
 fn cursor_grab(
-    mut windows: ResMut<Windows>,
+    mut windows: Query<&mut Window, With<PrimaryWindow>>,
     keys: Res<Input<KeyCode>>,
-    act_query: Query<&ActionState<GrabAction>, With<DollyCursorGrabAction>>,
-    mut config: ResMut<DollyCursorGrabConfig>
+    //act_query: Query<&ActionState<GrabAction>, With<DollyCursorGrabAction>>,
+    mut config: ResMut<DollyCursorGrabConfig>,
 ) {
-    if let Some(window) = windows.get_primary_mut() {
-        if let Ok(grab_action) = act_query.get_single() {
-            if keys.just_pressed(KeyCode::Escape) {
-                config.visible = toggle_grab_cursor(window);
-            }
-            // This doesn't work:
-            if grab_action.just_pressed(GrabAction::Exit) {
-                config.visible = toggle_grab_cursor(window);
-            }
+    if let Ok(window) = &mut windows.get_single_mut() {
+        //if let Ok(grab_action) = act_query.get_single() {
+        if keys.just_pressed(KeyCode::Escape) {
+            config.visible = toggle_grab_cursor(window);
         }
+        // This doesn't work:
+        /*
+        if grab_action.just_pressed(GrabAction::Exit) {
+            config.visible = toggle_grab_cursor(window);
+        }
+        */
+        //}
     }
 }

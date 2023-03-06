@@ -1,26 +1,16 @@
-use std::fmt::Display;
-
-use bevy::{
-    ecs::schedule::ShouldRun,
-    math::{Quat, Vec3},
-    pbr::PbrBundle,
-    prelude::{
-        default, App, Assets, BuildChildren, Bundle, Color, Commands, Component, GamepadAxisType,
-        GamepadButtonType, IntoSystemDescriptor, KeyCode, Mesh, Plugin, Query, Res, ResMut,
-        Resource, SpatialBundle, StandardMaterial, SystemLabel, SystemSet, Time, Transform, With,
-    },
-};
+use bevy::prelude::*;
 use leafwing_input_manager::prelude::*;
+use std::fmt::Display;
 
 use super::cone::Cone;
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash, SystemLabel)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, SystemSet)]
 pub struct DollyPosCtrlMoveLabel;
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash, SystemLabel)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, SystemSet)]
 pub struct DollyPosCtrlInputSetupLabel;
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash, SystemLabel)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, SystemSet)]
 pub struct DollyPosCtrlEntitySetupLabel;
 
 pub struct DollyPosCtrl;
@@ -29,15 +19,15 @@ impl Plugin for DollyPosCtrl {
         app.add_plugin(InputManagerPlugin::<MoveAction>::default());
         app.init_resource::<DollyPosCtrlConfig>();
         app.add_startup_system(
-            dolly_pos_ctrl_config_input_setup.label(DollyPosCtrlInputSetupLabel),
+            dolly_pos_ctrl_config_input_setup.in_set(DollyPosCtrlInputSetupLabel),
         );
         app.add_startup_system(
-            dolly_pos_ctrl_config_entity_setup.label(DollyPosCtrlEntitySetupLabel),
+            dolly_pos_ctrl_config_entity_setup.in_set(DollyPosCtrlEntitySetupLabel),
         );
-        app.add_system_set(
-            SystemSet::new()
-                .with_run_criteria(use_dolly_pos_ctrl_config)
-                .with_system(dolly_pos_ctrl_move_update.label(DollyPosCtrlMoveLabel)),
+        app.add_system(
+            dolly_pos_ctrl_move_update
+                .in_set(DollyPosCtrlMoveLabel)
+                .run_if(use_dolly_pos_ctrl_config),
         );
     }
 }
@@ -80,12 +70,8 @@ impl Default for DollyPosCtrlConfig {
     }
 }
 
-fn use_dolly_pos_ctrl_config(config: Res<DollyPosCtrlConfig>) -> ShouldRun {
-    if config.enabled {
-        ShouldRun::Yes
-    } else {
-        ShouldRun::No
-    }
+fn use_dolly_pos_ctrl_config(config: Res<DollyPosCtrlConfig>) -> bool {
+    config.enabled
 }
 
 #[derive(Component)]

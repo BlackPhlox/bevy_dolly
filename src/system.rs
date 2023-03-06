@@ -1,7 +1,7 @@
 use crate::prelude::*;
 use bevy::prelude::*;
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash, SystemLabel)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, SystemSet)]
 pub struct DollyComponentLabel;
 
 pub trait DollyComponent {
@@ -12,15 +12,15 @@ pub trait DollyComponent {
 
 impl DollyComponent for App {
     fn add_dolly_component<T: Component>(&mut self, _: T) -> &mut Self {
-        self.add_system(dolly_component_cam_change_detection::<T>.label(DollyComponentLabel))
+        self.add_system(dolly_component_cam_change_detection::<T>.in_set(DollyComponentLabel))
     }
 
     fn add_rig_component<T: Component>(&mut self, _: T) -> &mut Self {
-        self.add_system(dolly_component_change_detection::<T>.label(DollyComponentLabel))
+        self.add_system(dolly_component_change_detection::<T>.in_set(DollyComponentLabel))
     }
 
     fn add_dolly_2d_component<T: Component>(&mut self, _: T) -> &mut Self {
-        self.add_system(dolly_2d_component_cam_change_detection::<T>.label(DollyComponentLabel))
+        self.add_system(dolly_2d_component_cam_change_detection::<T>.in_set(DollyComponentLabel))
     }
 }
 

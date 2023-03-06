@@ -33,22 +33,23 @@ dolly = { path = "dolly", default-features = false }
 leafwing-input-manager = { version = "0.8", optional = true }
 
 [dependencies.bevy]
-version = "0.9"
-features = ["render", "bevy_asset"]
+version = "0.10"
+features = ["bevy_render", "bevy_asset"]
 default-features = false
 
 [dev-dependencies]
 leafwing-input-manager = "0.8"
 
 [dev-dependencies.bevy]
-version = "0.9"
-features = ["bevy_asset", "bevy_scene", "bevy_winit", "bevy_gltf", "png"]
+version = "0.10"
+features = ["bevy_core_pipeline", "bevy_asset", "bevy_scene", "bevy_pbr", "bevy_winit", "bevy_gltf", "bevy_sprite",  "png"]
 default-features = false
 
 [target.'cfg(target_os = "linux")'.dev-dependencies.bevy]
-version = "0.9"
+version = "0.10"
 features = ["x11", "wayland"]
 default-features = false
 
 [patch.crates-io]
-glam = { git = "https://github.com/bitshifter/glam-rs", tag = "0.22.0" } # keep in sync with bevy
+leafwing-input-manager = { git = "https://github.com/TimJentzsch/leafwing-input-manager", branch = "bevy-0.10" }
+

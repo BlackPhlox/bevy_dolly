@@ -11,24 +11,25 @@ struct MainCamera;
 // All you need to do is set a LookAt driver target_entity
 // and its will track it
 
-#[derive(Clone, Eq, PartialEq, Debug, Hash)]
+#[derive(States, Default, Clone, Eq, PartialEq, Debug, Hash)]
 enum Camera {
+    #[default]
     FollowPlayer,
     FollowSheep,
 }
 
 fn main() {
     App::new()
-        .insert_resource(Msaa { samples: 4 })
+        .insert_resource(Msaa::default())
         .add_plugins(DefaultPlugins)
         .add_plugin(DollyPosCtrl)
         .add_dolly_component(MainCamera)
         .add_startup_system(setup)
         .add_system(rotator_system)
-        .add_state(Camera::FollowSheep)
+        .add_state::<Camera>()
         .add_system(switch_camera_rig)
-        .add_system_set(SystemSet::on_update(Camera::FollowPlayer).with_system(follow_player))
-        .add_system_set(SystemSet::on_update(Camera::FollowSheep).with_system(follow_sheep))
+        .add_system(follow_player.in_set(OnUpdate(Camera::FollowPlayer)))
+        .add_system(follow_sheep.in_set(OnUpdate(Camera::FollowSheep)))
         .run();
 }
 
@@ -41,7 +42,10 @@ fn setup(
 ) {
     // plane
     commands.spawn(PbrBundle {
-        mesh: meshes.add(Mesh::from(shape::Plane { size: 5.0 })),
+        mesh: meshes.add(Mesh::from(shape::Plane {
+            size: 5.0,
+            ..Default::default()
+        })),
         material: materials.add(Color::rgb(0.3, 0.5, 0.3).into()),
         ..default()
     });
@@ -135,13 +139,13 @@ fn rotator_system(time: Res<Time>, mut query: Query<&mut Transform, With<Rotates
 #[allow(unused_must_use)]
 fn switch_camera_rig(mut camera: ResMut<State<Camera>>, keyboard_input: Res<Input<KeyCode>>) {
     if keyboard_input.just_pressed(KeyCode::C) {
-        let result = if camera.current().eq(&Camera::FollowPlayer) {
+        let result = if camera.0.eq(&Camera::FollowPlayer) {
             Camera::FollowSheep
         } else {
             Camera::FollowPlayer
         };
 
         println!("{result:?}");
-        camera.set(result);
+        camera.0 = result;
     }
 }
