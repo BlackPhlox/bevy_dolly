@@ -10,10 +10,11 @@ fn main() {
     App::new()
         .insert_resource(Msaa::default())
         .add_plugins(DefaultPlugins)
-        .add_dolly_component(MainCamera)
         .add_startup_system(setup)
         .add_system(rotator_system)
         .add_system(update_camera)
+        //.add_dolly_component(MainCamera)
+        .add_system(Dolly::<MainCamera>::update_active)
         .run();
 }
 
