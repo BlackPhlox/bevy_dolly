@@ -17,7 +17,7 @@ It is important to note that dolly is a way to translate the camera and thus, no
 
 Dolly requires two steps to function:
 1. Creating a `CameraRig` we are able to define drivers on which the dolly can enact, these drivers can both be constraints and functionality.
-2. A marker component that is inserted on both the Camera and the Rig
+2. A marker component that is registered on both the Camera and the Rig.
 
 To see how this is done in bevy, please look at this repository's [examples](/examples/).
 
