@@ -5,13 +5,13 @@ use std::fmt::Display;
 use super::cone::Cone;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, SystemSet)]
-pub struct DollyPosCtrlMoveLabel;
+pub struct DollyPosCtrlMoveSet;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, SystemSet)]
-pub struct DollyPosCtrlInputSetupLabel;
+pub struct DollyPosCtrlInputSetupSet;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, SystemSet)]
-pub struct DollyPosCtrlEntitySetupLabel;
+pub struct DollyPosCtrlEntitySetupSet;
 
 pub struct DollyPosCtrl;
 impl Plugin for DollyPosCtrl {
@@ -19,14 +19,14 @@ impl Plugin for DollyPosCtrl {
         app.add_plugin(InputManagerPlugin::<MoveAction>::default());
         app.init_resource::<DollyPosCtrlConfig>();
         app.add_startup_system(
-            dolly_pos_ctrl_config_input_setup.in_set(DollyPosCtrlInputSetupLabel),
+            dolly_pos_ctrl_config_input_setup.in_set(DollyPosCtrlInputSetupSet),
         );
         app.add_startup_system(
-            dolly_pos_ctrl_config_entity_setup.in_set(DollyPosCtrlEntitySetupLabel),
+            dolly_pos_ctrl_config_entity_setup.in_set(DollyPosCtrlEntitySetupSet),
         );
         app.add_system(
             dolly_pos_ctrl_move_update
-                .in_set(DollyPosCtrlMoveLabel)
+                .in_set(DollyPosCtrlMoveSet)
                 .run_if(use_dolly_pos_ctrl_config),
         );
     }
