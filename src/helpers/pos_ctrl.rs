@@ -18,9 +18,7 @@ impl Plugin for DollyPosCtrl {
     fn build(&self, app: &mut App) {
         app.add_plugin(InputManagerPlugin::<MoveAction>::default());
         app.init_resource::<DollyPosCtrlConfig>();
-        app.add_startup_system(
-            dolly_pos_ctrl_config_input_setup.in_set(DollyPosCtrlInputSetupSet),
-        );
+        app.add_startup_system(dolly_pos_ctrl_config_input_setup.in_set(DollyPosCtrlInputSetupSet));
         app.add_startup_system(
             dolly_pos_ctrl_config_entity_setup.in_set(DollyPosCtrlEntitySetupSet),
         );
