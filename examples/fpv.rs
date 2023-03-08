@@ -17,7 +17,7 @@ fn main() {
         .add_plugins(DefaultPlugins)
         .add_plugin(DollyCursorGrab)
         .add_state::<MovementType>()
-        .add_dolly_component(MainCamera)
+        .add_system(Dolly::<MainCamera>::update_active)
         .add_startup_system(setup)
         .add_system(update_fpvtype)
         .add_system(update_camera)

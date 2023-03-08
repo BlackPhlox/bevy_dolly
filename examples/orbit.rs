@@ -22,7 +22,7 @@ fn main() {
             ..Default::default()
         })
         .add_state::<Pan>()
-        .add_dolly_component(MainCamera)
+        .add_system(Dolly::<MainCamera>::update_active)
         .add_startup_system(setup)
         .add_system(update_camera)
         .add_system(swap_camera)
@@ -169,6 +169,7 @@ fn update_camera(
     mut rig_q: Query<&mut Rig>,
     trans: Query<&Transform, With<DollyPosCtrlMove>>,
     mut config: ResMut<DollyPosCtrlConfig>,
+    grab_config: Res<DollyCursorGrabConfig>,
 ) {
     let mut rig = rig_q.single_mut();
     let camera_driver = rig.driver_mut::<YawPitch>();
@@ -189,10 +190,12 @@ fn update_camera(
             camera_driver.rotate_yaw_pitch(90.0, 0.0);
         }
     } else {
-        camera_driver.rotate_yaw_pitch(
-            -0.1 * delta.x * sensitivity.x,
-            -0.1 * delta.y * sensitivity.y,
-        );
+        if !grab_config.visible {
+            camera_driver.rotate_yaw_pitch(
+                -0.1 * delta.x * sensitivity.x,
+                -0.1 * delta.y * sensitivity.y,
+            );
+        }
     }
 
     if keys.just_pressed(KeyCode::E) {

@@ -12,8 +12,8 @@ use bevy_dolly::prelude::*;
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
-        .add_dolly_component(LeftCamera)
-        .add_dolly_component(RightCamera)
+        .add_system(Dolly::<LeftCamera>::update_active)
+        .add_system(Dolly::<RightCamera>::update_active)
         .add_startup_system(setup)
         .add_system(set_camera_viewports)
         .add_system(update_camera_1)
