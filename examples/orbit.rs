@@ -188,13 +188,11 @@ fn update_camera(
         if keys.just_pressed(KeyCode::X) {
             camera_driver.rotate_yaw_pitch(90.0, 0.0);
         }
-    } else {
-        if !grab_config.visible {
-            camera_driver.rotate_yaw_pitch(
-                -0.1 * delta.x * sensitivity.x,
-                -0.1 * delta.y * sensitivity.y,
-            );
-        }
+    } else if !grab_config.visible {
+        camera_driver.rotate_yaw_pitch(
+            -0.1 * delta.x * sensitivity.x,
+            -0.1 * delta.y * sensitivity.y,
+        );
     }
 
     if keys.just_pressed(KeyCode::E) {
