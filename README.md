@@ -1,5 +1,5 @@
 <h1>bevy_dolly</h1>
-</div>
+<div align="center">
 <table>
   <tr>
     <th>Static</th>
@@ -10,6 +10,7 @@
     <td><a href="https://github.com/BlackPhlox/bevy_dolly"><img src="https://raw.githubusercontent.com/BlackPhlox/BlackPhlox/master/bevy_dolly_dev_0.svg" alt="bevy dolly pinned"></a></td>
   </tr>
 </table>
+</div>
 
 `bevy_dolly` is a prototype plugin using [h3r2tic](https://github.com/h3r2tic)'s powerful crate: [dolly](https://github.com/h3r2tic/dolly), implemented for bevy.<br/>
 
