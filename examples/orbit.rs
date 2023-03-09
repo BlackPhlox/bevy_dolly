@@ -1,8 +1,7 @@
 #![allow(clippy::type_complexity)]
-use bevy::input::mouse::MouseWheel;
+use bevy::input::mouse::{MouseMotion, MouseWheel};
 use bevy::prelude::*;
-use bevy::{input::mouse::MouseMotion, render::camera::ScalingMode};
-use bevy_dolly::prelude::cursor_grab::DollyCursorGrab;
+use bevy::render::camera::ScalingMode;
 use bevy_dolly::prelude::*;
 
 #[derive(Component)]
@@ -68,7 +67,7 @@ fn setup(
     commands.spawn((
         MainCamera,
         Rig::builder()
-            .with(dolly::drivers::Position::new(Vec3::ZERO))
+            .with(Position::new(Vec3::ZERO))
             .with(YawPitch::new().yaw_degrees(45.0).pitch_degrees(-30.0))
             .with(Smooth::new_position(0.3))
             .with(Smooth::new_rotation(0.3))
