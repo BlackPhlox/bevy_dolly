@@ -33,6 +33,7 @@ struct MainCamera;
 fn main() {
   App::new()
     .add_plugins(DefaultPlugins)
+    .add_startup_system(setup)
     //..
     .add_system(Dolly::<MainCamera>::update_active)
     //..
@@ -48,12 +49,12 @@ fn setup(
   commands.spawn((
     MainCamera, // The rig tag
     Rig::builder()
-            .with(Position::new(Vec3::ZERO))
-            .with(YawPitch::new().yaw_degrees(45.0).pitch_degrees(-30.0))
-            .with(Smooth::new_position(0.3))
-            .with(Smooth::new_rotation(0.3))
-            .with(Arm::new(Vec3::Z * 4.0))
-            .build(),
+      .with(Position::new(Vec3::ZERO))
+      .with(YawPitch::new().yaw_degrees(45.0).pitch_degrees(-30.0))
+      .with(Smooth::new_position(0.3))
+      .with(Smooth::new_rotation(0.3))
+      .with(Arm::new(Vec3::Z * 4.0))
+      .build(),
     Camera3dBundle::default(),
   ));
 }
@@ -84,7 +85,7 @@ Reference
 There is a bunch of other bevy camera controllers that are worth checking out, especially if you are just starting out learning bevy:
 
 - [smooth-bevy-cameras](https://github.com/bonsairobo/smooth-bevy-cameras) - 3 Smooth Camera controllers: Fps, Orbit or Unreal
-- [bevy_flycam]([bevy_flycam](https://github.com/sburris0/bevy_flycam)) - A simple fly camera
+- [bevy_flycam](https://github.com/sburris0/bevy_flycam) - A simple fly camera
 - [bevy_fly_camera](https://github.com/mcpar-land/bevy_fly_camera)  - A advanced fly camera
 - [bevy_config_cam](https://github.com/BlackPhlox/bevy_config_cam) - Plugin that enables to use collection of different camera controllers at runtime, uses bevy_dolly as the backend
 
