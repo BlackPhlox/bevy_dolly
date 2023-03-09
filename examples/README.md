@@ -32,6 +32,8 @@ Example showing the Fpv driver. Camera controller is comparable to :
 
 - [bevy_flycam](https://github.com/sburris0/bevy_flycam)
 
+- [bevy_spectator](https://github.com/JonahPlusPlus/bevy_spectator)
+
 ## `look_at`
 
 Simple default camera example of tracking (the `LookAt` driver) the player (Cone).
