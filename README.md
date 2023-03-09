@@ -59,7 +59,7 @@ fn setup(
   ));
 }
 ```
-Link to examples readme
+Link to [examples readme](/examples/README.md)
 
 ## Examples
 
