@@ -247,7 +247,7 @@ fn dolly_pos_ctrl_move_update(
         velocity += right * -action_state.clamped_value(MoveAction::StrafeLeft);
 
         velocity += Vec3::Y * action_state.clamped_value(MoveAction::Up);
-        velocity += Vec3::Y * action_state.clamped_value(MoveAction::Down);
+        velocity += Vec3::Y * -action_state.clamped_value(MoveAction::Down);
 
         if action_state.pressed(MoveAction::RotateRight) {
             //Wrapping around
