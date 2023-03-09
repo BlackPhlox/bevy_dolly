@@ -80,11 +80,12 @@ Reference
 
 ## Alternatives
 
-Cameras:
-- https://github.com/bonsairobo/smooth-bevy-cameras - 3 Smooth Camera controllers: Fps, Orbit or Unreal
-- https://github.com/mcpar-land/bevy_fly_camera - 
-- https://github.com/sburris0/bevy_flycam - A simple fly camera
-- https://github.com/BlackPhlox/bevy_config_cam - Plugin that enables to use collection of different camera controllers at runtime, uses bevy_dolly as the backend
+There is a bunch of other bevy camera controllers that are worth checking out, especially if you are just starting out learning bevy:
+
+- [smooth-bevy-cameras](https://github.com/bonsairobo/smooth-bevy-cameras) - 3 Smooth Camera controllers: Fps, Orbit or Unreal
+- [bevy_flycam]([bevy_flycam](https://github.com/sburris0/bevy_flycam)) - A simple fly camera
+- [bevy_fly_camera](https://github.com/mcpar-land/bevy_fly_camera)  - A advanced fly camera
+- [bevy_config_cam](https://github.com/BlackPhlox/bevy_config_cam) - Plugin that enables to use collection of different camera controllers at runtime, uses bevy_dolly as the backend
 
 ## Licensing
 The project is under dual license MIT and Apache 2.0, so joink to your hearts content, just remember the license agreements.
