@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 use leafwing_input_manager::prelude::*;
-use std::fmt::Display;
+use std::{any::TypeId, fmt::Display};
 
 use super::cone::Cone;
 
@@ -13,6 +13,27 @@ pub struct DollyPosCtrlInputSetupSet;
 #[derive(Debug, Clone, PartialEq, Eq, Hash, SystemSet)]
 pub struct DollyPosCtrlEntitySetupSet;
 
+/// This plugin is a simple player controller
+/// Add the Bevy Component: DollyPosCtrlMove
+/// to an entity to allow that entity's transform to
+/// be mutated by the plugin. Use code below in the
+/// app building step to override default behavior of the plugin:
+/// ```rs
+/// use bevy::prelude::*;
+/// use bevy_dolly::prelude::*;
+/// fn main() {
+///     App::new()
+///         .add_plugins(DefaultPlugins)
+///         .add_plugin(DollyPosCtrl)
+///         .insert_resource(DollyPosCtrlConfig {
+///             ..Default::default()
+///     }).run();
+/// }
+///
+/// fn setup(mut commands: Commands){
+///     commands.spawn(/* Your player entity here */, DollyPosCtrlMove));
+/// }
+/// ```
 pub struct DollyPosCtrl;
 impl Plugin for DollyPosCtrl {
     fn build(&self, app: &mut App) {
@@ -51,7 +72,6 @@ pub struct DollyPosCtrlConfig {
     pub pin: bool,
     pub position: Vec3,
     pub rotation: Quat,
-    pub default_player: bool,
 }
 
 impl Default for DollyPosCtrlConfig {
@@ -63,7 +83,6 @@ impl Default for DollyPosCtrlConfig {
             pin: true,
             position: Vec3::new(0., 0.5, 0.),
             rotation: Quat::IDENTITY,
-            default_player: true,
         }
     }
 }
@@ -189,40 +208,41 @@ fn dolly_pos_ctrl_config_entity_setup(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
     config: Res<DollyPosCtrlConfig>,
+    move_components: Query<Entity, With<DollyPosCtrlMove>>,
 ) {
-    if !config.default_player {
-        return;
-    }
+    let dolly_pos_ctrl_move_components = move_components.iter().len();
+    if dolly_pos_ctrl_move_components == 0 {
+        // Add default
+        let cone_mesh = meshes.add(Mesh::from(Cone {
+            height: 0.2,
+            radius: 0.1,
+            subdivisions: 5,
+        }));
 
-    let cone_mesh = meshes.add(Mesh::from(Cone {
-        height: 0.2,
-        radius: 0.1,
-        subdivisions: 5,
-    }));
-
-    let player_mat = materials.add(StandardMaterial {
-        base_color: Color::rgba(1.0, 0.0, 0.0, 0.5),
-        unlit: true,
-        ..default()
-    });
-
-    commands
-        .spawn(SpatialBundle::from_transform(Transform {
-            rotation: Quat::IDENTITY,
-            translation: config.position,
+        let player_mat = materials.add(StandardMaterial {
+            base_color: Color::rgba(1.0, 0.0, 0.0, 0.5),
+            unlit: true,
             ..default()
-        }))
-        .with_children(|cell| {
-            cell.spawn(PbrBundle {
-                mesh: cone_mesh.clone(),
-                material: player_mat.clone(),
-                transform: Transform::from_rotation(Quat::from_rotation_x(
-                    std::f32::consts::FRAC_PI_2,
-                )),
+        });
+
+        commands
+            .spawn(SpatialBundle::from_transform(Transform {
+                rotation: Quat::IDENTITY,
+                translation: config.position,
                 ..default()
-            });
-        })
-        .insert(DollyPosCtrlMove);
+            }))
+            .with_children(|cell| {
+                cell.spawn(PbrBundle {
+                    mesh: cone_mesh.clone(),
+                    material: player_mat.clone(),
+                    transform: Transform::from_rotation(Quat::from_rotation_x(
+                        std::f32::consts::FRAC_PI_2,
+                    )),
+                    ..default()
+                });
+            })
+            .insert(DollyPosCtrlMove);
+    }
 }
 
 fn dolly_pos_ctrl_move_update(
