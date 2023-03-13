@@ -70,16 +70,17 @@ fn setup(
     });
     commands.spawn(Transform::from_xyz(0., 0., 0.));
 
-    commands
-        .spawn(SceneBundle {
+    commands.spawn((
+        SceneBundle {
             scene: asset_server.load("poly_dolly.gltf#Scene0"),
             transform: Transform {
                 translation: Vec3::new(0., 0.2, 0.),
                 ..default()
             },
             ..default()
-        })
-        .insert(DollyPosCtrlMove);
+        },
+        DollyPosCtrlMove,
+    ));
 
     commands.spawn((
         MainCamera,
@@ -270,8 +271,7 @@ fn update_camera(
 
     if config.pin {
         if let Some(camera_pos) = rig.try_driver_mut::<Position>() {
-            if let Ok(pos) = trans.get_single() {
-                // + Offset
+            for pos in trans.iter() {
                 camera_pos.position = pos.translation + Vec3::new(0., 1., 0.);
             }
         }
