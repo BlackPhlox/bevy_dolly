@@ -1,8 +1,6 @@
-use bevy::{ecs::schedule::ScheduleLabel, input::mouse::MouseMotion, prelude::*};
+use bevy::prelude::*;
 use leafwing_input_manager::prelude::*;
 use std::fmt::Display;
-
-use crate::{dolly_type::Rig, drivers::fpv::Fpv, system::Dolly};
 
 use super::cone::Cone;
 
@@ -260,7 +258,6 @@ fn dolly_pos_ctrl_config_entity_setup(
         }
         Player::Entity(e) => {
             commands.entity(e).insert(DollyPosCtrlMove);
-            ()
         }
         Player::None => (),
     }
@@ -271,7 +268,6 @@ fn dolly_pos_ctrl_move_update(
     config: Res<DollyPosCtrlConfig>,
     mut transforms: Query<(&mut Transform, With<DollyPosCtrlMove>)>,
     act_query: Query<&ActionState<MoveAction>, With<DollyPosCtrlAction>>,
-    mut mouse_motion_events: EventReader<MouseMotion>,
 ) {
     let action_state = act_query.single();
 

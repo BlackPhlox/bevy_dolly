@@ -195,13 +195,11 @@ fn handle_mouse_scroll(
                 Projection::Perspective(pers) => {
                     if zoom.0 == ZoomType::Fov {
                         pers.fov = (pers.fov - mouse_wheel_event.y * 0.01).abs();
-                    } else {
-                        if let Ok(mut rig) = rig_q.get_single_mut() {
-                            if let Some(arm) = rig.try_driver_mut::<Arm>() {
-                                let mut xz = arm.offset;
-                                xz.z = (xz.z - mouse_wheel_event.y * 0.5).abs();
-                                arm.offset = xz;
-                            }
+                    } else if let Ok(mut rig) = rig_q.get_single_mut() {
+                        if let Some(arm) = rig.try_driver_mut::<Arm>() {
+                            let mut xz = arm.offset;
+                            xz.z = (xz.z - mouse_wheel_event.y * 0.5).abs();
+                            arm.offset = xz;
                         }
                     }
                 }
