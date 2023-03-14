@@ -2,7 +2,8 @@
 use bevy::input::mouse::MouseWheel;
 use bevy::prelude::*;
 use bevy::{input::mouse::MouseMotion, render::camera::ScalingMode};
-use bevy_dolly::prelude::{cursor_grab::DollyCursorGrab, *};
+use bevy_dolly::prelude::cursor_grab::DollyCursorGrab;
+use bevy_dolly::prelude::*;
 
 #[derive(Component)]
 struct MainCamera;
@@ -197,7 +198,7 @@ fn update_camera(
             Pan::Keys
         };
         pan.overwrite_set(result);
-        println!("State:{:?}", result);
+        println!("State:{result:?}");
     }
 
     if keys.just_pressed(KeyCode::P) {
@@ -207,7 +208,6 @@ fn update_camera(
 
     if config.pin {
         let camera_driver_2 = rig.driver_mut::<Position>();
-        let dolly_transform = DollyTransform::from(trans.single());
-        camera_driver_2.position = dolly_transform.position;
+        camera_driver_2.position = trans.single().translation;
     }
 }

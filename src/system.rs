@@ -34,11 +34,11 @@ pub fn dolly_component_cam_change_detection<T: Component>(
         //let d = rig.drivers.iter().map(|f| format!("{:?}", f)).collect::<Vec<String>>().join(", ");
         //info!("{:?} changed: {:?}", entity, d);
 
-        let dolly_transform = rig.update(time.delta_seconds());
+        let transform = rig.update(time.delta_seconds());
 
-        cameras.for_each_mut(|(mut bevy_transform, camera)| {
+        cameras.for_each_mut(|(mut t, camera)| {
             if camera.is_active {
-                *bevy_transform = DollyTransform(dolly_transform).into();
+                *t = transform;
             }
         });
     }
@@ -54,14 +54,14 @@ pub fn dolly_2d_component_cam_change_detection<T: Component>(
         //let d = rig.drivers.iter().map(|f| format!("{:?}", f)).collect::<Vec<String>>().join(", ");
         //info!("{:?} changed: {:?}", entity, d);
 
-        let mut dolly_transform = rig.update(time.delta_seconds());
+        let mut transform = rig.update(time.delta_seconds());
 
-        cameras.for_each_mut(|(mut bevy_transform, mut orth, camera)| {
+        cameras.for_each_mut(|(mut t, mut orth, camera)| {
             if camera.is_active {
-                orth.scale = dolly_transform.position.z * 0.0025; //.clamp(0.0, 0.5);
-                let xy = dolly_transform.position.truncate().extend(0 as f32);
-                dolly_transform.position = xy;
-                *bevy_transform = DollyTransform(dolly_transform).into();
+                orth.scale = transform.translation.z * 0.0025; //.clamp(0.0, 0.5);
+                let xy = transform.translation.truncate().extend(0 as f32);
+                transform.translation = xy;
+                *t = transform;
             }
         });
     }
@@ -77,10 +77,10 @@ pub fn dolly_component_change_detection<T: Component>(
         //let d = rig.drivers.iter().map(|f| format!("{:?}", f)).collect::<Vec<String>>().join(", ");
         //info!("{:?} changed: {:?}", entity, d);
 
-        let dolly_transform = rig.update(time.delta_seconds());
+        let transform = rig.update(time.delta_seconds());
 
-        transforms.for_each_mut(|mut bevy_transform| {
-            *bevy_transform = DollyTransform(dolly_transform).into();
+        transforms.for_each_mut(|mut t| {
+            *t = transform;
         });
     }
 }

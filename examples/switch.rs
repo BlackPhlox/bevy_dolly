@@ -99,30 +99,26 @@ fn follow_player(
     mut query: ParamSet<(Query<(&Transform, With<DollyPosCtrlMove>)>, Query<&mut Rig>)>,
 ) {
     let p0 = query.p0();
-    let player = p0.single().0.to_owned();
+    let p = p0.single().0.to_owned();
 
     let mut p1 = query.p1();
     let mut rig = p1.single_mut();
 
-    let dolly_transform = DollyTransform::from(player);
-
-    rig.driver_mut::<Position>().position = dolly_transform.position;
-    rig.driver_mut::<Rotation>().rotation = dolly_transform.rotation;
-    rig.driver_mut::<LookAt>().target = dolly_transform.position + Vec3::Y + Vec3::new(0., -1., 0.);
+    rig.driver_mut::<Position>().position = p.translation;
+    rig.driver_mut::<Rotation>().rotation = p.rotation;
+    rig.driver_mut::<LookAt>().target = p.translation + Vec3::Y + Vec3::new(0., -1., 0.);
 }
 
 fn follow_sheep(mut query: ParamSet<(Query<(&Transform, With<Rotates>)>, Query<&mut Rig>)>) {
     let p0 = query.p0();
-    let player = p0.single().0.to_owned();
+    let p = p0.single().0.to_owned();
 
     let mut p1 = query.p1();
     let mut rig = p1.single_mut();
 
-    let dolly_transform = DollyTransform::from(player);
-
-    rig.driver_mut::<Position>().position = dolly_transform.position;
-    rig.driver_mut::<Rotation>().rotation = dolly_transform.rotation;
-    rig.driver_mut::<LookAt>().target = dolly_transform.position + Vec3::Y;
+    rig.driver_mut::<Position>().position = p.translation;
+    rig.driver_mut::<Rotation>().rotation = p.rotation;
+    rig.driver_mut::<LookAt>().target = p.translation + Vec3::Y;
 }
 
 #[derive(Component)]
@@ -145,7 +141,7 @@ fn switch_camera_rig(mut camera: ResMut<State<Camera>>, keyboard_input: Res<Inpu
             Camera::FollowPlayer
         };
 
-        println!("{:?}", result);
+        println!("{result:?}");
         camera.set(result);
     }
 }
