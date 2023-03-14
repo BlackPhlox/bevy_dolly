@@ -1,6 +1,6 @@
+#![allow(clippy::type_complexity)]
 use bevy::prelude::*;
 use bevy_dolly::prelude::*;
-use dolly::glam;
 
 #[derive(Component)]
 struct MainCamera;
@@ -39,7 +39,7 @@ fn setup(
         commands
             .spawn_bundle((
                 Transform {
-                    translation: bevy::math::Vec3::new(0., 0.2, 0.),
+                    translation: Vec3::new(0., 0.2, 0.),
                     ..default()
                 },
                 GlobalTransform::identity(),
@@ -55,16 +55,12 @@ fn setup(
     commands.spawn((
         MainCamera,
         Rig::builder()
-            .with(Position::new(glam::Vec3::Y * 3.0))
+            .with(Position::new(Vec3::Y * 3.0))
             .with(LookAt::new(
                 /*start_pos.transform_2_dolly().position*/
-                glam::Vec3::new(0., 0., 2.),
+                Vec3::new(0., 0., 2.),
             ))
             .build(),
-    ));
-
-    commands.spawn((
-        MainCamera,
         Camera3dBundle {
             transform: Transform::from_xyz(-2.0, 1., 2.0)
                 .looking_at(Vec3::new(0., 0., 0.), Vec3::Y),
@@ -88,5 +84,5 @@ fn update_camera(
 ) {
     let mut p0 = query.p0();
     let (player, _) = p0.single_mut();
-    query.p1().single_mut().driver_mut::<LookAt>().target = player.transform_2_dolly_mut().position;
+    query.p1().single_mut().driver_mut::<LookAt>().target = player.translation;
 }

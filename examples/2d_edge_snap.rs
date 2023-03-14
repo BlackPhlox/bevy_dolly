@@ -1,9 +1,8 @@
 use bevy::prelude::*;
 use bevy_dolly::{
-    prelude::{Position, Rig, Smooth, Transform2Dolly},
+    prelude::{Position, Rig, Smooth},
     system::DollyComponent,
 };
-use dolly::glam;
 
 fn main() {
     App::new()
@@ -69,12 +68,11 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.spawn((
         MainCamera,
         Rig::builder()
-            .with(Position::new(glam::Vec3::new(0., 0., 0.)))
+            .with(Position::new(Vec3::new(0., 0., 0.)))
             .with(Smooth::new_position(1.2))
             .build(),
+        Camera2dBundle::default(),
     ));
-
-    commands.spawn((MainCamera, Camera2dBundle::default()));
 }
 
 /// The sprite is animated by changing its translation depending on the time that has passed since
@@ -100,7 +98,7 @@ fn update_camera(sprite_position: Query<(&Direction, &Transform)>, mut q0: Query
 
     for (_dir, pos) in &sprite_position {
         if pos.translation.x < 495. && pos.translation.x > -295. {
-            camera_driver.position = pos.transform_2_dolly().position;
+            camera_driver.position = pos.translation;
         }
     }
 }

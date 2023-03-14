@@ -1,8 +1,8 @@
+#![allow(clippy::type_complexity)]
 use std::f32::consts::PI;
 
 use bevy::prelude::*;
 use bevy_dolly::prelude::*;
-use dolly::glam;
 
 #[derive(Component)]
 struct MainCamera;
@@ -46,7 +46,7 @@ fn setup(
         ..default()
     });
 
-    let start_pos = glam::Vec3::new(0., 0., 0.);
+    let start_pos = Vec3::new(0., 0., 0.);
 
     commands.spawn((
         Rotates,
@@ -64,12 +64,12 @@ fn setup(
         MainCamera,
         Rig::builder()
             .with(Position::new(start_pos))
-            .with(Rotation::new(glam::Quat::IDENTITY))
+            .with(Rotation::new(Quat::IDENTITY))
             .with(Smooth::new_position(1.25).predictive(true))
-            .with(Arm::new(glam::Vec3::new(0.0, 1.5, -3.5)))
+            .with(Arm::new(Vec3::new(0.0, 1.5, -3.5)))
             .with(Smooth::new_position(2.5))
             .with(
-                LookAt::new(start_pos + glam::Vec3::Y)
+                LookAt::new(start_pos + Vec3::Y)
                     .tracking_smoothness(1.25)
                     .tracking_predictive(true),
             )
@@ -99,30 +99,26 @@ fn follow_player(
     mut query: ParamSet<(Query<(&Transform, With<DollyPosCtrlMove>)>, Query<&mut Rig>)>,
 ) {
     let p0 = query.p0();
-    let player = p0.single().0.to_owned();
+    let p = p0.single().0.to_owned();
 
     let mut p1 = query.p1();
     let mut rig = p1.single_mut();
 
-    let p = player.transform_2_dolly();
-
-    rig.driver_mut::<Position>().position = p.position;
+    rig.driver_mut::<Position>().position = p.translation;
     rig.driver_mut::<Rotation>().rotation = p.rotation;
-    rig.driver_mut::<LookAt>().target = p.position + glam::Vec3::Y + glam::Vec3::new(0., -1., 0.);
+    rig.driver_mut::<LookAt>().target = p.translation + Vec3::Y + Vec3::new(0., -1., 0.);
 }
 
 fn follow_sheep(mut query: ParamSet<(Query<(&Transform, With<Rotates>)>, Query<&mut Rig>)>) {
     let p0 = query.p0();
-    let player = p0.single().0.to_owned();
+    let p = p0.single().0.to_owned();
 
     let mut p1 = query.p1();
     let mut rig = p1.single_mut();
 
-    let p = player.transform_2_dolly();
-
-    rig.driver_mut::<Position>().position = p.position;
+    rig.driver_mut::<Position>().position = p.translation;
     rig.driver_mut::<Rotation>().rotation = p.rotation;
-    rig.driver_mut::<LookAt>().target = p.position + glam::Vec3::Y;
+    rig.driver_mut::<LookAt>().target = p.translation + Vec3::Y;
 }
 
 #[derive(Component)]
@@ -145,7 +141,7 @@ fn switch_camera_rig(mut camera: ResMut<State<Camera>>, keyboard_input: Res<Inpu
             Camera::FollowPlayer
         };
 
-        println!("{:?}", result);
+        println!("{result:?}");
         camera.set(result);
     }
 }

@@ -31,7 +31,7 @@ fn setup(
         ..default()
     });
 
-    let start_pos = dolly::glam::Vec3::new(0., 0., 0.);
+    let start_pos = Vec3::new(0., 0., 0.);
 
     commands.spawn((
         Rotates,
@@ -50,10 +50,6 @@ fn setup(
         Rig::builder()
             .with(MovableLookAt::from_position_target(start_pos))
             .build(),
-    ));
-
-    commands.spawn((
-        MainCamera,
         Camera3dBundle {
             transform: Transform::from_xyz(-2.0, 1., 5.0).looking_at(Vec3::ZERO, Vec3::Y),
             ..default()
@@ -71,10 +67,8 @@ fn update_camera(q0: Query<(&Transform, With<Rotates>)>, mut q1: Query<&mut Rig>
     let player = q0.single().0.to_owned();
     let mut rig = q1.single_mut();
 
-    let p = player.transform_2_dolly();
-
     rig.driver_mut::<MovableLookAt>()
-        .set_position_target(p.position, p.rotation);
+        .set_position_target(player.translation, player.rotation);
 }
 
 #[derive(Component)]

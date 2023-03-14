@@ -9,6 +9,8 @@ jobs:
     continue-on-error: true
     steps:
       - uses: actions/checkout@v2
+        with:
+          submodules: 'true'
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
@@ -23,6 +25,8 @@ jobs:
     steps:
       - name: Checkout sources
         uses: actions/checkout@v2
+        with:
+          submodules: 'true'
       - name: Cache
         uses: actions/cache@v2
         with:
@@ -46,12 +50,19 @@ jobs:
         with:
           command: test
           args: --examples
+      - name: Run cargo test for docs
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --doc
 
   fmt:
     name: Rustfmt
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+        with:
+            submodules: 'true'
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
@@ -68,15 +79,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+        with:
+          submodules: 'true'
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
           toolchain: stable
           override: true
       - name: Install Dependencies
-        run: sudo apt-get update; sudo apt-get install pkg-config libx11-dev libasound2-dev libudev-dev
+        run: sudo apt-get update; sudo apt-get install pkg-config libx11-dev libwayland-dev libxkbcommon-dev libasound2-dev libudev-dev libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev
       - run: rustup component add clippy
       - uses: actions-rs/cargo@v1
         with:
           command: clippy
-          args: -- -D warnings
+          args: --examples -- -D warnings

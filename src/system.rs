@@ -1,8 +1,5 @@
-use crate::prelude::{Rig, Transform2Bevy};
-use bevy::prelude::{
-    App, Camera, Changed, Component, Entity, IntoSystemDescriptor, OrthographicProjection, Query,
-    Res, SystemLabel, Time, Transform, With,
-};
+use crate::prelude::*;
+use bevy::prelude::*;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, SystemLabel)]
 pub struct DollyComponentLabel;
@@ -41,7 +38,7 @@ pub fn dolly_component_cam_change_detection<T: Component>(
 
         cameras.for_each_mut(|(mut t, camera)| {
             if camera.is_active {
-                t.transform_2_bevy(transform);
+                *t = transform;
             }
         });
     }
@@ -61,10 +58,10 @@ pub fn dolly_2d_component_cam_change_detection<T: Component>(
 
         cameras.for_each_mut(|(mut t, mut orth, camera)| {
             if camera.is_active {
-                orth.scale = transform.position.z * 0.0025; //.clamp(0.0, 0.5);
-                let xy = transform.position.truncate().extend(0 as f32);
-                transform.position = xy;
-                t.transform_2_bevy(transform);
+                orth.scale = transform.translation.z * 0.0025; //.clamp(0.0, 0.5);
+                let xy = transform.translation.truncate().extend(0 as f32);
+                transform.translation = xy;
+                *t = transform;
             }
         });
     }
@@ -83,7 +80,7 @@ pub fn dolly_component_change_detection<T: Component>(
         let transform = rig.update(time.delta_seconds());
 
         transforms.for_each_mut(|mut t| {
-            t.transform_2_bevy(transform);
+            *t = transform;
         });
     }
 }

@@ -1,9 +1,9 @@
+#![allow(clippy::type_complexity)]
 use bevy::input::mouse::MouseWheel;
 use bevy::prelude::*;
 use bevy::{input::mouse::MouseMotion, render::camera::ScalingMode};
 use bevy_dolly::prelude::cursor_grab::DollyCursorGrab;
 use bevy_dolly::prelude::*;
-use dolly::glam;
 
 #[derive(Component)]
 struct MainCamera;
@@ -64,40 +64,42 @@ fn setup(
     commands.spawn((
         MainCamera,
         Rig::builder()
-            .with(dolly::drivers::Position::new(glam::Vec3::ZERO))
+            .with(dolly::drivers::Position::new(Vec3::ZERO))
             .with(YawPitch::new().yaw_degrees(45.0).pitch_degrees(-30.0))
             .with(Smooth::new_position(0.3))
             .with(Smooth::new_rotation(1.5))
-            .with(Arm::new(glam::Vec3::Z * 4.0))
+            .with(Arm::new(Vec3::Z * 4.0))
             .build(),
     ));
 
-    let camera_iso = Camera3dBundle {
-        projection: OrthographicProjection {
-            scale: 3.0,
-            scaling_mode: ScalingMode::FixedVertical(2.0),
+    commands.spawn((
+        MainCamera,
+        Camera3dBundle {
+            projection: OrthographicProjection {
+                scale: 3.0,
+                scaling_mode: ScalingMode::FixedVertical(2.0),
+                ..default()
+            }
+            .into(),
+            transform: Transform::from_xyz(10.0, 10.0, 10.0).looking_at(Vec3::ZERO, Vec3::Y),
             ..default()
-        }
-        .into(),
-        transform: Transform::from_xyz(10.0, 10.0, 10.0).looking_at(Vec3::ZERO, Vec3::Y),
-        ..default()
-    };
-
-    let camera_perspective = Camera3dBundle {
-        projection: PerspectiveProjection {
-            ..Default::default()
-        }
-        .into(),
-        transform: Transform::from_xyz(10.0, 10.0, 10.0).looking_at(Vec3::ZERO, Vec3::Y),
-        camera: Camera {
-            is_active: false,
+        },
+    ));
+    commands.spawn((
+        SecondCamera,
+        Camera3dBundle {
+            projection: PerspectiveProjection {
+                ..Default::default()
+            }
+            .into(),
+            transform: Transform::from_xyz(10.0, 10.0, 10.0).looking_at(Vec3::ZERO, Vec3::Y),
+            camera: Camera {
+                is_active: false,
+                ..Default::default()
+            },
             ..Default::default()
         },
-        ..Default::default()
-    };
-
-    commands.spawn(camera_iso).insert(MainCamera);
-    commands.spawn(camera_perspective).insert(SecondCamera);
+    ));
 
     // light
     commands.spawn(PointLightBundle {
@@ -122,10 +124,14 @@ fn swap_camera(
     if keys.just_pressed(KeyCode::T) {
         if let Ok((e_main, cam_main)) = &mut q_main.get_single_mut() {
             if let Ok((e_sec, cam_sec)) = &mut q_sec.get_single_mut() {
-                commands.entity(e_main.clone()).remove::<MainCamera>();
-                commands.entity(e_sec.clone()).remove::<SecondCamera>();
-                commands.entity(e_main.clone()).insert(SecondCamera);
-                commands.entity(e_sec.clone()).insert(MainCamera);
+                commands
+                    .entity(*e_main)
+                    .remove::<MainCamera>()
+                    .insert(SecondCamera);
+                commands
+                    .entity(*e_sec)
+                    .remove::<SecondCamera>()
+                    .insert(MainCamera);
                 cam_sec.is_active = true;
                 cam_main.is_active = false;
             }
@@ -192,16 +198,16 @@ fn update_camera(
             Pan::Keys
         };
         pan.overwrite_set(result);
-        println!("State:{:?}", result);
+        println!("State:{result:?}");
     }
 
     if keys.just_pressed(KeyCode::P) {
-        config.pin = if config.pin { false } else { true };
+        config.pin = !config.pin;
         println!("Pinned:{:?}", config.pin);
     }
 
     if config.pin {
         let camera_driver_2 = rig.driver_mut::<Position>();
-        camera_driver_2.position = trans.single().transform_2_dolly().position;
+        camera_driver_2.position = trans.single().translation;
     }
 }
