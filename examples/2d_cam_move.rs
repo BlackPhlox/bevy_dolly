@@ -34,7 +34,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
             .build(),
     ));
 
-    commands.spawn(Camera2dBundle::default()).insert(MainCamera);
+    commands.spawn((Camera2dBundle::default(), MainCamera));
 
     commands.spawn(SpriteBundle {
         texture: asset_server.load("room.png"),
