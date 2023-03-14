@@ -19,17 +19,21 @@ impl Fpv {
         )
     }
 
-    pub fn set_rotation(
+    pub fn update_pos_rot(
         &mut self,
-        delta_mouse: Vec2,
-        sensitivity: Vec2,
         player_position: Vec3,
+        delta_mouse: Vec2,
+        lock_y: bool,
+        boost: f32,
         delta_time_sec: f32,
     ) {
-        self.driver_mut::<YawPitch>().rotate_yaw_pitch(
-            -0.1 * delta_mouse.x * sensitivity.x,
-            -0.1 * delta_mouse.y * sensitivity.y,
-        );
+        let pos = self.set_position(player_position, 1., boost, lock_y);
+        self.set_rotation(delta_mouse, pos, delta_time_sec)
+    }
+
+    pub fn set_rotation(&mut self, delta_mouse: Vec2, player_position: Vec3, delta_time_sec: f32) {
+        self.driver_mut::<YawPitch>()
+            .rotate_yaw_pitch(-0.1 * delta_mouse.x, -0.1 * delta_mouse.y);
         self.driver_mut::<Position>()
             .translate(player_position * delta_time_sec * 10.0);
     }

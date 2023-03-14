@@ -126,29 +126,29 @@ fn update_camera(
     }
 
     let boost: f32 = if keys.pressed(KeyCode::LShift) {
-        1.
+        boost_mult
     } else {
-        0.
+        1.
     };
 
     let mut delta = Vec2::ZERO;
     for event in mouse_motion_events.iter() {
         delta += event.delta;
     }
+    delta.x *= sensitivity.x;
+    delta.y *= sensitivity.y;
 
     let mut rig = rig_q.single_mut();
 
-    let move_vec = rig.driver_mut::<Fpv>().set_position(
-        move_vec,
-        boost,
-        boost_mult,
-        fps_state.0.eq(&MovementType::FirstPerson),
-    );
-
     if let Ok(window) = windows.get_single() {
         if !window.cursor.visible {
-            rig.driver_mut::<Fpv>()
-                .set_rotation(delta, sensitivity, move_vec, time_delta_seconds);
+            rig.driver_mut::<Fpv>().update_pos_rot(
+                move_vec,
+                delta,
+                fps_state.0.eq(&MovementType::FirstPerson),
+                boost,
+                time_delta_seconds,
+            );
         }
     }
 }

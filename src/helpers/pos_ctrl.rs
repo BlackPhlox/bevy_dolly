@@ -1,6 +1,8 @@
-use bevy::{ecs::schedule::ScheduleLabel, prelude::*};
+use bevy::{ecs::schedule::ScheduleLabel, input::mouse::MouseMotion, prelude::*};
 use leafwing_input_manager::prelude::*;
 use std::fmt::Display;
+
+use crate::{dolly_type::Rig, drivers::fpv::Fpv, system::Dolly};
 
 use super::cone::Cone;
 
@@ -70,8 +72,7 @@ pub struct DollyPosCtrlConfig {
     pub move_speed: f32,
     pub rot_speed: f32,
     pub pin: bool,
-    pub position: Vec3,
-    pub rotation: Quat,
+    pub transform: Transform,
     pub player: Player,
 }
 
@@ -90,8 +91,8 @@ impl Default for DollyPosCtrlConfig {
             move_speed: 1.2,
             rot_speed: 0.05,
             pin: true,
-            position: Vec3::new(0., 0.5, 0.),
-            rotation: Quat::IDENTITY,
+            transform: Transform::from_translation(Vec3::new(0., 0.5, 0.))
+                .with_rotation(Quat::IDENTITY),
             player: Player::default(),
         }
     }
@@ -232,11 +233,7 @@ fn spawn_default_player(
     });
 
     commands
-        .spawn(SpatialBundle::from_transform(Transform {
-            rotation: Quat::IDENTITY,
-            translation: config.position,
-            ..default()
-        }))
+        .spawn(SpatialBundle::from_transform(config.transform))
         .with_children(|cell| {
             cell.spawn(PbrBundle {
                 mesh: cone_mesh.clone(),
@@ -272,12 +269,13 @@ fn dolly_pos_ctrl_config_entity_setup(
 fn dolly_pos_ctrl_move_update(
     time: Res<Time>,
     config: Res<DollyPosCtrlConfig>,
-    mut transforms: Query<(&DollyPosCtrlMove, &mut Transform)>,
+    mut transforms: Query<(&mut Transform, With<DollyPosCtrlMove>)>,
     act_query: Query<&ActionState<MoveAction>, With<DollyPosCtrlAction>>,
+    mut mouse_motion_events: EventReader<MouseMotion>,
 ) {
     let action_state = act_query.single();
 
-    for (_player, mut transform) in transforms.iter_mut() {
+    for (mut transform, _) in transforms.iter_mut() {
         let (_, mut rotation) = transform.rotation.to_axis_angle();
         let mut velocity = Vec3::ZERO;
         let local_z = transform.local_z();

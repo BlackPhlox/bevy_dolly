@@ -232,7 +232,7 @@ fn update_camera(
         delta += event.delta;
     }
 
-    config.rotation = Quat::from_rotation_y(delta.x);
+    config.transform.rotation = Quat::from_rotation_y(delta.x);
 
     if pan.0.eq(&Pan::Keys) {
         if keys.just_pressed(KeyCode::Z) {
