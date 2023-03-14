@@ -1,43 +1,31 @@
-use std::fmt::Display;
-
-use bevy::{
-    ecs::schedule::ShouldRun,
-    math::{Quat, Vec3},
-    pbr::PbrBundle,
-    prelude::{
-        default, App, Assets, BuildChildren, Bundle, Color, Commands, Component, GamepadAxisType,
-        GamepadButtonType, IntoSystemDescriptor, KeyCode, Mesh, Plugin, Query, Res, ResMut,
-        Resource, SpatialBundle, StandardMaterial, SystemLabel, SystemSet, Time, Transform, With,
-    },
-};
+use bevy::prelude::*;
 use leafwing_input_manager::prelude::*;
+use std::fmt::Display;
 
 use super::cone::Cone;
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash, SystemLabel)]
-pub struct DollyPosCtrlMoveLabel;
+#[derive(Debug, Clone, PartialEq, Eq, Hash, SystemSet)]
+pub struct DollyPosCtrlMoveSet;
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash, SystemLabel)]
-pub struct DollyPosCtrlInputSetupLabel;
+#[derive(Debug, Clone, PartialEq, Eq, Hash, SystemSet)]
+pub struct DollyPosCtrlInputSetupSet;
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash, SystemLabel)]
-pub struct DollyPosCtrlEntitySetupLabel;
+#[derive(Debug, Clone, PartialEq, Eq, Hash, SystemSet)]
+pub struct DollyPosCtrlEntitySetupSet;
 
 pub struct DollyPosCtrl;
 impl Plugin for DollyPosCtrl {
     fn build(&self, app: &mut App) {
         app.add_plugin(InputManagerPlugin::<MoveAction>::default());
         app.init_resource::<DollyPosCtrlConfig>();
+        app.add_startup_system(dolly_pos_ctrl_config_input_setup.in_set(DollyPosCtrlInputSetupSet));
         app.add_startup_system(
-            dolly_pos_ctrl_config_input_setup.label(DollyPosCtrlInputSetupLabel),
+            dolly_pos_ctrl_config_entity_setup.in_set(DollyPosCtrlEntitySetupSet),
         );
-        app.add_startup_system(
-            dolly_pos_ctrl_config_entity_setup.label(DollyPosCtrlEntitySetupLabel),
-        );
-        app.add_system_set(
-            SystemSet::new()
-                .with_run_criteria(use_dolly_pos_ctrl_config)
-                .with_system(dolly_pos_ctrl_move_update.label(DollyPosCtrlMoveLabel)),
+        app.add_system(
+            dolly_pos_ctrl_move_update
+                .in_set(DollyPosCtrlMoveSet)
+                .run_if(use_dolly_pos_ctrl_config),
         );
     }
 }
@@ -80,12 +68,8 @@ impl Default for DollyPosCtrlConfig {
     }
 }
 
-fn use_dolly_pos_ctrl_config(config: Res<DollyPosCtrlConfig>) -> ShouldRun {
-    if config.enabled {
-        ShouldRun::Yes
-    } else {
-        ShouldRun::No
-    }
+fn use_dolly_pos_ctrl_config(config: Res<DollyPosCtrlConfig>) -> bool {
+    config.enabled
 }
 
 #[derive(Component)]
@@ -263,7 +247,7 @@ fn dolly_pos_ctrl_move_update(
         velocity += right * -action_state.clamped_value(MoveAction::StrafeLeft);
 
         velocity += Vec3::Y * action_state.clamped_value(MoveAction::Up);
-        velocity += Vec3::Y * action_state.clamped_value(MoveAction::Down);
+        velocity += Vec3::Y * -action_state.clamped_value(MoveAction::Down);
 
         if action_state.pressed(MoveAction::RotateRight) {
             //Wrapping around

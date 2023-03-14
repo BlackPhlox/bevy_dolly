@@ -1,14 +1,11 @@
 use bevy::prelude::*;
-use bevy_dolly::{
-    prelude::{Position, Rig, Smooth},
-    system::DollyComponent,
-};
+use bevy_dolly::prelude::*;
 
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
         .add_startup_system(setup)
-        .add_dolly_component(MainCamera)
+        .add_system(Dolly::<MainCamera>::update_2d_active)
         .add_system(sprite_movement)
         .add_system(update_camera)
         .run();

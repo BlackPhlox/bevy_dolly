@@ -4,13 +4,16 @@ use bevy_dolly::prelude::*;
 #[derive(Component)]
 struct MainCamera;
 
+const SPEED: f32 = 4.5;
+
 fn main() {
     App::new()
-        .insert_resource(Msaa { samples: 4 })
+        .insert_resource(Msaa::default())
         .add_plugins(DefaultPlugins)
         .add_startup_system(setup)
-        .add_dolly_2d_component(MainCamera)
-        .add_system(update_camera)
+        //If large amount of smoothing is used, where camera movement is expected beyond the time of input
+        //Ie. motion smoothing beyond 0.25, use update_2d_active_continuous instead
+        .add_systems((Dolly::<MainCamera>::update_2d_active, update_camera))
         .run();
 }
 
@@ -27,14 +30,13 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     });
 
     commands.spawn((
+        Camera2dBundle::default(),
         MainCamera,
         Rig::builder()
-            .with(Position::new(Vec3::new(0., 0., 400.)))
-            .with(Smooth::new_position(1.2))
+            .with(Position::default())
+            .with(Smooth::new_position(0.25))
             .build(),
     ));
-
-    commands.spawn((Camera2dBundle::default(), MainCamera));
 
     commands.spawn(SpriteBundle {
         texture: asset_server.load("room.png"),
@@ -45,31 +47,47 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         },
         ..Default::default()
     });
+
+    info!("Use W, A, S, D for movement");
+    info!("Use Z & X zooming in and out");
 }
 
 fn update_camera(keys: Res<Input<KeyCode>>, mut query: Query<&mut Rig>) {
-    let mut rig = query.single_mut();
-    let camera_driver = rig.driver_mut::<Position>();
-    let speed = 4.5;
+    for mut rig in &mut query {
+        for &key in keys.get_pressed() {
+            let pos_driver = rig.try_driver_mut::<Position>();
+            if let Some(pos) = pos_driver {
+                if key == KeyCode::W {
+                    pos.translate(SPEED * Vec3::Y);
+                }
+                if key == KeyCode::A {
+                    pos.translate(SPEED * -Vec3::X);
+                }
+                if key == KeyCode::S {
+                    pos.translate(SPEED * -Vec3::Y);
+                }
+                if key == KeyCode::D {
+                    pos.translate(SPEED * Vec3::X);
+                }
+                if key == KeyCode::Z {
+                    pos.translate(SPEED * -Vec3::Z);
+                }
+                if key == KeyCode::X {
+                    pos.translate(SPEED * Vec3::Z);
+                }
+            }
 
-    for &key in keys.get_pressed() {
-        if key == KeyCode::W {
-            camera_driver.translate(speed * Vec3::Y);
-        }
-        if key == KeyCode::A {
-            camera_driver.translate(speed * -Vec3::X);
-        }
-        if key == KeyCode::S {
-            camera_driver.translate(speed * -Vec3::Y);
-        }
-        if key == KeyCode::D {
-            camera_driver.translate(speed * Vec3::X);
-        }
-        if key == KeyCode::Z {
-            camera_driver.translate(speed * -Vec3::Z);
-        }
-        if key == KeyCode::X {
-            camera_driver.translate(speed * Vec3::Z);
+            let smooth_driver = rig.try_driver_mut::<Smooth>();
+            if let Some(smooth) = smooth_driver {
+                if key == KeyCode::C {
+                    smooth.position_smoothness = (smooth.position_smoothness - 0.001).abs();
+                    println!("Smoothness {}", smooth.position_smoothness);
+                }
+                if key == KeyCode::V {
+                    smooth.position_smoothness = (smooth.position_smoothness + 0.001).abs();
+                    println!("Smoothness {}", smooth.position_smoothness);
+                }
+            };
         }
     }
 }

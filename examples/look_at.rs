@@ -7,10 +7,10 @@ struct MainCamera;
 
 fn main() {
     App::new()
-        .insert_resource(Msaa { samples: 4 })
+        .insert_resource(Msaa::default())
         .add_plugins(DefaultPlugins)
         .add_plugin(DollyPosCtrl)
-        .add_dolly_component(MainCamera)
+        .add_system(Dolly::<MainCamera>::update_active)
         .add_startup_system(setup)
         .add_system(update_camera)
         .run();
@@ -27,7 +27,10 @@ fn setup(
 ) {
     // plane
     commands.spawn(PbrBundle {
-        mesh: meshes.add(Mesh::from(shape::Plane { size: 20.0 })),
+        mesh: meshes.add(Mesh::from(shape::Plane {
+            size: 20.0,
+            ..Default::default()
+        })),
         material: materials.add(Color::rgb(0.3, 0.5, 0.3).into()),
         ..default()
     });
@@ -58,11 +61,11 @@ fn setup(
             .with(Position::new(Vec3::Y * 3.0))
             .with(LookAt::new(
                 /*start_pos.transform_2_dolly().position*/
-                Vec3::new(0., 0., 2.),
+                Vec3::new(0., -2., 2.),
             ))
             .build(),
         Camera3dBundle {
-            transform: Transform::from_xyz(-2.0, 1., 2.0)
+            transform: Transform::from_xyz(-2.0, 2., 5.0)
                 .looking_at(Vec3::new(0., 0., 0.), Vec3::Y),
             ..default()
         },
