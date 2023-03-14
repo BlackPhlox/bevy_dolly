@@ -2,10 +2,7 @@ use bevy::{
     prelude::*,
     window::{CursorGrabMode, PrimaryWindow},
 };
-use leafwing_input_manager::{
-    prelude::{ActionState, InputMap},
-    Actionlike, InputManagerBundle,
-};
+use leafwing_input_manager::prelude::*;
 
 pub struct DollyCursorGrab;
 impl Plugin for DollyCursorGrab {
@@ -59,7 +56,7 @@ impl Default for DollyCursorGrabInputBundle {
         use GrabAction::*;
         let mut input_map = InputMap::default();
 
-        input_map.insert(KeyCode::Escape, Exit);
+        input_map.insert(QwertyScanCode::Escape, Exit);
 
         let input_manager = InputManagerBundle {
             input_map,
