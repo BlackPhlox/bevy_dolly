@@ -68,7 +68,7 @@ They enabled by default but is not needed and can be removed when setting up bev
 
 ```
 [dependencies]
-bevy_dolly = { git = "https://github.com/BlackPhlox/bevy_dolly" default-features = false }
+bevy_dolly = { git = "https://github.com/BlackPhlox/bevy_dolly", default-features = false }
 ```
 Note this will also remove the bevy_dolly's extended drivers add `features = ["drivers"],` to include the drivers back.
 
