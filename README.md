@@ -94,4 +94,9 @@ There is a bunch of other bevy camera controllers that are worth checking out, e
 The project is under dual license MIT and Apache 2.0, so joink to your hearts content, just remember the license agreements.
 
 ## Contributing
-Yes this project is still very much WIP, so PRs are very welcome
+
+Yes this project is still very much WIP, so PRs are very welcome.  
+The `dolly` dependency used is a slightly patched submodule, so to build the crate locally you must first run the following:  
+```bash
+git submodule update --init --recursive
+```

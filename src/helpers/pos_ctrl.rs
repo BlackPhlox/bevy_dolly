@@ -131,45 +131,45 @@ impl Default for DollyPosCtrlInputBundle {
         //TODO: Impl. when added to input-manager
         //input_map.assign_gamepad(Gamepad(0));
 
-        input_map.insert(KeyCode::W, Forward);
-        input_map.insert(KeyCode::Up, Forward);
+        input_map.insert(QwertyScanCode::W, Forward);
+        input_map.insert(QwertyScanCode::Up, Forward);
 
         input_map.insert(GamepadButtonType::DPadUp, Forward);
         //input_map.insert(SingleAxis::symmetric(GamepadAxisType::LeftStickY, 0.1), Forward); // + Y / - Y
 
-        input_map.insert(KeyCode::S, Backward);
-        input_map.insert(KeyCode::Down, Backward);
+        input_map.insert(QwertyScanCode::S, Backward);
+        input_map.insert(QwertyScanCode::Down, Backward);
         input_map.insert(GamepadButtonType::DPadDown, Backward);
 
-        input_map.insert(KeyCode::A, StrafeLeft);
-        input_map.insert(KeyCode::Left, StrafeLeft);
+        input_map.insert(QwertyScanCode::A, StrafeLeft);
+        input_map.insert(QwertyScanCode::Left, StrafeLeft);
         input_map.insert(GamepadButtonType::DPadLeft, StrafeLeft);
 
-        input_map.insert(KeyCode::D, StrafeRight);
-        input_map.insert(KeyCode::Right, StrafeRight);
+        input_map.insert(QwertyScanCode::D, StrafeRight);
+        input_map.insert(QwertyScanCode::Right, StrafeRight);
         input_map.insert(GamepadButtonType::DPadRight, StrafeRight);
 
         //input_map.insert(SingleAxis::symmetric(GamepadAxisType::LeftStickX, 0.1), StrafeRight); // + X / - X
 
-        input_map.insert(KeyCode::Space, Up);
+        input_map.insert(QwertyScanCode::Space, Up);
         input_map.insert(
             SingleAxis::positive_only(GamepadAxisType::LeftStickY, 0.1),
             Up,
         );
 
-        input_map.insert(KeyCode::LShift, Down);
+        input_map.insert(QwertyScanCode::LShift, Down);
         input_map.insert(
             SingleAxis::negative_only(GamepadAxisType::LeftStickY, 0.1),
             Down,
         );
 
-        input_map.insert(KeyCode::Comma, RotateLeft);
+        input_map.insert(QwertyScanCode::Comma, RotateLeft);
         input_map.insert(
             SingleAxis::negative_only(GamepadAxisType::LeftStickX, 0.1),
             RotateLeft,
         );
 
-        input_map.insert(KeyCode::Period, RotateRight);
+        input_map.insert(QwertyScanCode::Period, RotateRight);
         input_map.insert(
             SingleAxis::positive_only(GamepadAxisType::LeftStickX, 0.1),
             RotateRight,
