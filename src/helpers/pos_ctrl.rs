@@ -13,6 +13,27 @@ pub struct DollyPosCtrlInputSetupSet;
 #[derive(Debug, Clone, PartialEq, Eq, Hash, SystemSet)]
 pub struct DollyPosCtrlEntitySetupSet;
 
+/// This plugin is a simple player controller
+/// Add the Bevy Component: DollyPosCtrlMove
+/// to an entity to allow that entity's transform to
+/// be mutated by the plugin. Use code below in the
+/// app building step to override default behavior of the plugin:
+/// ```rs
+/// use bevy::prelude::*;
+/// use bevy_dolly::prelude::*;
+/// fn main() {
+///     App::new()
+///         .add_plugins(DefaultPlugins)
+///         .add_plugin(DollyPosCtrl)
+///         .insert_resource(DollyPosCtrlConfig {
+///             ..Default::default()
+///     }).run();
+/// }
+///
+/// fn setup(mut commands: Commands){
+///     commands.spawn(/* Your player entity here */, DollyPosCtrlMove));
+/// }
+/// ```
 pub struct DollyPosCtrl;
 impl Plugin for DollyPosCtrl {
     fn build(&self, app: &mut App) {
@@ -49,9 +70,16 @@ pub struct DollyPosCtrlConfig {
     pub move_speed: f32,
     pub rot_speed: f32,
     pub pin: bool,
-    pub position: Vec3,
-    pub rotation: Quat,
-    pub default_player: bool,
+    pub transform: Transform,
+    pub player: Player,
+}
+
+#[derive(Default, PartialEq, Eq, Debug, Clone, Copy, Hash)]
+pub enum Player {
+    #[default]
+    DefaultPlayer,
+    Entity(Entity),
+    None,
 }
 
 impl Default for DollyPosCtrlConfig {
@@ -61,9 +89,9 @@ impl Default for DollyPosCtrlConfig {
             move_speed: 1.2,
             rot_speed: 0.05,
             pin: true,
-            position: Vec3::new(0., 0.5, 0.),
-            rotation: Quat::IDENTITY,
-            default_player: true,
+            transform: Transform::from_translation(Vec3::new(0., 0.5, 0.))
+                .with_rotation(Quat::IDENTITY),
+            player: Player::default(),
         }
     }
 }
@@ -184,16 +212,12 @@ impl Default for DollyPosCtrlInputBundle {
     }
 }
 
-fn dolly_pos_ctrl_config_entity_setup(
+fn spawn_default_player(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
     config: Res<DollyPosCtrlConfig>,
 ) {
-    if !config.default_player {
-        return;
-    }
-
     let cone_mesh = meshes.add(Mesh::from(Cone {
         height: 0.2,
         radius: 0.1,
@@ -207,11 +231,7 @@ fn dolly_pos_ctrl_config_entity_setup(
     });
 
     commands
-        .spawn(SpatialBundle::from_transform(Transform {
-            rotation: Quat::IDENTITY,
-            translation: config.position,
-            ..default()
-        }))
+        .spawn(SpatialBundle::from_transform(config.transform))
         .with_children(|cell| {
             cell.spawn(PbrBundle {
                 mesh: cone_mesh.clone(),
@@ -225,15 +245,33 @@ fn dolly_pos_ctrl_config_entity_setup(
         .insert(DollyPosCtrlMove);
 }
 
+#[allow(unused_mut)]
+fn dolly_pos_ctrl_config_entity_setup(
+    mut commands: Commands,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
+    config: Res<DollyPosCtrlConfig>,
+) {
+    match config.player {
+        Player::DefaultPlayer => {
+            spawn_default_player(commands, meshes, materials, config);
+        }
+        Player::Entity(e) => {
+            commands.entity(e).insert(DollyPosCtrlMove);
+        }
+        Player::None => (),
+    }
+}
+
 fn dolly_pos_ctrl_move_update(
     time: Res<Time>,
     config: Res<DollyPosCtrlConfig>,
-    mut transforms: Query<(&DollyPosCtrlMove, &mut Transform)>,
+    mut transforms: Query<(&mut Transform, With<DollyPosCtrlMove>)>,
     act_query: Query<&ActionState<MoveAction>, With<DollyPosCtrlAction>>,
 ) {
     let action_state = act_query.single();
 
-    for (_player, mut transform) in transforms.iter_mut() {
+    for (mut transform, _) in transforms.iter_mut() {
         let (_, mut rotation) = transform.rotation.to_axis_angle();
         let mut velocity = Vec3::ZERO;
         let local_z = transform.local_z();

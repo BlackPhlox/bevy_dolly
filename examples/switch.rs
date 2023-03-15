@@ -99,30 +99,22 @@ fn setup(
     info!("Press C to toggle between the default player and the sheep");
 }
 
-fn follow_player(
-    mut query: ParamSet<(Query<(&Transform, With<DollyPosCtrlMove>)>, Query<&mut Rig>)>,
-) {
-    let p0 = query.p0();
-    let p = p0.single().0.to_owned();
-
-    let mut p1 = query.p1();
-    let mut rig = p1.single_mut();
-
-    rig.driver_mut::<Position>().position = p.translation;
-    rig.driver_mut::<Rotation>().rotation = p.rotation;
-    rig.driver_mut::<LookAt>().target = p.translation + Vec3::Y + Vec3::new(0., -1., 0.);
+fn follow_player(query: Query<(&Transform, With<DollyPosCtrlMove>)>, mut q: Query<&mut Rig>) {
+    if let Ok((p, _)) = query.get_single() {
+        let mut rig = q.single_mut();
+        rig.driver_mut::<Position>().position = p.translation;
+        rig.driver_mut::<Rotation>().rotation = p.rotation;
+        rig.driver_mut::<LookAt>().target = p.translation + Vec3::Y + Vec3::new(0., -1., 0.);
+    }
 }
 
-fn follow_sheep(mut query: ParamSet<(Query<(&Transform, With<Rotates>)>, Query<&mut Rig>)>) {
-    let p0 = query.p0();
-    let p = p0.single().0.to_owned();
-
-    let mut p1 = query.p1();
-    let mut rig = p1.single_mut();
-
-    rig.driver_mut::<Position>().position = p.translation;
-    rig.driver_mut::<Rotation>().rotation = p.rotation;
-    rig.driver_mut::<LookAt>().target = p.translation + Vec3::Y;
+fn follow_sheep(query: Query<&Transform, With<Rotates>>, mut rig_q: Query<&mut Rig>) {
+    if let Ok(p) = query.get_single() {
+        let mut rig = rig_q.single_mut();
+        rig.driver_mut::<Position>().position = p.translation;
+        rig.driver_mut::<Rotation>().rotation = p.rotation;
+        rig.driver_mut::<LookAt>().target = p.translation + Vec3::Y;
+    }
 }
 
 #[derive(Component)]

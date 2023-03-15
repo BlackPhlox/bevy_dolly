@@ -88,6 +88,7 @@ There is a bunch of other bevy camera controllers that are worth checking out, e
 - [bevy_spectator](https://github.com/JonahPlusPlus/bevy_spectator) - A spectator camera controller
 - [bevy_flycam](https://github.com/sburris0/bevy_flycam) - A simple fly camera
 - [bevy_fly_camera](https://github.com/mcpar-land/bevy_fly_camera)  - A advanced fly camera
+- [bevy_pancam](https://github.com/johanhelsing/bevy_pancam) - 2D Click and Drag - Style camera movement
 - [bevy_config_cam](https://github.com/BlackPhlox/bevy_config_cam) - Plugin that enables to use collection of different camera controllers at runtime, uses bevy_dolly as the backend
 
 ## Licensing
