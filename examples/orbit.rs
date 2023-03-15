@@ -262,7 +262,7 @@ fn update_camera(
             "Camera: {}",
             match config.pin {
                 true => "Pinned",
-                false => "Unpinned",
+                false => "Static",
             }
         );
     }

@@ -61,6 +61,17 @@ fn setup(
 ```
 Link to [examples readme](/examples/README.md)
 
+## Helpers
+
+This plugin is currently also provides some helper plugins, which.
+They enabled by default but is not needed and can be removed when setting up bevy_dolly's dependency:
+
+```
+[dependencies]
+bevy_dolly = { git = "https://github.com/BlackPhlox/bevy_dolly" default-features = false }
+```
+Note this will also remove the bevy_dolly's extended drivers add `features = ["drivers"],` to include the drivers back.
+
 ## Examples
 
 To see how works in bevy in practice, please look at this repository's [examples](/examples/).
