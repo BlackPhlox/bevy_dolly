@@ -71,6 +71,7 @@ pub struct DollyPosCtrlConfig {
     pub rot_speed: f32,
     pub pin: bool,
     pub transform: Transform,
+    pub control: DollyPosCtrlInputBundle,
     pub player: Player,
 }
 
@@ -89,6 +90,7 @@ impl Default for DollyPosCtrlConfig {
             move_speed: 1.2,
             rot_speed: 0.05,
             pin: true,
+            control: DollyPosCtrlInputBundle::default(),
             transform: Transform::from_translation(Vec3::new(0., 0.5, 0.))
                 .with_rotation(Quat::IDENTITY),
             player: Player::default(),
@@ -103,15 +105,17 @@ fn use_dolly_pos_ctrl_config(config: Res<DollyPosCtrlConfig>) -> bool {
 #[derive(Component)]
 struct DollyPosCtrlAction;
 
-fn dolly_pos_ctrl_config_input_setup(mut commands: Commands) {
-    commands.spawn((DollyPosCtrlAction, DollyPosCtrlInputBundle::default()));
+fn dolly_pos_ctrl_config_input_setup(mut commands: Commands, q: Query<&DollyPosCtrlAction>) {
+    if q.iter().len() > 0 {
+        commands.spawn((DollyPosCtrlAction, DollyPosCtrlInputBundle::default()));
+    }
 }
 
 #[derive(Component)]
 pub struct DollyPosCtrlMove;
 
 #[derive(Bundle)]
-struct DollyPosCtrlInputBundle {
+pub struct DollyPosCtrlInputBundle {
     #[bundle]
     input_manager: InputManagerBundle<MoveAction>,
 }
@@ -152,63 +156,118 @@ impl Display for DollyPosCtrlInputBundle {
     }
 }
 
+impl DollyPosCtrlInputBundle {
+    pub fn init() -> Self {
+        Self {
+            input_manager: InputManagerBundle {
+                input_map: InputMap::default(),
+                action_state: ActionState::default(),
+            },
+        }
+    }
+
+    pub fn move_wasd(&mut self) -> Self {
+        use MoveAction::*;
+        let m = &mut self.input_manager.input_map;
+
+        m.insert(QwertyScanCode::W, Forward);
+        m.insert(QwertyScanCode::S, Backward);
+        m.insert(QwertyScanCode::A, StrafeLeft);
+        m.insert(QwertyScanCode::D, StrafeRight);
+
+        Self {
+            input_manager: InputManagerBundle {
+                input_map: m.clone(),
+                action_state: ActionState::default(),
+            },
+        }
+    }
+
+    pub fn move_arrows(&mut self) -> Self {
+        use MoveAction::*;
+        let m = &mut self.input_manager.input_map;
+
+        m.insert(QwertyScanCode::Up, Forward);
+        m.insert(QwertyScanCode::Down, Backward);
+        m.insert(QwertyScanCode::Left, StrafeLeft);
+        m.insert(QwertyScanCode::Right, StrafeRight);
+
+        Self {
+            input_manager: InputManagerBundle {
+                input_map: m.clone(),
+                action_state: ActionState::default(),
+            },
+        }
+    }
+
+    pub fn move_dpad(&mut self) -> Self {
+        use MoveAction::*;
+        let m = &mut self.input_manager.input_map;
+
+        m.insert(GamepadButtonType::DPadUp, Forward);
+        m.insert(GamepadButtonType::DPadDown, Backward);
+        m.insert(GamepadButtonType::DPadLeft, StrafeLeft);
+        m.insert(GamepadButtonType::DPadRight, StrafeRight);
+
+        Self {
+            input_manager: InputManagerBundle {
+                input_map: m.clone(),
+                action_state: ActionState::default(),
+            },
+        }
+    }
+}
+
 impl Default for DollyPosCtrlInputBundle {
     fn default() -> Self {
         use MoveAction::*;
-        let mut input_map = InputMap::default();
+
+        let mut bundle = DollyPosCtrlInputBundle::init();
+
+        bundle.move_wasd();
+        bundle.move_arrows();
+        bundle.move_dpad();
+
         //TODO: Impl. when added to input-manager
         //input_map.assign_gamepad(Gamepad(0));
 
-        input_map.insert(QwertyScanCode::W, Forward);
-        input_map.insert(QwertyScanCode::Up, Forward);
-
-        input_map.insert(GamepadButtonType::DPadUp, Forward);
-        //input_map.insert(SingleAxis::symmetric(GamepadAxisType::LeftStickY, 0.1), Forward); // + Y / - Y
-
-        input_map.insert(QwertyScanCode::S, Backward);
-        input_map.insert(QwertyScanCode::Down, Backward);
-        input_map.insert(GamepadButtonType::DPadDown, Backward);
-
-        input_map.insert(QwertyScanCode::A, StrafeLeft);
-        input_map.insert(QwertyScanCode::Left, StrafeLeft);
-        input_map.insert(GamepadButtonType::DPadLeft, StrafeLeft);
-
-        input_map.insert(QwertyScanCode::D, StrafeRight);
-        input_map.insert(QwertyScanCode::Right, StrafeRight);
-        input_map.insert(GamepadButtonType::DPadRight, StrafeRight);
-
-        //input_map.insert(SingleAxis::symmetric(GamepadAxisType::LeftStickX, 0.1), StrafeRight); // + X / - X
-
-        input_map.insert(QwertyScanCode::Space, Up);
-        input_map.insert(
+        bundle
+            .input_manager
+            .input_map
+            .insert(QwertyScanCode::Space, Up);
+        bundle.input_manager.input_map.insert(
             SingleAxis::positive_only(GamepadAxisType::LeftStickY, 0.1),
             Up,
         );
 
-        input_map.insert(QwertyScanCode::LShift, Down);
-        input_map.insert(
+        bundle
+            .input_manager
+            .input_map
+            .insert(QwertyScanCode::LShift, Down);
+        bundle.input_manager.input_map.insert(
             SingleAxis::negative_only(GamepadAxisType::LeftStickY, 0.1),
             Down,
         );
 
-        input_map.insert(QwertyScanCode::Comma, RotateLeft);
-        input_map.insert(
+        bundle
+            .input_manager
+            .input_map
+            .insert(QwertyScanCode::Comma, RotateLeft);
+        bundle.input_manager.input_map.insert(
             SingleAxis::negative_only(GamepadAxisType::LeftStickX, 0.1),
             RotateLeft,
         );
 
-        input_map.insert(QwertyScanCode::Period, RotateRight);
-        input_map.insert(
+        bundle
+            .input_manager
+            .input_map
+            .insert(QwertyScanCode::Period, RotateRight);
+        bundle.input_manager.input_map.insert(
             SingleAxis::positive_only(GamepadAxisType::LeftStickX, 0.1),
             RotateRight,
         );
 
-        let input_manager = InputManagerBundle {
-            input_map,
-            action_state: ActionState::default(),
-        };
-
-        Self { input_manager }
+        bundle
     }
 }
 
