@@ -14,6 +14,8 @@
 
 `bevy_dolly` is a prototype plugin using [h3r2tic](https://github.com/h3r2tic)'s powerful crate: [dolly](https://github.com/h3r2tic/dolly), implemented for bevy.<br/>
 
+⚠ **Feedback** - _Bevy_dolly's API is still being revised, so feedback on ergonomics and DX is highly appreciated_ ⚠
+
 It is important to note that dolly is a way to control the movement of the camera and thus, not the camera component itself. </br>
 
 Dolly requires two steps to function:
