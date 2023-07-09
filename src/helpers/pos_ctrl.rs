@@ -112,7 +112,7 @@ pub struct DollyPosCtrlMove;
 
 #[derive(Bundle)]
 struct DollyPosCtrlInputBundle {
-    #[bundle]
+    #[bundle(ignore)]
     input_manager: InputManagerBundle<MoveAction>,
 }
 
