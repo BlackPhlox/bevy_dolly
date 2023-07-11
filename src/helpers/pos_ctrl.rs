@@ -37,13 +37,17 @@ pub struct DollyPosCtrlEntitySetupSet;
 pub struct DollyPosCtrl;
 impl Plugin for DollyPosCtrl {
     fn build(&self, app: &mut App) {
-        app.add_plugin(InputManagerPlugin::<MoveAction>::default());
+        app.add_plugins(InputManagerPlugin::<MoveAction>::default());
         app.init_resource::<DollyPosCtrlConfig>();
-        app.add_startup_system(dolly_pos_ctrl_config_input_setup.in_set(DollyPosCtrlInputSetupSet));
-        app.add_startup_system(
-            dolly_pos_ctrl_config_entity_setup.in_set(DollyPosCtrlEntitySetupSet),
+        app.add_systems(
+            Startup,
+            (
+                dolly_pos_ctrl_config_input_setup.in_set(DollyPosCtrlInputSetupSet),
+                dolly_pos_ctrl_config_entity_setup.in_set(DollyPosCtrlEntitySetupSet),
+            ),
         );
-        app.add_system(
+        app.add_systems(
+            Update,
             dolly_pos_ctrl_move_update
                 .in_set(DollyPosCtrlMoveSet)
                 .run_if(use_dolly_pos_ctrl_config),
@@ -51,7 +55,7 @@ impl Plugin for DollyPosCtrl {
     }
 }
 
-#[derive(Actionlike, PartialEq, Eq, Clone, Copy, Hash, Debug)]
+#[derive(Actionlike, PartialEq, Eq, Clone, Copy, Hash, Debug, Reflect)]
 pub enum MoveAction {
     Forward,
     Backward,
@@ -185,7 +189,7 @@ impl Default for DollyPosCtrlInputBundle {
             Up,
         );
 
-        input_map.insert(QwertyScanCode::LShift, Down);
+        input_map.insert(QwertyScanCode::ShiftLeft, Down);
         input_map.insert(
             SingleAxis::negative_only(GamepadAxisType::LeftStickY, 0.1),
             Down,

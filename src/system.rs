@@ -14,15 +14,24 @@ pub trait DollyComponent {
 
 impl DollyComponent for App {
     fn add_dolly_component<T: Component>(&mut self, _: T) -> &mut Self {
-        self.add_system(Dolly::<T>::update_active_continuous.in_set(DollyUpdateSet))
+        self.add_systems(
+            Update,
+            Dolly::<T>::update_active_continuous.in_set(DollyUpdateSet),
+        )
     }
 
     fn add_rig_component<T: Component>(&mut self, _: T) -> &mut Self {
-        self.add_system(Dolly::<T>::update_all_continuous.in_set(DollyUpdateSet))
+        self.add_systems(
+            Update,
+            Dolly::<T>::update_all_continuous.in_set(DollyUpdateSet),
+        )
     }
 
     fn add_dolly_2d_component<T: Component>(&mut self, _: T) -> &mut Self {
-        self.add_system(Dolly::<T>::update_2d_active_continuous.in_set(DollyUpdateSet))
+        self.add_systems(
+            Update,
+            Dolly::<T>::update_2d_active_continuous.in_set(DollyUpdateSet),
+        )
     }
 }
 
