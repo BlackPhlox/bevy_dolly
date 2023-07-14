@@ -21,15 +21,19 @@ enum Camera {
 fn main() {
     App::new()
         .insert_resource(Msaa::default())
-        .add_plugins(DefaultPlugins)
-        .add_plugin(DollyPosCtrl)
-        .add_system(Dolly::<MainCamera>::update_active)
-        .add_startup_system(setup)
-        .add_system(rotator_system)
+        .add_plugins((DefaultPlugins, DollyPosCtrl))
+        .add_systems(Startup, setup)
+        .add_systems(
+            Update,
+            (
+                Dolly::<MainCamera>::update_active,
+                rotator_system,
+                switch_camera_rig,
+                follow_player.run_if(in_state(Camera::FollowPlayer)),
+                follow_sheep.run_if(in_state(Camera::FollowSheep)),
+            ),
+        )
         .add_state::<Camera>()
-        .add_system(switch_camera_rig)
-        .add_system(follow_player.in_set(OnUpdate(Camera::FollowPlayer)))
-        .add_system(follow_sheep.in_set(OnUpdate(Camera::FollowSheep)))
         .run();
 }
 
@@ -129,15 +133,19 @@ fn rotator_system(time: Res<Time>, mut query: Query<&mut Transform, With<Rotates
 }
 
 #[allow(unused_must_use)]
-fn switch_camera_rig(mut camera: ResMut<State<Camera>>, keyboard_input: Res<Input<KeyCode>>) {
+fn switch_camera_rig(
+    camera: Res<State<Camera>>,
+    mut next_camera: ResMut<NextState<Camera>>,
+    keyboard_input: Res<Input<KeyCode>>,
+) {
     if keyboard_input.just_pressed(KeyCode::C) {
-        let result = if camera.0.eq(&Camera::FollowPlayer) {
+        let result = if *camera == Camera::FollowPlayer {
             Camera::FollowSheep
         } else {
             Camera::FollowPlayer
         };
 
         println!("{result:?}");
-        camera.0 = result;
+        next_camera.set(result);
     }
 }

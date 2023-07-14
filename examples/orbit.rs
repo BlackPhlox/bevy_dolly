@@ -13,20 +13,23 @@ struct SecondCamera;
 fn main() {
     App::new()
         .insert_resource(Msaa::default())
-        .add_plugins(DefaultPlugins)
-        .add_plugin(DollyPosCtrl)
-        .add_plugin(DollyCursorGrab)
+        .add_plugins((DefaultPlugins, DollyPosCtrl, DollyCursorGrab))
         .insert_resource(DollyPosCtrlConfig {
             ..Default::default()
         })
         .add_state::<ProjectionType>()
         .add_state::<Pan>()
         .add_state::<ZoomType>()
-        .add_system(Dolly::<MainCamera>::update_active)
-        .add_startup_system(setup)
-        .add_system(update_camera)
-        .add_system(swap_camera)
-        .add_system(handle_mouse_scroll)
+        .add_systems(Startup, setup)
+        .add_systems(
+            Update,
+            (
+                Dolly::<MainCamera>::update_active,
+                update_camera,
+                swap_camera,
+                handle_mouse_scroll,
+            ),
+        )
         .run();
 }
 
@@ -117,7 +120,7 @@ fn setup(
         ..Default::default()
     };
 
-    if startup_perspective.0 == ProjectionType::Orthographic {
+    if *startup_perspective == ProjectionType::Orthographic {
         commands.spawn((MainCamera, orth));
         commands.spawn((SecondCamera, pers));
     } else {
@@ -144,8 +147,10 @@ fn setup(
 fn swap_camera(
     keys: Res<Input<KeyCode>>,
     mut commands: Commands,
-    mut perspective: ResMut<State<ProjectionType>>,
-    mut zoom: ResMut<State<ZoomType>>,
+    perspective: Res<State<ProjectionType>>,
+    mut next_perspective: ResMut<NextState<ProjectionType>>,
+    zoom: Res<State<ZoomType>>,
+    mut next_zoom: ResMut<NextState<ZoomType>>,
     mut q_main: Query<(Entity, &mut Camera), (With<MainCamera>, Without<SecondCamera>)>,
     mut q_sec: Query<(Entity, &mut Camera), (With<SecondCamera>, Without<MainCamera>)>,
 ) {
@@ -163,23 +168,25 @@ fn swap_camera(
                 cam_sec.is_active = true;
                 cam_main.is_active = false;
 
-                perspective.0 = if perspective.0 == ProjectionType::Orthographic {
+                next_perspective.set(if *perspective == ProjectionType::Orthographic {
                     ProjectionType::Perspective
                 } else {
                     ProjectionType::Orthographic
-                };
+                });
 
-                println!("Perspective: {:?}", perspective.0);
+                println!("Perspective: {:?}", perspective);
             }
         }
     } else if keys.just_pressed(KeyCode::G) {
         // Arm doesn't make a difference for Orthographic projection
-        zoom.0 = if zoom.0 == ZoomType::Arm && perspective.0 == ProjectionType::Perspective {
-            ZoomType::Fov
-        } else {
-            ZoomType::Arm
-        };
-        println!("ZoomType: {:?}", zoom.0);
+        next_zoom.set(
+            if *zoom == ZoomType::Arm && *perspective == ProjectionType::Perspective {
+                ZoomType::Fov
+            } else {
+                ZoomType::Arm
+            },
+        );
+        println!("ZoomType: {:?}", zoom);
     }
 }
 
@@ -193,7 +200,7 @@ fn handle_mouse_scroll(
         for mut projection in &mut q_main.iter_mut() {
             match &mut projection.as_mut() {
                 Projection::Perspective(pers) => {
-                    if zoom.0 == ZoomType::Fov {
+                    if *zoom == ZoomType::Fov {
                         pers.fov = (pers.fov - mouse_wheel_event.y * 0.01).abs();
                     } else if let Ok(mut rig) = rig_q.get_single_mut() {
                         if let Some(arm) = rig.try_driver_mut::<Arm>() {
@@ -214,7 +221,8 @@ fn handle_mouse_scroll(
 #[allow(unused_must_use)]
 fn update_camera(
     keys: Res<Input<KeyCode>>,
-    mut pan: ResMut<State<Pan>>,
+    pan: Res<State<Pan>>,
+    mut next_pan: ResMut<NextState<Pan>>,
     mut mouse_motion_events: EventReader<MouseMotion>,
     mut rig_q: Query<&mut Rig>,
     trans: Query<&Transform, With<DollyPosCtrlMove>>,
@@ -232,7 +240,7 @@ fn update_camera(
 
     config.transform.rotation = Quat::from_rotation_y(delta.x);
 
-    if pan.0.eq(&Pan::Keys) {
+    if *pan == Pan::Keys {
         if keys.just_pressed(KeyCode::Z) {
             camera_yp.rotate_yaw_pitch(-90.0, 0.0);
         }
@@ -247,12 +255,12 @@ fn update_camera(
     }
 
     if keys.just_pressed(KeyCode::E) {
-        let result = if pan.0.eq(&Pan::Keys) {
+        let result = if *pan == Pan::Keys {
             Pan::Mouse
         } else {
             Pan::Keys
         };
-        pan.0 = result;
+        next_pan.set(result);
         println!("PanType: {result:?}");
     }
 

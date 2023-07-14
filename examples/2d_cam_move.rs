@@ -10,10 +10,13 @@ fn main() {
     App::new()
         .insert_resource(Msaa::default())
         .add_plugins(DefaultPlugins)
-        .add_startup_system(setup)
+        .add_systems(Startup, setup)
         //If large amount of smoothing is used, where camera movement is expected beyond the time of input
         //Ie. motion smoothing beyond 0.25, use update_2d_active_continuous instead
-        .add_systems((Dolly::<MainCamera>::update_2d_active, update_camera))
+        .add_systems(
+            Update,
+            (Dolly::<MainCamera>::update_2d_active, update_camera),
+        )
         .run();
 }
 

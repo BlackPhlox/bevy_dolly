@@ -14,13 +14,17 @@ enum MovementType {
 fn main() {
     App::new()
         .insert_resource(Msaa::default())
-        .add_plugins(DefaultPlugins)
-        .add_plugin(DollyCursorGrab)
+        .add_plugins((DefaultPlugins, DollyCursorGrab))
         .add_state::<MovementType>()
-        .add_system(Dolly::<MainCamera>::update_active)
-        .add_startup_system(setup)
-        .add_system(update_fpvtype)
-        .add_system(update_camera)
+        .add_systems(Startup, setup)
+        .add_systems(
+            Update,
+            (
+                Dolly::<MainCamera>::update_active,
+                update_camera,
+                update_fpvtype,
+            ),
+        )
         .run();
 }
 
@@ -77,16 +81,20 @@ fn setup(
     info!("Press Esc to toggle cursor focus");
 }
 
-fn update_fpvtype(keys: Res<Input<KeyCode>>, mut fps_state: ResMut<State<MovementType>>) {
+fn update_fpvtype(
+    keys: Res<Input<KeyCode>>,
+    fps_state: Res<State<MovementType>>,
+    mut fps_next_state: ResMut<NextState<MovementType>>,
+) {
     if keys.just_pressed(KeyCode::F) {
-        let result = if fps_state.0.eq(&MovementType::FirstPerson) {
+        let result = if *fps_state == MovementType::FirstPerson {
             MovementType::Free
         } else {
             MovementType::FirstPerson
         };
 
         println!("State:{result:?}");
-        fps_state.0 = result;
+        fps_next_state.set(result);
     }
 }
 
@@ -125,7 +133,7 @@ fn update_camera(
         move_vec.y -= 1.0;
     }
 
-    let boost: f32 = if keys.pressed(KeyCode::LShift) {
+    let boost: f32 = if keys.pressed(KeyCode::ShiftLeft) {
         boost_mult
     } else {
         1.
@@ -145,7 +153,7 @@ fn update_camera(
             rig.driver_mut::<Fpv>().update_pos_rot(
                 move_vec,
                 delta,
-                fps_state.0.eq(&MovementType::FirstPerson),
+                *fps_state == MovementType::FirstPerson,
                 boost,
                 time_delta_seconds,
             );

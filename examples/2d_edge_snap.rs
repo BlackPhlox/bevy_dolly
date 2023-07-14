@@ -4,10 +4,15 @@ use bevy_dolly::prelude::*;
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
-        .add_startup_system(setup)
-        .add_system(Dolly::<MainCamera>::update_2d_active)
-        .add_system(sprite_movement)
-        .add_system(update_camera)
+        .add_systems(Startup, setup)
+        .add_systems(
+            Update,
+            (
+                Dolly::<MainCamera>::update_2d_active,
+                update_camera,
+                sprite_movement,
+            ),
+        )
         .run();
 }
 
