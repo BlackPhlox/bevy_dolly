@@ -29,7 +29,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands
         .spawn(SpriteBundle {
             texture: asset_server.load("bevy_dolly.png"),
-            transform: Transform::from_xyz(100., 0., 0.),
+            transform: Transform::from_xyz(100., 0., 0.1),
             sprite: Sprite {
                 custom_size: Some(Vec2::new(128., 128.)),
                 ..Default::default()
@@ -50,7 +50,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
 
     commands.spawn(SpriteBundle {
         texture: asset_server.load("room_end.png"),
-        transform: Transform::from_xyz(1116., -104.5, 0.),
+        transform: Transform::from_xyz(1116., -104.5, 0.2),
         sprite: Sprite {
             ..Default::default()
         },
@@ -59,7 +59,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
 
     commands.spawn(SpriteBundle {
         texture: asset_server.load("room_end.png"),
-        transform: Transform::from_xyz(-916., -104.5, 0.),
+        transform: Transform::from_xyz(-916., -104.5, 0.2),
         sprite: Sprite {
             flip_x: true,
             ..Default::default()
