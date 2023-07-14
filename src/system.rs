@@ -80,8 +80,8 @@ where
                     {
                         orth.scale = (transform.translation.z + 1.) * Self::SCALE_INCR_THRESHOLD;
                     }
-                    //Drop Z from camera's transform calculations
-                    let xy = transform.translation.truncate().extend(0 as f32);
+                    //Drop Z from camera's transform calculations and keep original
+                    let xy = transform.translation.truncate().extend(t.translation.z);
                     transform.translation = xy;
                     *t = transform;
                 }
@@ -146,8 +146,8 @@ where
                     {
                         orth.scale = (transform.translation.z + 1.) * Self::SCALE_INCR_THRESHOLD;
                     }
-                    //Drop Z from camera's transform calculations
-                    let xy = transform.translation.truncate().extend(0 as f32);
+                    //Drop Z from camera's transform calculations and keep original
+                    let xy = transform.translation.truncate().extend(t.translation.z);
                     transform.translation = xy;
                     *t = transform;
                 }
