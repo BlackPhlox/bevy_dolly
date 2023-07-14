@@ -42,7 +42,7 @@ leafwing-input-manager = "0.10"
 
 [dev-dependencies.bevy]
 version = "0.11.0"
-features = ["bevy_core_pipeline", "bevy_asset", "bevy_scene", "bevy_pbr", "bevy_winit", "bevy_gltf", "bevy_sprite", "png"]
+features = ["bevy_core_pipeline", "bevy_asset", "bevy_scene", "bevy_pbr", "bevy_winit", "bevy_gltf", "bevy_sprite", "png", "ktx2", "zstd", "tonemapping_luts"]
 default-features = false
 
 [target.'cfg(target_os = "linux")'.dev-dependencies.bevy]
