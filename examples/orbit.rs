@@ -144,6 +144,7 @@ fn setup(
     info!("Press Esc to toggle cursor focus");
 }
 
+#[allow(clippy::too_many_arguments)]
 fn swap_camera(
     keys: Res<Input<KeyCode>>,
     mut commands: Commands,
@@ -218,7 +219,7 @@ fn handle_mouse_scroll(
     }
 }
 
-#[allow(unused_must_use)]
+#[allow(clippy::too_many_arguments)]
 fn update_camera(
     keys: Res<Input<KeyCode>>,
     pan: Res<State<Pan>>,

@@ -132,7 +132,6 @@ fn rotator_system(time: Res<Time>, mut query: Query<&mut Transform, With<Rotates
     }
 }
 
-#[allow(unused_must_use)]
 fn switch_camera_rig(
     camera: Res<State<Camera>>,
     mut next_camera: ResMut<NextState<Camera>>,
