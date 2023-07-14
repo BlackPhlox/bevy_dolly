@@ -49,7 +49,6 @@ enum GrabAction {
 
 #[derive(Bundle)]
 struct DollyCursorGrabInputBundle {
-    #[bundle(ignore)]
     input_manager: InputManagerBundle<GrabAction>,
 }
 
