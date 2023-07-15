@@ -12,12 +12,17 @@ use bevy_dolly::prelude::*;
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
-        .add_system(Dolly::<LeftCamera>::update_active)
-        .add_system(Dolly::<RightCamera>::update_active)
-        .add_startup_system(setup)
-        .add_system(set_camera_viewports)
-        .add_system(update_camera_1)
-        .add_system(update_camera_2)
+        .add_systems(Startup, setup)
+        .add_systems(
+            Update,
+            (
+                Dolly::<LeftCamera>::update_active,
+                Dolly::<RightCamera>::update_active,
+                set_camera_viewports,
+                update_camera_1,
+                update_camera_2,
+            ),
+        )
         .run();
 }
 

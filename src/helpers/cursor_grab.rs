@@ -8,9 +8,11 @@ pub struct DollyCursorGrab;
 impl Plugin for DollyCursorGrab {
     fn build(&self, app: &mut App) {
         app.init_resource::<DollyCursorGrabConfig>()
-            .add_startup_system(initial_grab_cursor)
-            .add_startup_system(dolly_cursor_grab_input_setup)
-            .add_system(cursor_grab.run_if(use_grab));
+            .add_systems(
+                Startup,
+                (initial_grab_cursor, dolly_cursor_grab_input_setup),
+            )
+            .add_systems(Update, cursor_grab.run_if(use_grab));
     }
 }
 
@@ -40,14 +42,13 @@ fn dolly_cursor_grab_input_setup(mut commands: Commands) {
     commands.spawn((DollyCursorGrabInputBundle::default(), DollyCursorGrabAction));
 }
 
-#[derive(Actionlike, PartialEq, Eq, Clone, Copy, Hash, Debug)]
+#[derive(Actionlike, PartialEq, Eq, Clone, Copy, Hash, Debug, Reflect)]
 enum GrabAction {
     Exit,
 }
 
 #[derive(Bundle)]
 struct DollyCursorGrabInputBundle {
-    #[bundle(ignore)]
     input_manager: InputManagerBundle<GrabAction>,
 }
 
