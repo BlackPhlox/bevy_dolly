@@ -8,11 +8,9 @@ struct MainCamera;
 fn main() {
     App::new()
         .insert_resource(Msaa::default())
-        .add_plugins(DefaultPlugins)
-        .add_plugin(DollyPosCtrl)
-        .add_system(Dolly::<MainCamera>::update_active)
-        .add_startup_system(setup)
-        .add_system(update_camera)
+        .add_plugins((DefaultPlugins, DollyPosCtrl))
+        .add_systems(Startup, setup)
+        .add_systems(Update, (Dolly::<MainCamera>::update_active, update_camera))
         .run();
 }
 #[allow(dead_code)]

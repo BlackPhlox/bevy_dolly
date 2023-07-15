@@ -14,15 +14,24 @@ pub trait DollyComponent {
 
 impl DollyComponent for App {
     fn add_dolly_component<T: Component>(&mut self, _: T) -> &mut Self {
-        self.add_system(Dolly::<T>::update_active_continuous.in_set(DollyUpdateSet))
+        self.add_systems(
+            Update,
+            Dolly::<T>::update_active_continuous.in_set(DollyUpdateSet),
+        )
     }
 
     fn add_rig_component<T: Component>(&mut self, _: T) -> &mut Self {
-        self.add_system(Dolly::<T>::update_all_continuous.in_set(DollyUpdateSet))
+        self.add_systems(
+            Update,
+            Dolly::<T>::update_all_continuous.in_set(DollyUpdateSet),
+        )
     }
 
     fn add_dolly_2d_component<T: Component>(&mut self, _: T) -> &mut Self {
-        self.add_system(Dolly::<T>::update_2d_active_continuous.in_set(DollyUpdateSet))
+        self.add_systems(
+            Update,
+            Dolly::<T>::update_2d_active_continuous.in_set(DollyUpdateSet),
+        )
     }
 }
 
@@ -71,8 +80,8 @@ where
                     {
                         orth.scale = (transform.translation.z + 1.) * Self::SCALE_INCR_THRESHOLD;
                     }
-                    //Drop Z from camera's transform calculations
-                    let xy = transform.translation.truncate().extend(0 as f32);
+                    //Drop Z from camera's transform calculations and keep original
+                    let xy = transform.translation.truncate().extend(t.translation.z);
                     transform.translation = xy;
                     *t = transform;
                 }
@@ -137,8 +146,8 @@ where
                     {
                         orth.scale = (transform.translation.z + 1.) * Self::SCALE_INCR_THRESHOLD;
                     }
-                    //Drop Z from camera's transform calculations
-                    let xy = transform.translation.truncate().extend(0 as f32);
+                    //Drop Z from camera's transform calculations and keep original
+                    let xy = transform.translation.truncate().extend(t.translation.z);
                     transform.translation = xy;
                     *t = transform;
                 }
