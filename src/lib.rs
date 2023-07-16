@@ -1,4 +1,4 @@
-pub use dolly;
+pub mod dolly;
 
 pub mod dolly_type;
 #[cfg(feature = "drivers")]

@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 use dolly::{driver::RigDriver, prelude::*};
+use crate::{dolly, prelude::{YawPitch, Position, Rotation}};
 
 impl Fpv {
     pub fn from_position_target(target_transform: Transform) -> Self {
