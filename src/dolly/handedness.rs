@@ -3,7 +3,6 @@ use std::fmt::Debug;
 use bevy_math::{vec3, Vec3};
 //use glam::Vec3;
 
-
 pub trait Handedness: Clone + Copy + Debug + 'static {
     const FORWARD_Z_SIGN: f32;
     const FORWARD: Vec3 = vec3(0.0, 0.0, Self::FORWARD_Z_SIGN);
