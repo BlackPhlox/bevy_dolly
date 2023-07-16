@@ -11,8 +11,8 @@
   </tr>
 </table>
   <div align="center">
-<a href="https://crates.io/crates/bevy_config"><img src="https://img.shields.io/crates/v/bevy_dolly" alt="link to crates.io"></a>
-<a href="https://docs.rs/bevy_config"><img src="https://docs.rs/bevy_dolly/badge.svg" alt="link to docs.rs"></a>
+<a href="https://crates.io/crates/bevy_dolly"><img src="https://img.shields.io/crates/v/bevy_dolly" alt="link to crates.io"></a>
+<a href="https://docs.rs/bevy_dolly"><img src="https://docs.rs/bevy_dolly/badge.svg" alt="link to docs.rs"></a>
 <a href="https://github.com/BlackPhlox/bevy_dolly/blob/main/LICENSE-MIT"><img src="https://img.shields.io/crates/l/bevy_dolly" alt="link to license"></a>
 <a href="https://crates.io/crates/bevy_dolly"><img src="https://img.shields.io/crates/d/bevy_dolly" alt="downloads/link to crates.io"></a>
 <a href="https://github.com/BlackPhlox/bevy_dolly"><img src="https://img.shields.io/github/stars/BlackPhlox/bevy_dolly" alt="stars/github repo"></a>
