@@ -197,7 +197,7 @@ fn handle_mouse_scroll(
     zoom: Res<State<ZoomType>>,
     mut rig_q: Query<&mut Rig>,
 ) {
-    for mouse_wheel_event in mouse_wheel_events.iter() {
+    for mouse_wheel_event in mouse_wheel_events.read() {
         for mut projection in &mut q_main.iter_mut() {
             match &mut projection.as_mut() {
                 Projection::Perspective(pers) => {
@@ -235,7 +235,7 @@ fn update_camera(
     let sensitivity = Vec2::splat(2.0);
 
     let mut delta = Vec2::ZERO;
-    for event in mouse_motion_events.iter() {
+    for event in mouse_motion_events.read() {
         delta += event.delta;
     }
 
