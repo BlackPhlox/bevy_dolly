@@ -1,5 +1,5 @@
 [package]
-name = "bevy_dolly_cameras"
+name = "bevy_dolly"
 version = "0.0.2"
 authors = ["Black Phlox <bphlox@gmail.com>", "Caleb Yates <calebyates42@gmail.com>"]
 license = "MIT OR Apache-2.0"
