@@ -29,8 +29,13 @@ drivers = []
 helpers = ["dep:leafwing-input-manager"]
 
 [dependencies]
-dolly = { path = "dolly", default-features = false }
+# dolly = { version = "0.4", default-features = false }
 leafwing-input-manager = { version = "0.10", optional = true }
+
+[dependencies.dolly]
+version = "0.4"
+git = "https://github.com/BlackPhlox/dolly.git"
+default-features = false
 
 [dependencies.bevy]
 version = "0.11.0"

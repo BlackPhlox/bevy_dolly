@@ -1,6 +1,6 @@
 use std::marker::PhantomData;
 
-use crate::prelude::*;
+use crate::{prelude::*, TransformConversion};
 use bevy::prelude::*;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, SystemSet)]
@@ -56,7 +56,7 @@ where
 
             cameras.for_each_mut(|(mut t, camera)| {
                 if camera.is_active {
-                    *t = transform;
+                    *t = transform.into_bevy_transform();
                 }
             });
         }
@@ -75,15 +75,15 @@ where
             cameras.for_each_mut(|(mut t, mut orth, camera)| {
                 if camera.is_active {
                     //Bind camera's Z axis to scale, if used for init state check to prevent scale of 0
-                    if !(transform.translation.z < Self::RANGE_SCALE_2D
-                        && transform.translation.z > -Self::RANGE_SCALE_2D)
+                    if !(transform.position.z < Self::RANGE_SCALE_2D
+                        && transform.position.z > -Self::RANGE_SCALE_2D)
                     {
-                        orth.scale = (transform.translation.z + 1.) * Self::SCALE_INCR_THRESHOLD;
+                        orth.scale = (transform.position.z + 1.) * Self::SCALE_INCR_THRESHOLD;
                     }
                     //Drop Z from camera's transform calculations and keep original
-                    let xy = transform.translation.truncate().extend(t.translation.z);
-                    transform.translation = xy;
-                    *t = transform;
+                    let xy = transform.position.truncate().extend(t.translation.z);
+                    transform.position = xy;
+                    *t = transform.into_bevy_transform();
                 }
             });
         }
@@ -101,7 +101,7 @@ where
             let transform = rig.update(time.delta_seconds());
 
             transforms.for_each_mut(|mut t| {
-                *t = transform;
+                *t = transform.into_bevy_transform();
             });
         }
     }
@@ -124,7 +124,7 @@ where
 
             cameras.for_each_mut(|(mut t, camera)| {
                 if camera.is_active {
-                    *t = transform;
+                    *t = transform.into_bevy_transform();
                 }
             });
         }
@@ -141,15 +141,15 @@ where
             cameras.for_each_mut(|(mut t, mut orth, camera)| {
                 if camera.is_active {
                     //Bind camera's Z axis to scale, if used for init state check to prevent scale of 0
-                    if !(transform.translation.z < Self::RANGE_SCALE_2D
-                        && transform.translation.z > -Self::RANGE_SCALE_2D)
+                    if !(transform.position.z < Self::RANGE_SCALE_2D
+                        && transform.position.z > -Self::RANGE_SCALE_2D)
                     {
-                        orth.scale = (transform.translation.z + 1.) * Self::SCALE_INCR_THRESHOLD;
+                        orth.scale = (transform.position.z + 1.) * Self::SCALE_INCR_THRESHOLD;
                     }
                     //Drop Z from camera's transform calculations and keep original
-                    let xy = transform.translation.truncate().extend(t.translation.z);
-                    transform.translation = xy;
-                    *t = transform;
+                    let xy = transform.position.truncate().extend(t.translation.z);
+                    transform.position = xy;
+                    *t = transform.into_bevy_transform();
                 }
             });
         }
@@ -166,7 +166,7 @@ where
             let transform = rig.update(time.delta_seconds());
 
             transforms.for_each_mut(|mut t| {
-                *t = transform;
+                *t = transform.into_bevy_transform();
             });
         }
     }

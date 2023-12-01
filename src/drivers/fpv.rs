@@ -1,6 +1,8 @@
 use bevy::prelude::*;
 use dolly::{driver::RigDriver, prelude::*};
 
+use crate::TransformConversion;
+
 impl Fpv {
     pub fn from_position_target(target_transform: Transform) -> Self {
         let mut yp = YawPitch::new();
@@ -63,8 +65,8 @@ impl Fpv {
 pub struct Fpv(CameraRig);
 
 // Turn the nested rig into a driver, so it can be used in another rig.
-impl RigDriver for Fpv {
-    fn update(&mut self, params: dolly::rig::RigUpdateParams) -> Transform {
+impl RigDriver<RightHanded> for Fpv {
+    fn update(&mut self, params: dolly::rig::RigUpdateParams<RightHanded>) -> dolly::transform::Transform<RightHanded> {
         self.0.update(params.delta_time_seconds)
     }
 }

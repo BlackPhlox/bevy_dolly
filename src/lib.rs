@@ -1,4 +1,5 @@
 pub use dolly;
+use dolly::handedness::RightHanded;
 
 pub mod dolly_type;
 #[cfg(feature = "drivers")]
@@ -16,4 +17,18 @@ pub mod prelude {
         helpers::{cone::*, cursor_grab::*, pos_ctrl::*},
         system::*,
     };
+}
+
+trait TransformConversion {
+	fn into_bevy_transform(self) -> bevy::prelude::Transform;
+}
+
+impl TransformConversion for dolly::transform::Transform<RightHanded> {
+	fn into_bevy_transform(self) -> bevy::prelude::Transform {
+		bevy::prelude::Transform {
+			translation: self.position,
+			rotation: self.rotation,
+			..Default::default()
+		}
+	}
 }

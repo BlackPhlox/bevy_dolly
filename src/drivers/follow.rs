@@ -31,8 +31,8 @@ impl MovableLookAt {
 pub struct MovableLookAt(CameraRig);
 
 // Turn the nested rig into a driver, so it can be used in another rig.
-impl RigDriver for MovableLookAt {
-    fn update(&mut self, params: dolly::rig::RigUpdateParams) -> Transform {
+impl RigDriver<RightHanded> for MovableLookAt {
+    fn update(&mut self, params: dolly::rig::RigUpdateParams<RightHanded>) -> dolly::transform::Transform<RightHanded> {
         self.0.update(params.delta_time_seconds)
     }
 }
