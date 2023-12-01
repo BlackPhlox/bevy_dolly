@@ -1,11 +1,11 @@
 [package]
-name = "bevy_dolly"
-version = "0.0.1"
-authors = ["Black Phlox <bphlox@gmail.com>"]
+name = "bevy_dolly_cameras"
+version = "0.0.2"
+authors = ["Black Phlox <bphlox@gmail.com>", "Caleb Yates <calebyates42@gmail.com>"]
 license = "MIT OR Apache-2.0"
 edition = "2021"
 readme = "README.md"
-repository = "https://github.com/BlackPhlox/bevy_dolly"
+repository = "https://github.com/ActuallyHappening/bevy_dolly_cameras"
 documentation = "https://docs.rs/bevy_dolly"
 description = "The dolly abstraction layer for the bevy game framework"
 keywords = ["gamedev", "bevy", "camera", "fps", "3d" ]
@@ -34,7 +34,7 @@ leafwing-input-manager = { version = "0.10", optional = true }
 
 [dependencies.dolly]
 version = "0.4"
-git = "https://github.com/BlackPhlox/dolly.git"
+# git = "https://github.com/BlackPhlox/dolly.git"
 default-features = false
 
 [dependencies.bevy]

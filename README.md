@@ -22,7 +22,8 @@
 </div>
 </br>
 
-`bevy_dolly` is a prototype plugin using [h3r2tic](https://github.com/h3r2tic)'s powerful crate: [dolly](https://github.com/h3r2tic/dolly), implemented for bevy.
+`bevy_dolly_camera` is a prototype plugin using [h3r2tic](https://github.com/h3r2tic)'s powerful crate: [dolly](https://github.com/h3r2tic/dolly), implemented for bevy.
+This crate is a fork of [bevy_dolly](https://github.com/BlackPhlox/bevy_dolly) which never saw the light of day in crates.io
 
 ⚠ **Feedback** - _Bevy_dolly's API is still being revised, so feedback on ergonomics and DX is highly appreciated_ ⚠
 
@@ -101,7 +102,9 @@ To see how works in Bevy in practice, please look at this repository's [examples
 
 |bevy|bevy_dolly|
 |---|---|
-|0.11| 0.0.1 |
+|0.12| 0.0.2 |
+
+(0.0.1 was never released to maintain compatibility with `bevy_dolly`'s original unreleased version)
 
 ## Alternatives
 
@@ -121,9 +124,4 @@ The project is under dual license MIT and Apache 2.0, so joink to your hearts co
 
 ## Contributing
 
-Yes this project is still very much WIP, so PRs are very welcome.  
-The `dolly` dependency used is a slightly patched submodule, so to build the crate locally you must first run the following:  
-
-```bash
-git submodule update --init --recursive
-```
+Yes please contribute! PRs are welcome any time!
