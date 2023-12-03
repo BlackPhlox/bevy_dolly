@@ -82,14 +82,35 @@ fn setup(
   commands.spawn((
     MainCamera, // The rig component tag 
     Rig::builder() // The rig itself
-      .with(Position::new(Vec3::ZERO))
-      .with(YawPitch::new().yaw_degrees(45.0).pitch_degrees(-30.0))
-      .with(Smooth::new_position(0.3))
-      .with(Smooth::new_rotation(0.3))
-      .with(Arm::new(Vec3::Z * 4.0))
+      .with(Position::new(Vec3::ZERO)) // Start position
+      // Adds a driver with method rotate_yaw_pitch
+      .with(YawPitch::new().yaw_degrees(45.0).pitch_degrees(-30.0)) 
+      // Interpolation when the translation is updated, also known as smoothing
+      .with(Smooth::new_position(0.3)) 
+      // Interpolation when the rotation is updated (updated via the YawPitch driver)
+      .with(Smooth::new_rotation(0.3)) 
+      // Moves the camera point out in the Z direction and uses the position as the pivot
+      .with(Arm::new(Vec3::Z * 4.0)) 
       .build(),
     Camera3dBundle::default(), // The camera which is related via the rig tag 
   ));
+}
+```
+
+And your runtime to update the rig:
+
+```rust
+fn update_input(
+  mut commands: Commands,
+  keys: Res<Input<KeyCode>>,
+  mut rig_q: Query<&mut Rig>,
+) {
+  let mut rig = rig_q.single_mut();
+  if let Some(yaw_pitch) = rig.try_driver_mut::<YawPitch>() {
+      if keys.just_pressed(KeyCode::Z) {
+          yaw_pitch.rotate_yaw_pitch(-90.0, 0.0);
+      }
+  }
 }
 ```
 
