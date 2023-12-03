@@ -62,9 +62,10 @@ struct MainCamera;
 fn main() {
   App::new()
     .add_plugins(DefaultPlugins)
-    .add_startup_system(setup)
     //..
-    .add_system(Dolly::<MainCamera>::update_active)
+    .add_system(Startup, setup)
+    .add_system(Update, Dolly::<MainCamera>::update_active)
+    .add_system(Update, update_input)
     //..
     .run();
 }
@@ -81,7 +82,7 @@ fn setup(
     MainCamera, // The rig component tag 
     Rig::builder() // The rig itself
       .with(Position::new(Vec3::ZERO)) // Start position
-      // Adds a driver with method rotate_yaw_pitch
+      // Adds a driver with the method rotate_yaw_pitch
       .with(YawPitch::new().yaw_degrees(45.0).pitch_degrees(-30.0)) 
       // Interpolation when the translation is updated, also known as smoothing
       .with(Smooth::new_position(0.3)) 
