@@ -28,4 +28,4 @@ jobs:
           override: true
 
       - name: Check code
-        run: cargo update && cargo check --lib --examples
+        run: cargo update && cargo check --lib --examples --features "drivers" --no-default-features
