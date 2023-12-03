@@ -22,8 +22,6 @@
 </div>
 </br>
 
-# Improving `bevy_dolly` Documentation
-
 ## Overview
 
 `bevy_dolly` is a prototype plugin built for the [Bevy](https://github.com/bevyengine/bevy) game engine. It leverages the powerful `dolly` crate, developed by [h3r2tic](https://github.com/h3r2tic), to control camera movement within a Bevy application.
