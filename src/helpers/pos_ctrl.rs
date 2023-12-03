@@ -122,7 +122,7 @@ struct DollyPosCtrlInputBundle {
 impl Display for DollyPosCtrlInputBundle {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let input_map = &self.input_manager.input_map;
-        for (v, ma) in input_map.iter() {
+        for (ma, v) in input_map.iter() {
             let _ = write!(f, "Action: {ma:?} -> ");
             for (i, b) in v.iter().enumerate() {
                 let str = match b {
