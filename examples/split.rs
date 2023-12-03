@@ -124,7 +124,7 @@ fn set_camera_viewports(
     mut left_camera: Query<&mut Camera, (With<LeftCamera>, Without<RightCamera>)>,
     mut right_camera: Query<&mut Camera, With<RightCamera>>,
 ) {
-    for resize_event in resize_events.iter() {
+    for resize_event in resize_events.read() {
         if let Ok((entity, window)) = windows.get_single() {
             if resize_event.window == entity {
                 let mut left_camera = left_camera.single_mut();

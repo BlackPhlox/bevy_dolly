@@ -140,7 +140,7 @@ fn update_camera(
     };
 
     let mut delta = Vec2::ZERO;
-    for event in mouse_motion_events.iter() {
+    for event in mouse_motion_events.read() {
         delta += event.delta;
     }
     delta.x *= sensitivity.x;
