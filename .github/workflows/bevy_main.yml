@@ -16,6 +16,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+        with:
+          ref: bevy_main
       - run: git submodule update --init --recursive
 
       - name: Install Dependencies
