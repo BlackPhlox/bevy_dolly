@@ -28,7 +28,7 @@ helpers = ["dep:leafwing-input-manager"]
 
 [dependencies]
 dolly = { path = "dolly", default-features = false }
-leafwing-input-manager = { version = "0.11.1", optional = true }
+leafwing-input-manager = { version = "0.11.2", optional = true }
 
 [dependencies.bevy]
 version = "0.12"
@@ -36,7 +36,7 @@ features = ["bevy_render", "bevy_asset", "bevy_pbr"]
 default-features = false
 
 [dev-dependencies]
-leafwing-input-manager = "0.11.1"
+leafwing-input-manager = "0.11.2"
 
 [dev-dependencies.bevy]
 version = "0.12"
