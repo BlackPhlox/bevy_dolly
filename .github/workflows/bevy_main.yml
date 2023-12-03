@@ -1,3 +1,5 @@
+# From:
+# https://bevy-cheatbook.github.io/setup/bevy-git.html#ci-setup
 name: check if code still compiles
 
 on:
