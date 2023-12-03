@@ -458,6 +458,8 @@ name = "bevy_dolly"
 version = "0.0.2"
 dependencies = [
  "bevy",
+ "bevy_math",
+ "bevy_transform",
  "leafwing-input-manager",
 ]
 
