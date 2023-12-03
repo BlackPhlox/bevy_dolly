@@ -27,7 +27,7 @@ drivers = []
 helpers = ["dep:leafwing-input-manager"]
 
 [dependencies]
-dolly = { path = "dolly", default-features = false }
+#dolly = { path = "dolly", default-features = false }
 leafwing-input-manager = { version = "0.11.2", optional = true }
 
 [dependencies.bevy]

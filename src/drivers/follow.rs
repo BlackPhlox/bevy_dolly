@@ -1,5 +1,8 @@
+use crate::{
+    dolly::{self, prelude::*},
+    prelude::RigDriver,
+};
 use bevy::prelude::*;
-use dolly::{driver::RigDriver, prelude::*};
 
 impl MovableLookAt {
     pub fn from_position_target(target_position: Vec3) -> Self {
