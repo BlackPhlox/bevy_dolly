@@ -63,9 +63,9 @@ fn main() {
   App::new()
     .add_plugins(DefaultPlugins)
     //..
-    .add_system(Startup, setup)
-    .add_system(Update, Dolly::<MainCamera>::update_active)
-    .add_system(Update, update_input)
+    .add_systems(Startup, setup)
+    .add_systems(Update, Dolly::<MainCamera>::update_active)
+    .add_systems(Update, update_input)
     //..
     .run();
 }
