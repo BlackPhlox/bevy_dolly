@@ -1,3 +1,7 @@
+use crate::{
+    dolly,
+    prelude::{Position, Rotation, YawPitch},
+};
 use bevy::prelude::*;
 use dolly::{driver::RigDriver, prelude::*};
 
