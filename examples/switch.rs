@@ -33,7 +33,7 @@ fn main() {
                 follow_sheep.run_if(in_state(Camera::FollowSheep)),
             ),
         )
-        .add_state::<Camera>()
+        .init_state::<Camera>()
         .run();
 }
 
@@ -46,11 +46,8 @@ fn setup(
 ) {
     // plane
     commands.spawn(PbrBundle {
-        mesh: meshes.add(Mesh::from(shape::Plane {
-            size: 5.0,
-            ..Default::default()
-        })),
-        material: materials.add(Color::rgb(0.3, 0.5, 0.3).into()),
+        mesh: meshes.add(Plane3d::default().mesh().size(5., 5.)),
+        material: materials.add(Color::rgb(0.3, 0.5, 0.3)),
         ..default()
     });
 
@@ -103,8 +100,8 @@ fn setup(
     info!("Press C to toggle between the default player and the sheep");
 }
 
-fn follow_player(query: Query<(&Transform, With<DollyPosCtrlMove>)>, mut q: Query<&mut Rig>) {
-    if let Ok((p, _)) = query.get_single() {
+fn follow_player(query: Query<&Transform, With<DollyPosCtrlMove>>, mut q: Query<&mut Rig>) {
+    if let Ok(p) = query.get_single() {
         let mut rig = q.single_mut();
         rig.driver_mut::<Position>().position = p.translation;
         rig.driver_mut::<Rotation>().rotation = p.rotation;
@@ -135,9 +132,9 @@ fn rotator_system(time: Res<Time>, mut query: Query<&mut Transform, With<Rotates
 fn switch_camera_rig(
     camera: Res<State<Camera>>,
     mut next_camera: ResMut<NextState<Camera>>,
-    keyboard_input: Res<Input<KeyCode>>,
+    keyboard_input: Res<ButtonInput<KeyCode>>,
 ) {
-    if keyboard_input.just_pressed(KeyCode::C) {
+    if keyboard_input.just_pressed(KeyCode::KeyC) {
         let result = if *camera == Camera::FollowPlayer {
             Camera::FollowSheep
         } else {

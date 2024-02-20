@@ -162,48 +162,48 @@ impl Default for DollyPosCtrlInputBundle {
         //TODO: Impl. when added to input-manager
         //input_map.assign_gamepad(Gamepad(0));
 
-        input_map.insert(QwertyScanCode::W, Forward);
-        input_map.insert(QwertyScanCode::Up, Forward);
+        input_map.insert(Forward, KeyCode::KeyW);
+        input_map.insert(Forward, KeyCode::ArrowUp);
 
-        input_map.insert(GamepadButtonType::DPadUp, Forward);
-        //input_map.insert(SingleAxis::symmetric(GamepadAxisType::LeftStickY, 0.1), Forward); // + Y / - Y
+        input_map.insert(Forward, GamepadButtonType::DPadUp);
+        //input_map.insert(Forward, SingleAxis::symmetric(GamepadAxisType::LeftStickY, 0.1)); // + Y / - Y
 
-        input_map.insert(QwertyScanCode::S, Backward);
-        input_map.insert(QwertyScanCode::Down, Backward);
-        input_map.insert(GamepadButtonType::DPadDown, Backward);
+        input_map.insert(Backward, KeyCode::KeyS);
+        input_map.insert(Backward, KeyCode::ArrowDown);
+        input_map.insert(Backward, GamepadButtonType::DPadDown);
 
-        input_map.insert(QwertyScanCode::A, StrafeLeft);
-        input_map.insert(QwertyScanCode::Left, StrafeLeft);
-        input_map.insert(GamepadButtonType::DPadLeft, StrafeLeft);
+        input_map.insert(StrafeLeft, KeyCode::KeyA);
+        input_map.insert(StrafeLeft, KeyCode::ArrowLeft);
+        input_map.insert(StrafeLeft, GamepadButtonType::DPadLeft);
 
-        input_map.insert(QwertyScanCode::D, StrafeRight);
-        input_map.insert(QwertyScanCode::Right, StrafeRight);
-        input_map.insert(GamepadButtonType::DPadRight, StrafeRight);
+        input_map.insert(StrafeRight, KeyCode::KeyD);
+        input_map.insert(StrafeRight, KeyCode::ArrowRight);
+        input_map.insert(StrafeRight, GamepadButtonType::DPadRight);
 
-        //input_map.insert(SingleAxis::symmetric(GamepadAxisType::LeftStickX, 0.1), StrafeRight); // + X / - X
+        //input_map.insert(StrafeRight, SingleAxis::symmetric(GamepadAxisType::LeftStickX, 0.1)); // + X / - X
 
-        input_map.insert(QwertyScanCode::Space, Up);
+        input_map.insert(Up, KeyCode::Space);
         input_map.insert(
-            SingleAxis::positive_only(GamepadAxisType::LeftStickY, 0.1),
             Up,
+            SingleAxis::positive_only(GamepadAxisType::LeftStickY, 0.1),
         );
 
-        input_map.insert(QwertyScanCode::ShiftLeft, Down);
+        input_map.insert(Down, KeyCode::ShiftLeft);
         input_map.insert(
-            SingleAxis::negative_only(GamepadAxisType::LeftStickY, 0.1),
             Down,
+            SingleAxis::negative_only(GamepadAxisType::LeftStickY, 0.1),
         );
 
-        input_map.insert(QwertyScanCode::Comma, RotateLeft);
+        input_map.insert(RotateLeft, KeyCode::Comma);
         input_map.insert(
-            SingleAxis::negative_only(GamepadAxisType::LeftStickX, 0.1),
             RotateLeft,
+            SingleAxis::negative_only(GamepadAxisType::LeftStickX, 0.1),
         );
 
-        input_map.insert(QwertyScanCode::Period, RotateRight);
+        input_map.insert(RotateRight, KeyCode::Period);
         input_map.insert(
-            SingleAxis::positive_only(GamepadAxisType::LeftStickX, 0.1),
             RotateRight,
+            SingleAxis::positive_only(GamepadAxisType::LeftStickX, 0.1),
         );
 
         let input_manager = InputManagerBundle {
@@ -269,39 +269,39 @@ fn dolly_pos_ctrl_config_entity_setup(
 fn dolly_pos_ctrl_move_update(
     time: Res<Time>,
     config: Res<DollyPosCtrlConfig>,
-    mut transforms: Query<(&mut Transform, With<DollyPosCtrlMove>)>,
+    mut transforms: Query<&mut Transform, With<DollyPosCtrlMove>>,
     act_query: Query<&ActionState<MoveAction>, With<DollyPosCtrlAction>>,
 ) {
     let action_state = act_query.single();
 
-    for (mut transform, _) in transforms.iter_mut() {
+    for mut transform in transforms.iter_mut() {
         let (_, mut rotation) = transform.rotation.to_axis_angle();
         let mut velocity = Vec3::ZERO;
         let local_z = transform.local_z();
         let forward = Vec3::new(local_z.x, 0., local_z.z);
         let right = transform.rotation * -Vec3::X;
 
-        velocity += forward * action_state.clamped_value(MoveAction::Forward);
-        velocity += forward * -action_state.clamped_value(MoveAction::Backward);
+        velocity += forward * action_state.clamped_value(&MoveAction::Forward);
+        velocity += forward * -action_state.clamped_value(&MoveAction::Backward);
 
-        velocity += right * action_state.clamped_value(MoveAction::StrafeRight);
-        velocity += right * -action_state.clamped_value(MoveAction::StrafeLeft);
+        velocity += right * action_state.clamped_value(&MoveAction::StrafeRight);
+        velocity += right * -action_state.clamped_value(&MoveAction::StrafeLeft);
 
-        velocity += Vec3::Y * action_state.clamped_value(MoveAction::Up);
-        velocity += Vec3::Y * -action_state.clamped_value(MoveAction::Down);
+        velocity += Vec3::Y * action_state.clamped_value(&MoveAction::Up);
+        velocity += Vec3::Y * -action_state.clamped_value(&MoveAction::Down);
 
-        if action_state.pressed(MoveAction::RotateRight) {
+        if action_state.pressed(&MoveAction::RotateRight) {
             //Wrapping around
             if rotation > std::f32::consts::FRAC_PI_2 * 4.0 - config.rot_speed {
                 rotation = 0.0;
             }
-            rotation += action_state.clamped_value(MoveAction::RotateRight) * config.rot_speed;
-        } else if action_state.pressed(MoveAction::RotateLeft) {
+            rotation += action_state.clamped_value(&MoveAction::RotateRight) * config.rot_speed;
+        } else if action_state.pressed(&MoveAction::RotateLeft) {
             //Wrapping around
             if rotation < config.rot_speed {
                 rotation = std::f32::consts::FRAC_PI_2 * 4.0;
             }
-            let mut delta_value = action_state.clamped_value(MoveAction::RotateLeft);
+            let mut delta_value = action_state.clamped_value(&MoveAction::RotateLeft);
             if delta_value.is_sign_positive() {
                 delta_value *= -1.;
             }

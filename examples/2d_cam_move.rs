@@ -55,38 +55,38 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     info!("Use Z & X zooming in and out");
 }
 
-fn update_camera(keys: Res<Input<KeyCode>>, mut query: Query<&mut Rig>) {
+fn update_camera(keys: Res<ButtonInput<KeyCode>>, mut query: Query<&mut Rig>) {
     for mut rig in &mut query {
         for &key in keys.get_pressed() {
             let pos_driver = rig.try_driver_mut::<Position>();
             if let Some(pos) = pos_driver {
-                if key == KeyCode::W {
+                if key == KeyCode::KeyW {
                     pos.translate(SPEED * Vec3::Y);
                 }
-                if key == KeyCode::A {
+                if key == KeyCode::KeyA {
                     pos.translate(SPEED * -Vec3::X);
                 }
-                if key == KeyCode::S {
+                if key == KeyCode::KeyS {
                     pos.translate(SPEED * -Vec3::Y);
                 }
-                if key == KeyCode::D {
+                if key == KeyCode::KeyD {
                     pos.translate(SPEED * Vec3::X);
                 }
-                if key == KeyCode::Z {
+                if key == KeyCode::KeyZ {
                     pos.translate(SPEED * -Vec3::Z);
                 }
-                if key == KeyCode::X {
+                if key == KeyCode::KeyX {
                     pos.translate(SPEED * Vec3::Z);
                 }
             }
 
             let smooth_driver = rig.try_driver_mut::<Smooth>();
             if let Some(smooth) = smooth_driver {
-                if key == KeyCode::C {
+                if key == KeyCode::KeyC {
                     smooth.position_smoothness = (smooth.position_smoothness - 0.001).abs();
                     println!("Smoothness {}", smooth.position_smoothness);
                 }
-                if key == KeyCode::V {
+                if key == KeyCode::KeyV {
                     smooth.position_smoothness = (smooth.position_smoothness + 0.001).abs();
                     println!("Smoothness {}", smooth.position_smoothness);
                 }

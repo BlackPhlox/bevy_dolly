@@ -54,7 +54,7 @@ where
 
             let transform = rig.update(time.delta_seconds());
 
-            cameras.for_each_mut(|(mut t, camera)| {
+            cameras.iter_mut().for_each(|(mut t, camera)| {
                 if camera.is_active {
                     *t = transform;
                 }
@@ -72,7 +72,7 @@ where
     ) {
         for mut rig in &mut query {
             let mut transform = rig.update(time.delta_seconds());
-            cameras.for_each_mut(|(mut t, mut orth, camera)| {
+            cameras.iter_mut().for_each(|(mut t, mut orth, camera)| {
                 if camera.is_active {
                     //Bind camera's Z axis to scale, if used for init state check to prevent scale of 0
                     if !(transform.translation.z < Self::RANGE_SCALE_2D
@@ -100,7 +100,7 @@ where
 
             let transform = rig.update(time.delta_seconds());
 
-            transforms.for_each_mut(|mut t| {
+            transforms.iter_mut().for_each(|mut t| {
                 *t = transform;
             });
         }
@@ -122,7 +122,7 @@ where
 
             let transform = rig.update(time.delta_seconds());
 
-            cameras.for_each_mut(|(mut t, camera)| {
+            cameras.iter_mut().for_each(|(mut t, camera)| {
                 if camera.is_active {
                     *t = transform;
                 }
@@ -138,7 +138,7 @@ where
     ) {
         for mut rig in &mut query {
             let mut transform = rig.update(time.delta_seconds());
-            cameras.for_each_mut(|(mut t, mut orth, camera)| {
+            cameras.iter_mut().for_each(|(mut t, mut orth, camera)| {
                 if camera.is_active {
                     //Bind camera's Z axis to scale, if used for init state check to prevent scale of 0
                     if !(transform.translation.z < Self::RANGE_SCALE_2D
@@ -165,7 +165,7 @@ where
 
             let transform = rig.update(time.delta_seconds());
 
-            transforms.for_each_mut(|mut t| {
+            transforms.iter_mut().for_each(|mut t| {
                 *t = transform;
             });
         }
