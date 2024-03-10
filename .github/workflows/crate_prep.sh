@@ -1,8 +1,12 @@
 #!/bin/sh
 
-cp -r dolly dolly_crate
-rm dolly_crate/.git
-rm -rf dolly
-mv dolly_crate dolly
+# Convert git submodule to a folder under the current repo
+git rm --cached dolly # Delete reference to submodule HEAD (no trailing slash)
+git rm .gitmodules # Remove submodule ref,
+rm -rf dolly/.git # Remove submodule git metadata
+git add dolly # Add files instead of commit reference
 
-read -p "Press any key to resume ..."
+# Don't run command if script is executed from GH Actions 
+if [ -z "${CI}" ]; then
+    read -p "Press any key to resume ..."
+fi
