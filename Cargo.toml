@@ -21,7 +21,7 @@ name = "bevy_dolly"
 [features]
 default = ["drivers", "helpers"]
 drivers = []
-helpers = ["dep:leafwing-input-manager"]
+helpers = ["dep:leafwing-input-manager", "bevy/bevy_pbr"]
 
 [dependencies]
 dolly = { path = "dolly", default-features = false }
@@ -29,7 +29,7 @@ leafwing-input-manager = { version = "0.13", optional = true }
 
 [dependencies.bevy]
 version = "0.13"
-features = ["bevy_render", "bevy_asset", "bevy_pbr"]
+features = ["bevy_render", "bevy_asset"]
 default-features = false
 
 [dev-dependencies]
