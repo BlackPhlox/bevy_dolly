@@ -170,3 +170,8 @@ Yes this project is still a WIP, so PRs are very welcome.
 > ```bash
 > git submodule update --init --recursive
 > ```
+> Followed by:
+> ```bash
+> cd dolly
+> git checkout bevy_0.13
+> ```
