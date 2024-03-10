@@ -17,9 +17,9 @@ fn main() {
         .insert_resource(DollyPosCtrlConfig {
             ..Default::default()
         })
-        .add_state::<ProjectionType>()
-        .add_state::<Pan>()
-        .add_state::<ZoomType>()
+        .init_state::<ProjectionType>()
+        .init_state::<Pan>()
+        .init_state::<ZoomType>()
         .add_systems(Startup, setup)
         .add_systems(
             Update,
@@ -64,11 +64,8 @@ fn setup(
 ) {
     // plane
     commands.spawn(PbrBundle {
-        mesh: meshes.add(Mesh::from(shape::Plane {
-            size: 5.0,
-            ..Default::default()
-        })),
-        material: materials.add(Color::rgb(0.3, 0.5, 0.3).into()),
+        mesh: meshes.add(Plane3d::default().mesh().size(5., 5.)),
+        material: materials.add(Color::rgb(0.3, 0.5, 0.3)),
         ..default()
     });
     commands.spawn(Transform::from_xyz(0., 0., 0.));
@@ -146,7 +143,7 @@ fn setup(
 
 #[allow(clippy::too_many_arguments)]
 fn swap_camera(
-    keys: Res<Input<KeyCode>>,
+    keys: Res<ButtonInput<KeyCode>>,
     mut commands: Commands,
     perspective: Res<State<ProjectionType>>,
     mut next_perspective: ResMut<NextState<ProjectionType>>,
@@ -155,7 +152,7 @@ fn swap_camera(
     mut q_main: Query<(Entity, &mut Camera), (With<MainCamera>, Without<SecondCamera>)>,
     mut q_sec: Query<(Entity, &mut Camera), (With<SecondCamera>, Without<MainCamera>)>,
 ) {
-    if keys.just_pressed(KeyCode::T) {
+    if keys.just_pressed(KeyCode::KeyT) {
         if let Ok((e_main, cam_main)) = &mut q_main.get_single_mut() {
             if let Ok((e_sec, cam_sec)) = &mut q_sec.get_single_mut() {
                 commands
@@ -178,7 +175,7 @@ fn swap_camera(
                 println!("Perspective: {:?}", perspective);
             }
         }
-    } else if keys.just_pressed(KeyCode::G) {
+    } else if keys.just_pressed(KeyCode::KeyG) {
         // Arm doesn't make a difference for Orthographic projection
         next_zoom.set(
             if *zoom == ZoomType::Arm && *perspective == ProjectionType::Perspective {
@@ -221,7 +218,7 @@ fn handle_mouse_scroll(
 
 #[allow(clippy::too_many_arguments)]
 fn update_camera(
-    keys: Res<Input<KeyCode>>,
+    keys: Res<ButtonInput<KeyCode>>,
     pan: Res<State<Pan>>,
     mut next_pan: ResMut<NextState<Pan>>,
     mut mouse_motion_events: EventReader<MouseMotion>,
@@ -242,10 +239,10 @@ fn update_camera(
     config.transform.rotation = Quat::from_rotation_y(delta.x);
 
     if *pan == Pan::Keys {
-        if keys.just_pressed(KeyCode::Z) {
+        if keys.just_pressed(KeyCode::KeyZ) {
             camera_yp.rotate_yaw_pitch(-90.0, 0.0);
         }
-        if keys.just_pressed(KeyCode::X) {
+        if keys.just_pressed(KeyCode::KeyX) {
             camera_yp.rotate_yaw_pitch(90.0, 0.0);
         }
     } else if !grab_config.visible {
@@ -255,7 +252,7 @@ fn update_camera(
         );
     }
 
-    if keys.just_pressed(KeyCode::E) {
+    if keys.just_pressed(KeyCode::KeyE) {
         let result = if *pan == Pan::Keys {
             Pan::Mouse
         } else {
@@ -265,7 +262,7 @@ fn update_camera(
         println!("PanType: {result:?}");
     }
 
-    if keys.just_pressed(KeyCode::P) {
+    if keys.just_pressed(KeyCode::KeyP) {
         config.pin = !config.pin;
         println!(
             "Camera: {}",

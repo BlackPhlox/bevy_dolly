@@ -32,11 +32,8 @@ fn setup(
 ) {
     // plane
     commands.spawn(PbrBundle {
-        mesh: meshes.add(Mesh::from(shape::Plane {
-            size: 5.0,
-            ..Default::default()
-        })),
-        material: materials.add(Color::rgb(0.3, 0.5, 0.3).into()),
+        mesh: meshes.add(Plane3d::default().mesh().size(5., 5.)),
+        material: materials.add(Color::rgb(0.3, 0.5, 0.3)),
         ..default()
     });
 
@@ -72,8 +69,8 @@ fn setup(
     });
 }
 
-fn update_camera(q0: Query<(&Transform, With<Rotates>)>, mut q1: Query<&mut Rig>) {
-    let player = q0.single().0.to_owned();
+fn update_camera(q0: Query<&Transform, With<Rotates>>, mut q1: Query<&mut Rig>) {
+    let player = q0.single().to_owned();
     let mut rig = q1.single_mut();
 
     rig.driver_mut::<MovableLookAt>()

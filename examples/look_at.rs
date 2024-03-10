@@ -25,11 +25,8 @@ fn setup(
 ) {
     // plane
     commands.spawn(PbrBundle {
-        mesh: meshes.add(Mesh::from(shape::Plane {
-            size: 20.0,
-            ..Default::default()
-        })),
-        material: materials.add(Color::rgb(0.3, 0.5, 0.3).into()),
+        mesh: meshes.add(Plane3d::default().mesh().size(20., 20.)),
+        material: materials.add(Color::rgb(0.3, 0.5, 0.3)),
         ..default()
     });
 
@@ -79,11 +76,11 @@ fn setup(
 
 fn update_camera(
     mut query: ParamSet<(
-        Query<(&mut Transform, With<DollyPosCtrlMove>)>,
+        Query<&mut Transform, With<DollyPosCtrlMove>>,
         Query<&mut Rig>,
     )>,
 ) {
     let mut p0 = query.p0();
-    let (player, _) = p0.single_mut();
+    let player = p0.single_mut();
     query.p1().single_mut().driver_mut::<LookAt>().target = player.translation;
 }

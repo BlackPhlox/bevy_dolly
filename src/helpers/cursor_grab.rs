@@ -57,7 +57,7 @@ impl Default for DollyCursorGrabInputBundle {
         use GrabAction::*;
         let mut input_map = InputMap::default();
 
-        input_map.insert(QwertyScanCode::Escape, Exit);
+        input_map.insert(Exit, KeyCode::Escape);
 
         let input_manager = InputManagerBundle {
             input_map,
@@ -105,7 +105,7 @@ fn initial_grab_cursor(
 
 fn cursor_grab(
     mut windows: Query<&mut Window, With<PrimaryWindow>>,
-    keys: Res<Input<KeyCode>>,
+    keys: Res<ButtonInput<KeyCode>>,
     //act_query: Query<&ActionState<GrabAction>, With<DollyCursorGrabAction>>,
     mut config: ResMut<DollyCursorGrabConfig>,
 ) {
