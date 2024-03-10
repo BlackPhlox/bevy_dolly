@@ -67,8 +67,8 @@ impl Fpv {
 pub struct Fpv(CameraRig);
 
 // Turn the nested rig into a driver, so it can be used in another rig.
-impl RigDriver for Fpv {
-    fn update(&mut self, params: dolly::rig::RigUpdateParams) -> Transform {
+impl RigDriver<LeftHanded> for Fpv {
+    fn update(&mut self, params: dolly::rig::RigUpdateParams<LeftHanded>) -> Transform {
         self.0.update(params.delta_time_seconds)
     }
 }

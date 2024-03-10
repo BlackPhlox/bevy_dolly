@@ -23,9 +23,9 @@ impl MovableLookAt {
     }
 
     pub fn set_position_target(&mut self, target_position: Vec3, target_rotation: Quat) {
-        self.driver_mut::<Position>().position = target_position;
-        self.driver_mut::<Rotation>().rotation = target_rotation;
-        self.driver_mut::<LookAt>().target = target_position + Vec3::Y;
+        self.driver_mut::<Position>().position = target_position.into();
+        self.driver_mut::<Rotation>().rotation = target_rotation.into();
+        self.driver_mut::<LookAt>().target = (target_position + Vec3::Y).into();
     }
 }
 
@@ -34,8 +34,8 @@ impl MovableLookAt {
 pub struct MovableLookAt(CameraRig);
 
 // Turn the nested rig into a driver, so it can be used in another rig.
-impl RigDriver for MovableLookAt {
-    fn update(&mut self, params: dolly::rig::RigUpdateParams) -> Transform {
+impl RigDriver<LeftHanded> for MovableLookAt {
+    fn update(&mut self, params: dolly::rig::RigUpdateParams<LeftHanded>) -> Transform {
         self.0.update(params.delta_time_seconds)
     }
 }
