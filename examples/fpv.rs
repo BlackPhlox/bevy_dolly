@@ -15,7 +15,7 @@ fn main() {
     App::new()
         .insert_resource(Msaa::default())
         .add_plugins((DefaultPlugins, DollyCursorGrab))
-        .add_state::<MovementType>()
+        .init_state::<MovementType>()
         .add_systems(Startup, setup)
         .add_systems(
             Update,
@@ -37,11 +37,8 @@ fn setup(
 ) {
     // plane
     commands.spawn(PbrBundle {
-        mesh: meshes.add(Mesh::from(shape::Plane {
-            size: 5.0,
-            ..Default::default()
-        })),
-        material: materials.add(Color::rgb(0.3, 0.5, 0.3).into()),
+        mesh: meshes.add(Plane3d::default().mesh().size(5., 5.)),
+        material: materials.add(Color::rgb(0.3, 0.5, 0.3)),
         ..default()
     });
 
@@ -82,11 +79,11 @@ fn setup(
 }
 
 fn update_fpvtype(
-    keys: Res<Input<KeyCode>>,
+    keys: Res<ButtonInput<KeyCode>>,
     fps_state: Res<State<MovementType>>,
     mut fps_next_state: ResMut<NextState<MovementType>>,
 ) {
-    if keys.just_pressed(KeyCode::F) {
+    if keys.just_pressed(KeyCode::KeyF) {
         let result = if *fps_state == MovementType::FirstPerson {
             MovementType::Free
         } else {
@@ -100,7 +97,7 @@ fn update_fpvtype(
 
 fn update_camera(
     time: Res<Time>,
-    keys: Res<Input<KeyCode>>,
+    keys: Res<ButtonInput<KeyCode>>,
     windows: Query<&Window, With<PrimaryWindow>>,
     fps_state: Res<State<MovementType>>,
     mut mouse_motion_events: EventReader<MouseMotion>,
@@ -113,23 +110,23 @@ fn update_camera(
     let mut move_vec = Vec3::ZERO;
 
     // Q: Is dolly left-handed so z is flipped?
-    if keys.pressed(KeyCode::W) {
+    if keys.pressed(KeyCode::KeyW) {
         move_vec.z -= 1.0;
     }
-    if keys.pressed(KeyCode::S) {
+    if keys.pressed(KeyCode::KeyS) {
         move_vec.z += 1.0;
     }
-    if keys.pressed(KeyCode::A) {
+    if keys.pressed(KeyCode::KeyA) {
         move_vec.x -= 1.0;
     }
-    if keys.pressed(KeyCode::D) {
+    if keys.pressed(KeyCode::KeyD) {
         move_vec.x += 1.0;
     }
 
-    if keys.pressed(KeyCode::E) || keys.pressed(KeyCode::Space) {
+    if keys.pressed(KeyCode::KeyE) || keys.pressed(KeyCode::Space) {
         move_vec.y += 1.0;
     }
-    if keys.pressed(KeyCode::Q) {
+    if keys.pressed(KeyCode::KeyQ) {
         move_vec.y -= 1.0;
     }
 

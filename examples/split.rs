@@ -2,7 +2,6 @@
 //! Renders two cameras to the same window to accomplish "split screen".
 
 use bevy::{
-    core_pipeline::clear_color::ClearColorConfig,
     prelude::*,
     render::camera::Viewport,
     window::{PrimaryWindow, WindowResized},
@@ -41,11 +40,8 @@ fn setup(
 ) {
     // plane
     commands.spawn(PbrBundle {
-        mesh: meshes.add(Mesh::from(shape::Plane {
-            size: 100.0,
-            subdivisions: 0,
-        })),
-        material: materials.add(Color::rgb(0.3, 0.5, 0.3).into()),
+        mesh: meshes.add(Plane3d::default().mesh().size(100., 100.)),
+        material: materials.add(Color::rgb(0.3, 0.5, 0.3)),
         ..default()
     });
 
@@ -105,11 +101,8 @@ fn setup(
     commands
         .spawn(Camera3dBundle {
             transform: Transform::from_xyz(100.0, 100., 150.0).looking_at(Vec3::ZERO, Vec3::Y),
-            camera_3d: Camera3d {
-                clear_color: ClearColorConfig::None,
-                ..default()
-            },
             camera: Camera {
+                clear_color: ClearColorConfig::None,
                 order: 1,
                 ..default()
             },
@@ -160,9 +153,9 @@ fn update_camera_1(mut query: Query<&mut Rig, (With<LeftCamera>, Without<RightCa
 
 fn update_camera_2(
     time: Res<Time>,
-    mut query: Query<(&mut Rig, (With<RightCamera>, Without<LeftCamera>))>,
+    mut query: Query<&mut Rig, (With<RightCamera>, Without<LeftCamera>)>,
 ) {
-    let (mut rig, _a) = query.single_mut();
+    let mut rig = query.single_mut();
     let camera_driver = rig.driver_mut::<YawPitch>();
 
     camera_driver.rotate_yaw_pitch(-1.0, 0.0);
