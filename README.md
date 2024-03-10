@@ -48,8 +48,8 @@ In your `Cargo.toml`:
 ```toml
 [dependencies]
 # Your bevy dependency here ... 
-# bevy = "0.12"
-bevy_dolly = { version = "0.0.2" }
+# bevy = "0.13"
+bevy_dolly = { version = "0.0.3" }
 ```
 
 In your Bevy App:
@@ -119,7 +119,7 @@ fn update_input(
 
 ```toml
 [dependencies]
-bevy_dolly = { version = "0.0.2", default-features = false }
+bevy_dolly = { version = "0.0.3", default-features = false }
 ```
 
 To include the drivers back, add `features = ["drivers"],` to the dependency.
@@ -140,6 +140,7 @@ cargo run --release --example orbit
 
 |bevy|bevy_dolly|
 |---|---|
+|0.13|0.0.3|
 |0.12|0.0.2|
 |0.11|0.0.1|
 

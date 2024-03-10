@@ -1,6 +1,6 @@
 [package]
 name = "bevy_dolly"
-version = "0.0.2"
+version = "0.0.3"
 authors = ["Black Phlox <bphlox@gmail.com>"]
 license = "MIT OR Apache-2.0"
 edition = "2021"
