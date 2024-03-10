@@ -24,7 +24,7 @@
 
 ## Overview
 
-`bevy_dolly` is a prototype plugin built for the [Bevy](https://github.com/bevyengine/bevy) game engine. It leverages the powerful `dolly` crate, developed by [h3r2tic](https://github.com/h3r2tic), to control camera movement within a Bevy application.
+`bevy_dolly` is a prototype plugin built for the [Bevy](https://github.com/bevyengine/bevy) game engine. It leverages the powerful [`dolly`](https://github.com/h3r2tic/dolly) crate, developed by [h3r2tic](https://github.com/h3r2tic), to control camera movement within a Bevy application.
 
 > [!WARNING]  
 > Be aware that `bevy_dolly`'s API is still undergoing revisions. Feedback on its ergonomics and developer experience (DX) is highly appreciated.
@@ -49,7 +49,7 @@ In your `Cargo.toml`:
 [dependencies]
 # Your bevy dependency here ... 
 # bevy = "0.12"
-bevy_dolly = { version = "0.0.2" }
+bevy_dolly = { version = "0.0.3" }
 ```
 
 In your Bevy App:
@@ -119,7 +119,7 @@ fn update_input(
 
 ```toml
 [dependencies]
-bevy_dolly = { version = "0.0.2", default-features = false }
+bevy_dolly = { version = "0.0.3", default-features = false }
 ```
 
 To include the drivers back, add `features = ["drivers"],` to the dependency.
@@ -140,6 +140,7 @@ cargo run --release --example orbit
 
 |bevy|bevy_dolly|
 |---|---|
+|0.13|0.0.3|
 |0.12|0.0.2|
 |0.11|0.0.1|
 
