@@ -1,4 +1,4 @@
 [submodule "dolly"]
 	path = dolly
-	url = https://github.com/BlackPhlox/dolly
-    branch = bevy_dolly
+	url = https://github.com/rparrett/dolly
+    branch = bevy-0.14

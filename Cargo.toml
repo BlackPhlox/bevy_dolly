@@ -1,6 +1,6 @@
 [package]
 name = "bevy_dolly"
-version = "0.0.3"
+version = "0.0.4"
 authors = ["Black Phlox <bphlox@gmail.com>"]
 license = "MIT OR Apache-2.0"
 edition = "2021"
@@ -25,18 +25,18 @@ helpers = ["dep:leafwing-input-manager", "bevy/bevy_pbr"]
 
 [dependencies]
 dolly = { path = "dolly", default-features = false }
-leafwing-input-manager = { version = "0.13", optional = true }
+leafwing-input-manager = { version = "0.14", optional = true }
 
 [dependencies.bevy]
-version = "0.13"
+version = "0.14"
 features = ["bevy_render", "bevy_asset"]
 default-features = false
 
 [dev-dependencies]
-leafwing-input-manager = "0.13"
+leafwing-input-manager = "0.14"
 
 [dev-dependencies.bevy]
-version = "0.13"
+version = "0.14"
 features = [
     "bevy_core_pipeline",
     "bevy_asset",
@@ -45,6 +45,7 @@ features = [
     "bevy_winit",
     "bevy_gltf",
     "bevy_sprite",
+    "bevy_state",
     "png",
     "ktx2",
     "zstd",
@@ -54,6 +55,6 @@ features = [
 default-features = false
 
 [target.'cfg(target_os = "linux")'.dev-dependencies.bevy]
-version = "0.13"
+version = "0.14"
 features = ["x11", "wayland"]
 default-features = false
