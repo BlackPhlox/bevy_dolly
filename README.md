@@ -176,5 +176,5 @@ Yes this project is still a WIP, so PRs are very welcome.
 >
 > ```bash
 > cd dolly
-> git checkout bevy_0.13
+> git checkout bevy_0.14
 > ```
