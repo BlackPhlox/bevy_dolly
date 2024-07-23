@@ -33,7 +33,6 @@ fn setup(
         Rig::builder()
             .with(Position::new(Vec3::Y * 3.0))
             .with(LookAt::new(
-                /*start_pos.transform_2_dolly().position*/
                 Vec3::new(0., -2., 2.),
             ))
             .build(),

@@ -5,6 +5,8 @@ use bevy_dolly::prelude::*;
 #[derive(Component)]
 struct MainCamera;
 
+// Uses one of the default drivers that come with bevy_dolly called LookAt
+
 fn main() {
     App::new()
         .insert_resource(Msaa::default())
@@ -21,7 +23,6 @@ fn setup(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
-    //mut config: ResMut<CtrlConfig>,
 ) {
     // plane
     commands.spawn(PbrBundle {
@@ -31,24 +32,6 @@ fn setup(
     });
 
     Transform::from_translation(Vec3::new(0., 0., 2.));
-
-    /*
-    config.entity = Some(
-        commands
-            .spawn_bundle((
-                Transform {
-                    translation: Vec3::new(0., 0.2, 0.),
-                    ..default()
-                },
-                GlobalTransform::identity(),
-            ))
-            .with_children(|cell| {
-                cell.spawn_scene(asset_server.load("sheep.gltf#Scene0"));
-            })
-            .insert(Player)
-            .id(),
-    );
-    */
 
     commands.spawn((
         MainCamera,
