@@ -32,9 +32,7 @@ fn setup(
         MainCamera,
         Rig::builder()
             .with(Position::new(Vec3::Y * 3.0))
-            .with(LookAt::new(
-                Vec3::new(0., -2., 2.),
-            ))
+            .with(LookAt::new(Vec3::new(0., -2., 2.)))
             .build(),
         Camera3dBundle {
             transform: Transform::from_xyz(-2.0, 2., 5.0)
