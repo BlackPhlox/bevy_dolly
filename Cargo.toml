@@ -26,6 +26,7 @@ helpers = ["dep:leafwing-input-manager", "bevy/bevy_pbr"]
 [dependencies]
 dolly = { path = "dolly", default-features = false }
 leafwing-input-manager = { version = "0.14", optional = true }
+bevy_reflect = "0.14"
 
 [dependencies.bevy]
 version = "0.14"

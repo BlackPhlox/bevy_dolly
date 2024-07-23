@@ -505,6 +505,7 @@ version = "0.0.4"
 dependencies = [
  "bevy",
  "bevy-inspector-egui",
+ "bevy_reflect",
  "dolly",
  "leafwing-input-manager",
 ]
@@ -1566,6 +1567,7 @@ name = "dolly"
 version = "0.4.2"
 dependencies = [
  "bevy_math",
+ "bevy_reflect",
  "bevy_transform",
 ]
 
