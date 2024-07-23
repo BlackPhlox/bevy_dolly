@@ -228,7 +228,7 @@ fn spawn_default_player(
     }));
 
     let player_mat = materials.add(StandardMaterial {
-        base_color: Color::rgba(1.0, 0.0, 0.0, 0.5),
+        base_color: Color::srgba(1.0, 0.0, 0.0, 0.5),
         unlit: true,
         ..default()
     });

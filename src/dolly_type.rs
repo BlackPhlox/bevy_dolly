@@ -22,7 +22,6 @@ impl RigBuilder {
         self
     }
 
-    ///
     pub fn build(self) -> Rig {
         Rig(self.0.build())
     }

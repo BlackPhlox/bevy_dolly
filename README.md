@@ -48,8 +48,8 @@ In your `Cargo.toml`:
 ```toml
 [dependencies]
 # Your bevy dependency here ... 
-# bevy = "0.12"
-bevy_dolly = { version = "0.0.3" }
+# bevy = "0.14"
+bevy_dolly = { version = "0.0.4" }
 ```
 
 In your Bevy App:
@@ -140,6 +140,7 @@ cargo run --release --example orbit
 
 |bevy|bevy_dolly|
 |---|---|
+|0.14|0.0.4|
 |0.13|0.0.3|
 |0.12|0.0.2|
 |0.11|0.0.1|
@@ -170,8 +171,10 @@ Yes this project is still a WIP, so PRs are very welcome.
 > ```bash
 > git submodule update --init --recursive
 > ```
+>
 > Followed by:
+>
 > ```bash
 > cd dolly
-> git checkout bevy_0.13
+> git checkout bevy_0.14
 > ```
