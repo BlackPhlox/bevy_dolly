@@ -66,7 +66,9 @@ fn setup(
         },
     ));
 
-    info!("Use Q and E to turn the sheep");
+    info!("Use W, A, S, D for movement");
+    info!("Use Space and Shift for going up and down");
+    info!("Use , (Comma) and . (Period) to rotate Left or Right");
     // light
     commands.spawn(PointLightBundle {
         transform: Transform::from_xyz(4.0, 8.0, 4.0),

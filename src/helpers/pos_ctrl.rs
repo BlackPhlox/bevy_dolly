@@ -75,11 +75,11 @@ pub struct DollyPosCtrlConfig {
     pub rot_speed: f32,
     pub pin: bool,
     pub transform: Transform,
-    pub player: Player,
+    pub player: DollyCameraPlayer,
 }
 
 #[derive(Default, PartialEq, Eq, Debug, Clone, Copy, Hash)]
-pub enum Player {
+pub enum DollyCameraPlayer {
     #[default]
     DefaultPlayer,
     Entity(Entity),
@@ -95,7 +95,7 @@ impl Default for DollyPosCtrlConfig {
             pin: true,
             transform: Transform::from_translation(Vec3::new(0., 0.5, 0.))
                 .with_rotation(Quat::IDENTITY),
-            player: Player::default(),
+            player: DollyCameraPlayer::default(),
         }
     }
 }
@@ -256,13 +256,13 @@ fn dolly_pos_ctrl_config_entity_setup(
     config: Res<DollyPosCtrlConfig>,
 ) {
     match config.player {
-        Player::DefaultPlayer => {
+        DollyCameraPlayer::DefaultPlayer => {
             spawn_default_player(commands, meshes, materials, config);
         }
-        Player::Entity(e) => {
+        DollyCameraPlayer::Entity(e) => {
             commands.entity(e).insert(DollyPosCtrlMove);
         }
-        Player::None => (),
+        DollyCameraPlayer::None => (),
     }
 }
 
