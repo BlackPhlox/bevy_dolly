@@ -51,6 +51,7 @@ fn setup(
     });
 }
 
+#[allow(clippy::type_complexity)]
 fn update_camera(
     mut query: ParamSet<(
         Query<&mut Transform, With<DollyPosCtrlMove>>,
