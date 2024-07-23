@@ -1,7 +1,5 @@
 use bevy::prelude::{Component, Deref, DerefMut};
-use dolly::{driver::RigDriverTraits, prelude::CameraRig, rig::CameraRigBuilder};
-
-use crate::dolly;
+use crate::dolly::prelude::*;
 
 #[derive(Component, Deref, DerefMut)]
 pub struct Rig(CameraRig);
