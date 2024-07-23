@@ -109,7 +109,6 @@ fn update_camera(
 
     let mut move_vec = Vec3::ZERO;
 
-    // Q: Is dolly left-handed so z is flipped?
     if keys.pressed(KeyCode::KeyW) {
         move_vec.z -= 1.0;
     }

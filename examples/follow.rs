@@ -19,7 +19,6 @@ fn main() {
                 rotator_system,
             ),
         )
-        //.add_dolly_component(MainCamera)
         .run();
 }
 
