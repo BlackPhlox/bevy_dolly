@@ -1,5 +1,5 @@
-use bevy::prelude::{Component, Deref, DerefMut};
 use crate::dolly::prelude::*;
+use bevy::prelude::{Component, Deref, DerefMut};
 
 #[derive(Component, Deref, DerefMut)]
 pub struct Rig(CameraRig);
