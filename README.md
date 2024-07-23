@@ -119,7 +119,7 @@ fn update_input(
 
 ```toml
 [dependencies]
-bevy_dolly = { version = "0.0.3", default-features = false }
+bevy_dolly = { version = "0.0.4", default-features = false }
 ```
 
 To include the drivers back, add `features = ["drivers"],` to the dependency.
