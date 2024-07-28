@@ -41,7 +41,7 @@ Dolly operates in two essential steps:
 
 ## Understanding Drivers
 
-Drivers are mechanisms that influence the behavior of the camera. They can represent constraints or provide additional functionality. To explore the available drivers, refer to the [examples](example-showcase).
+Drivers are mechanisms that influence the behavior of the camera. They can represent constraints or provide additional functionality. To explore the available drivers, refer to the [examples](#example-showcase).
 
 In your `Cargo.toml`:
 
