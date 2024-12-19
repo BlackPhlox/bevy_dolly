@@ -8,12 +8,13 @@ pub mod helpers;
 pub mod system;
 
 pub mod prelude {
-    pub use crate::{
-        dolly::prelude::*,
-        dolly_type::*,
-        drivers::{follow::*, fpv::*},
-        helpers::*,
-        helpers::{cone::*, cursor_grab::*, pos_ctrl::*},
-        system::*,
+    pub use crate::{dolly::prelude::*, dolly_type::*, system::*};
+
+    #[cfg(feature = "drivers")]
+    pub use crate::drivers::{follow::*, fpv::*};
+    #[cfg(feature = "helpers")]
+    pub use crate::helpers::{
+        *,
+        {cone::*, cursor_grab::*, pos_ctrl::*},
     };
 }
