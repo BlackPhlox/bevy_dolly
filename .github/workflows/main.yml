@@ -49,11 +49,16 @@ jobs:
           override: true
       - name: Install Dependencies
         run: sudo apt-get update; sudo apt-get install pkg-config libx11-dev libwayland-dev libxkbcommon-dev libasound2-dev libudev-dev libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev
-      - name: Run cargo test
+      - name: Run cargo test - default flags
         uses: actions-rs/cargo@v1
         with:
           command: test
           args: --examples
+      - name: Run cargo test - no default flags
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --examples --no-default-features
       - name: Run cargo test for docs
         uses: actions-rs/cargo@v1
         with:
