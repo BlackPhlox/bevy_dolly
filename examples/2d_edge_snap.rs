@@ -26,46 +26,36 @@ enum Direction {
 }
 
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
-    commands
-        .spawn(SpriteBundle {
-            texture: asset_server.load("bevy_dolly.png"),
-            transform: Transform::from_xyz(100., 0., 0.1),
-            sprite: Sprite {
-                custom_size: Some(Vec2::new(128., 128.)),
-                ..Default::default()
-            },
-            ..Default::default()
-        })
-        .insert(Direction::Right);
+    let offset_transform = Transform::from_xyz(100., 0., 0.);
 
-    commands.spawn(SpriteBundle {
-        texture: asset_server.load("room.png"),
-        transform: Transform::from_xyz(100., 200., 0.),
-        sprite: Sprite {
-            custom_size: Some(Vec2::new(2.6 * 800., 800.)),
-            ..Default::default()
-        },
-        ..Default::default()
-    });
+    let mut dolly = Sprite::from_image(asset_server.load("bevy_dolly.png"));
+    dolly.custom_size = Some(Vec2::new(128., 128.));
+    commands.spawn((
+        dolly,
+        offset_transform.with_translation(Vec3 {
+            x: 0.,
+            y: 0.,
+            z: 1.,
+        }),
+        Direction::Right,
+    ));
 
-    commands.spawn(SpriteBundle {
-        texture: asset_server.load("room_end.png"),
-        transform: Transform::from_xyz(1116., -104.5, 0.2),
-        sprite: Sprite {
-            ..Default::default()
-        },
-        ..Default::default()
-    });
+    let mut room = Sprite::from_image(asset_server.load("room.png"));
+    room.custom_size = Some(Vec2::new(2.6 * 800., 800.));
+    commands.spawn((
+        room,
+        offset_transform.with_translation(Vec3 {
+            x: 0.,
+            y: 200.,
+            z: 0.,
+        }),
+    ));
 
-    commands.spawn(SpriteBundle {
-        texture: asset_server.load("room_end.png"),
-        transform: Transform::from_xyz(-916., -104.5, 0.2),
-        sprite: Sprite {
-            flip_x: true,
-            ..Default::default()
-        },
-        ..Default::default()
-    });
+    let mut room_end = Sprite::from_image(asset_server.load("room_end.png"));
+    commands.spawn((room_end.clone(), Transform::from_xyz(1016., -104.5, 2.0)));
+
+    room_end.flip_x = true;
+    commands.spawn((room_end, Transform::from_xyz(-1016., -104.5, 2.0)));
 
     commands.spawn((
         MainCamera,
@@ -73,7 +63,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
             .with(Position::new(Vec3::new(0., 0., 0.)))
             .with(Smooth::new_position(1.2))
             .build(),
-        Camera2dBundle::default(),
+        Camera2d,
     ));
 }
 
@@ -82,8 +72,8 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
 fn sprite_movement(time: Res<Time>, mut sprite_position: Query<(&mut Direction, &mut Transform)>) {
     for (mut logo, mut transform) in &mut sprite_position {
         match *logo {
-            Direction::Right => transform.translation.x += 400. * time.delta_seconds(),
-            Direction::Left => transform.translation.x -= 400. * time.delta_seconds(),
+            Direction::Right => transform.translation.x += 400. * time.delta_secs(),
+            Direction::Left => transform.translation.x -= 400. * time.delta_secs(),
         }
 
         if transform.translation.x > 1200. {

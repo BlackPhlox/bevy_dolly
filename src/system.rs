@@ -52,7 +52,7 @@ where
         for mut rig in &mut query {
             //info!("{:?} changed: {:?}", entity, d);
 
-            let transform = rig.update(time.delta_seconds());
+            let transform = rig.update(time.delta_secs());
 
             cameras.iter_mut().for_each(|(mut t, camera)| {
                 if camera.is_active {
@@ -71,7 +71,7 @@ where
         mut query: Query<&mut Rig, (Changed<Rig>, With<T>)>,
     ) {
         for mut rig in &mut query {
-            let mut transform = rig.update(time.delta_seconds());
+            let mut transform = rig.update(time.delta_secs());
             cameras.iter_mut().for_each(|(mut t, mut orth, camera)| {
                 if camera.is_active {
                     //Bind camera's Z axis to scale, if used for init state check to prevent scale of 0
@@ -98,7 +98,7 @@ where
         for mut rig in &mut query {
             //info!("{:?} changed: {:?}", entity, d);
 
-            let transform = rig.update(time.delta_seconds());
+            let transform = rig.update(time.delta_secs());
 
             transforms.iter_mut().for_each(|mut t| {
                 *t = transform;
@@ -120,7 +120,7 @@ where
         for mut rig in &mut query {
             //info!("{:?} changed: {:?}", entity, d);
 
-            let transform = rig.update(time.delta_seconds());
+            let transform = rig.update(time.delta_secs());
 
             cameras.iter_mut().for_each(|(mut t, camera)| {
                 if camera.is_active {
@@ -137,7 +137,7 @@ where
         mut query: Query<&mut Rig, With<T>>,
     ) {
         for mut rig in &mut query {
-            let mut transform = rig.update(time.delta_seconds());
+            let mut transform = rig.update(time.delta_secs());
             cameras.iter_mut().for_each(|(mut t, mut orth, camera)| {
                 if camera.is_active {
                     //Bind camera's Z axis to scale, if used for init state check to prevent scale of 0
@@ -163,7 +163,7 @@ where
         for mut rig in &mut query {
             //info!("{:?} changed: {:?}", entity, d);
 
-            let transform = rig.update(time.delta_seconds());
+            let transform = rig.update(time.delta_secs());
 
             transforms.iter_mut().for_each(|mut t| {
                 *t = transform;

@@ -39,44 +39,38 @@ fn setup(
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
     // plane
-    commands.spawn(PbrBundle {
-        mesh: meshes.add(Plane3d::default().mesh().size(100., 100.)),
-        material: materials.add(Color::srgb(0.3, 0.5, 0.3)),
-        ..default()
-    });
+    commands.spawn((
+        Mesh3d(meshes.add(Plane3d::default().mesh().size(100., 100.))),
+        MeshMaterial3d(materials.add(Color::srgb(0.3, 0.5, 0.3))),
+    ));
 
-    commands.spawn(SceneBundle {
-        scene: asset_server.load("poly_fox.glb#Scene0"),
-        ..default()
-    });
+    let poly_fox = asset_server.load(GltfAssetLabel::Scene(0).from_asset("poly_fox.glb"));
 
-    commands.spawn(SceneBundle {
-        scene: asset_server.load("poly_dolly.gltf#Scene0"),
-        ..default()
-    });
+    commands.spawn((SceneRoot(poly_fox),));
+
+    let poly_dolly = asset_server.load(GltfAssetLabel::Scene(0).from_asset("poly_dolly.gltf"));
+
+    commands.spawn((SceneRoot(poly_dolly),));
 
     // Light
-    commands.spawn(DirectionalLightBundle {
-        transform: Transform::from_rotation(Quat::from_euler(
+    commands.spawn((
+        DirectionalLight {
+            shadows_enabled: true,
+            ..default()
+        },
+        Transform::from_rotation(Quat::from_euler(
             EulerRot::ZYX,
             0.0,
             1.0,
             -std::f32::consts::FRAC_PI_4,
         )),
-        directional_light: DirectionalLight {
-            shadows_enabled: true,
-            ..default()
-        },
-        ..default()
-    });
+    ));
 
     // camera
     commands.spawn((
         LeftCamera,
-        Camera3dBundle {
-            transform: Transform::from_xyz(0.0, 200.0, -100.0).looking_at(Vec3::ZERO, Vec3::Y),
-            ..default()
-        },
+        Camera3d::default(),
+        Transform::from_xyz(0.0, 200.0, -100.0).looking_at(Vec3::ZERO, Vec3::Y),
     ));
 
     commands.spawn((
@@ -98,17 +92,16 @@ fn setup(
     ));
 
     // camera
-    commands
-        .spawn(Camera3dBundle {
-            transform: Transform::from_xyz(100.0, 100., 150.0).looking_at(Vec3::ZERO, Vec3::Y),
-            camera: Camera {
-                clear_color: ClearColorConfig::None,
-                order: 1,
-                ..default()
-            },
+    commands.spawn((
+        Camera3d::default(),
+        Camera {
+            clear_color: ClearColorConfig::None,
+            order: 1,
             ..default()
-        })
-        .insert(RightCamera);
+        },
+        Transform::from_xyz(100.0, 100., 150.0).looking_at(Vec3::ZERO, Vec3::Y),
+        RightCamera,
+    ));
 }
 
 fn set_camera_viewports(
@@ -161,5 +154,5 @@ fn update_camera_2(
     camera_driver.rotate_yaw_pitch(-1.0, 0.0);
 
     let a = rig.driver_mut::<Arm>();
-    a.offset = Vec3::Z * ((time.delta_seconds() * 0.2).sin().cos().abs() * 400. - 200.);
+    a.offset = Vec3::Z * ((time.delta_secs() * 0.2).sin().cos().abs() * 400. - 200.);
 }
