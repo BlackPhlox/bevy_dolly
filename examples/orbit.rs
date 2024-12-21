@@ -64,7 +64,7 @@ fn setup(
     // plane
     commands.spawn((
         Mesh3d(meshes.add(Plane3d::default().mesh().size(5., 5.))),
-        MeshMaterial3d(materials.add(Color::srgb(0.3, 0.5, 0.3)))
+        MeshMaterial3d(materials.add(Color::srgb(0.3, 0.5, 0.3))),
     ));
 
     let poly_dolly = asset_server.load(GltfAssetLabel::Scene(0).from_asset("poly_dolly.gltf"));
@@ -72,7 +72,7 @@ fn setup(
     commands.spawn((
         SceneRoot(poly_dolly),
         Transform::from_xyz(0., 0.2, 0.),
-        DollyPosCtrlMove
+        DollyPosCtrlMove,
     ));
 
     commands.spawn((
@@ -89,7 +89,9 @@ fn setup(
     let start_transform = Transform::from_xyz(10.0, 10.0, 10.0).looking_at(Vec3::ZERO, Vec3::Y);
 
     let orth = Projection::from(OrthographicProjection {
-        scaling_mode: ScalingMode::FixedVertical { viewport_height: 2.0 },
+        scaling_mode: ScalingMode::FixedVertical {
+            viewport_height: 2.0,
+        },
         scale: 3.,
         ..OrthographicProjection::default_3d()
     });
@@ -97,18 +99,15 @@ fn setup(
     let pers = Projection::from(PerspectiveProjection::default());
 
     if *startup_perspective == ProjectionType::Orthographic {
-        commands.spawn((MainCamera, orth,start_transform));
-        commands.spawn((SecondCamera, pers,start_transform));
+        commands.spawn((MainCamera, orth, start_transform));
+        commands.spawn((SecondCamera, pers, start_transform));
     } else {
-        commands.spawn((MainCamera, pers,start_transform));
-        commands.spawn((SecondCamera, orth,start_transform));
+        commands.spawn((MainCamera, pers, start_transform));
+        commands.spawn((SecondCamera, orth, start_transform));
     }
 
     // light
-    commands.spawn((
-        PointLight::default(),
-        Transform::from_xyz(4.0, 8.0, 4.0)
-    ));
+    commands.spawn((PointLight::default(), Transform::from_xyz(4.0, 8.0, 4.0)));
 
     info!("Use W, A, S, D for movement");
     info!("Use Space and Shift for going up and down");

@@ -37,15 +37,12 @@ fn setup(
     // plane
     commands.spawn((
         Mesh3d(meshes.add(Plane3d::default().mesh().size(5., 5.))),
-        MeshMaterial3d(materials.add(Color::srgb(0.3, 0.5, 0.3)))
+        MeshMaterial3d(materials.add(Color::srgb(0.3, 0.5, 0.3))),
     ));
 
     let poly_dolly = asset_server.load(GltfAssetLabel::Scene(0).from_asset("poly_dolly.gltf"));
 
-    commands.spawn((
-        SceneRoot(poly_dolly),
-        Transform::from_xyz(0., 0.2, 0.),
-    ));
+    commands.spawn((SceneRoot(poly_dolly), Transform::from_xyz(0., 0.2, 0.)));
 
     let translation = [2.0f32, 2.0f32, 5.0f32];
     let transform =
@@ -57,14 +54,11 @@ fn setup(
             .with(Fpv::from_position_target(transform))
             .build(),
         Camera3d::default(),
-        transform
+        transform,
     ));
 
     // light
-    commands.spawn((
-        PointLight::default(),
-        Transform::from_xyz(4.0, 8.0, 4.0)
-    ));
+    commands.spawn((PointLight::default(), Transform::from_xyz(4.0, 8.0, 4.0)));
 
     info!("Use W, A, S, D for movement");
     info!("Use Space/E and Ctrl/Q for going up and down");

@@ -25,7 +25,14 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
 
     let mut dolly = Sprite::from_image(asset_server.load("bevy_dolly.png"));
     dolly.custom_size = Some(Vec2::new(128., 128.));
-    commands.spawn((dolly, offset_transform.with_translation(Vec3 { x: 0., y: 0., z: 1. })));
+    commands.spawn((
+        dolly,
+        offset_transform.with_translation(Vec3 {
+            x: 0.,
+            y: 0.,
+            z: 1.,
+        }),
+    ));
 
     commands.spawn((
         Camera2d::default(),

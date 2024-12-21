@@ -22,24 +22,21 @@ fn setup(
     // plane
     commands.spawn((
         Mesh3d(meshes.add(Plane3d::default().mesh().size(20., 20.))),
-        MeshMaterial3d(materials.add(Color::srgb(0.3, 0.5, 0.3)))
+        MeshMaterial3d(materials.add(Color::srgb(0.3, 0.5, 0.3))),
     ));
 
     commands.spawn((
         MainCamera,
         Rig::builder()
-        .with(Position::new(Vec3::Y * 3.0))
-        .with(LookAt::new(Vec3::new(0., -2., 2.)))
+            .with(Position::new(Vec3::Y * 3.0))
+            .with(LookAt::new(Vec3::new(0., -2., 2.)))
             .build(),
         Camera3d::default(),
-        Transform::from_xyz(-2.0, 1., 5.0).looking_at(Vec3::ZERO, Vec3::Y)
+        Transform::from_xyz(-2.0, 1., 5.0).looking_at(Vec3::ZERO, Vec3::Y),
     ));
 
     // light
-    commands.spawn((
-        PointLight::default(),
-        Transform::from_xyz(4.0, 8.0, 4.0)
-    ));
+    commands.spawn((PointLight::default(), Transform::from_xyz(4.0, 8.0, 4.0)));
 
     info!("Use W, A, S, D for movement");
     info!("Use Space and Shift for going up and down");

@@ -157,7 +157,7 @@ struct DollyPosCtrlInputBundle {
 impl Default for DollyPosCtrlInputBundle {
     fn default() -> Self {
         use MoveAction::*;
-        let input_map = InputMap::default() 
+        let input_map = InputMap::default()
         //TODO: Impl. when added to input-manager
         //input_map.assign_gamepad(Gamepad(0));
 
@@ -237,15 +237,11 @@ fn spawn_default_player(
     commands
         .spawn(config.transform)
         .with_children(|cell| {
-            cell.spawn(
-                (
-                    Mesh3d(  cone_mesh.clone() ),
-                    MeshMaterial3d( player_mat.clone() ),
-                    Transform::from_rotation(Quat::from_rotation_x(
-                       std::f32::consts::FRAC_PI_2,
-                   )),
-                )
-            );
+            cell.spawn((
+                Mesh3d(cone_mesh.clone()),
+                MeshMaterial3d(player_mat.clone()),
+                Transform::from_rotation(Quat::from_rotation_x(std::f32::consts::FRAC_PI_2)),
+            ));
         })
         .insert(DollyPosCtrlMove);
 }

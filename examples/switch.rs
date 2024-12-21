@@ -46,7 +46,7 @@ fn setup(
     // plane
     commands.spawn((
         Mesh3d(meshes.add(Plane3d::default().mesh().size(5., 5.))),
-        MeshMaterial3d(materials.add(Color::srgb(0.3, 0.5, 0.3)))
+        MeshMaterial3d(materials.add(Color::srgb(0.3, 0.5, 0.3))),
     ));
 
     let start_pos = Vec3::new(0., 0., 0.);
@@ -59,7 +59,7 @@ fn setup(
         Transform {
             translation: Vec3::new(0., 0.2, 0.),
             ..default()
-        }
+        },
     ));
 
     commands.spawn((
@@ -81,14 +81,11 @@ fn setup(
     commands.spawn((
         MainCamera,
         Camera3d::default(),
-        Transform::from_xyz(-2.0, 1., 5.0).looking_at(Vec3::ZERO, Vec3::Y)
+        Transform::from_xyz(-2.0, 1., 5.0).looking_at(Vec3::ZERO, Vec3::Y),
     ));
 
     // light
-    commands.spawn((
-        PointLight::default(),
-        Transform::from_xyz(4.0, 8.0, 4.0)
-    ));
+    commands.spawn((PointLight::default(), Transform::from_xyz(4.0, 8.0, 4.0)));
 
     //info!(" Use 1, 2, 3, 4 to target different sheep");
     //info!(" Use Q and E to turn the sheep");
@@ -118,9 +115,9 @@ struct Rotates;
 
 fn rotator_system(time: Res<Time>, mut query: Query<&mut Transform, With<Rotates>>) {
     for mut transform in query.iter_mut() {
-        *transform = Transform::from_rotation(Quat::from_rotation_y(
-            (4.0 * PI / 20.0) * time.delta_secs(),
-        )) * *transform;
+        *transform =
+            Transform::from_rotation(Quat::from_rotation_y((4.0 * PI / 20.0) * time.delta_secs()))
+                * *transform;
     }
 }
 

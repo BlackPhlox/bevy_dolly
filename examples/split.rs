@@ -41,39 +41,36 @@ fn setup(
     // plane
     commands.spawn((
         Mesh3d(meshes.add(Plane3d::default().mesh().size(100., 100.))),
-        MeshMaterial3d(materials.add(Color::srgb(0.3, 0.5, 0.3)))
+        MeshMaterial3d(materials.add(Color::srgb(0.3, 0.5, 0.3))),
     ));
 
     let poly_fox = asset_server.load(GltfAssetLabel::Scene(0).from_asset("poly_fox.glb"));
 
-    commands.spawn((
-        SceneRoot(poly_fox),
-    ));
+    commands.spawn((SceneRoot(poly_fox),));
 
     let poly_dolly = asset_server.load(GltfAssetLabel::Scene(0).from_asset("poly_dolly.gltf"));
 
-    commands.spawn((
-        SceneRoot(poly_dolly),
-    ));
+    commands.spawn((SceneRoot(poly_dolly),));
 
     // Light
     commands.spawn((
         DirectionalLight {
             shadows_enabled: true,
             ..default()
-        }, 
+        },
         Transform::from_rotation(Quat::from_euler(
-        EulerRot::ZYX,
-        0.0,
-        1.0,
-        -std::f32::consts::FRAC_PI_4,
-    ))));
+            EulerRot::ZYX,
+            0.0,
+            1.0,
+            -std::f32::consts::FRAC_PI_4,
+        )),
+    ));
 
     // camera
     commands.spawn((
         LeftCamera,
         Camera3d::default(),
-        Transform::from_xyz(0.0, 200.0, -100.0).looking_at(Vec3::ZERO, Vec3::Y)
+        Transform::from_xyz(0.0, 200.0, -100.0).looking_at(Vec3::ZERO, Vec3::Y),
     ));
 
     commands.spawn((
@@ -95,18 +92,16 @@ fn setup(
     ));
 
     // camera
-    commands
-        .spawn((
-            Camera3d::default(), 
-            Camera {
-                clear_color: ClearColorConfig::None,
-                order: 1,
-                ..default()
-            },
-            Transform::from_xyz(100.0, 100., 150.0).looking_at(Vec3::ZERO, Vec3::Y),
-            RightCamera
-        )
-    );
+    commands.spawn((
+        Camera3d::default(),
+        Camera {
+            clear_color: ClearColorConfig::None,
+            order: 1,
+            ..default()
+        },
+        Transform::from_xyz(100.0, 100., 150.0).looking_at(Vec3::ZERO, Vec3::Y),
+        RightCamera,
+    ));
 }
 
 fn set_camera_viewports(
