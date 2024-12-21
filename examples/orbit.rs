@@ -12,7 +12,6 @@ struct SecondCamera;
 
 fn main() {
     App::new()
-        .insert_resource(Msaa::default())
         .add_plugins((DefaultPlugins, DollyPosCtrl, DollyCursorGrab))
         .insert_resource(DollyPosCtrlConfig {
             ..Default::default()
@@ -63,23 +62,17 @@ fn setup(
     startup_perspective: Res<State<ProjectionType>>,
 ) {
     // plane
-    commands.spawn(PbrBundle {
-        mesh: meshes.add(Plane3d::default().mesh().size(5., 5.)),
-        material: materials.add(Color::srgb(0.3, 0.5, 0.3)),
-        ..default()
-    });
-    commands.spawn(Transform::from_xyz(0., 0., 0.));
+    commands.spawn((
+        Mesh3d(meshes.add(Plane3d::default().mesh().size(5., 5.))),
+        MeshMaterial3d(materials.add(Color::srgb(0.3, 0.5, 0.3)))
+    ));
+
+    let poly_dolly = asset_server.load(GltfAssetLabel::Scene(0).from_asset("poly_dolly.gltf"));
 
     commands.spawn((
-        SceneBundle {
-            scene: asset_server.load("poly_dolly.gltf#Scene0"),
-            transform: Transform {
-                translation: Vec3::new(0., 0.2, 0.),
-                ..default()
-            },
-            ..default()
-        },
-        DollyPosCtrlMove,
+        SceneRoot(poly_dolly),
+        Transform::from_xyz(0., 0.2, 0.),
+        DollyPosCtrlMove
     ));
 
     commands.spawn((
@@ -93,43 +86,29 @@ fn setup(
             .build(),
     ));
 
-    let orth = Camera3dBundle {
-        projection: OrthographicProjection {
-            scale: 3.0,
-            scaling_mode: ScalingMode::FixedVertical(2.0),
-            ..default()
-        }
-        .into(),
-        transform: Transform::from_xyz(10.0, 10.0, 10.0).looking_at(Vec3::ZERO, Vec3::Y),
-        ..default()
-    };
+    let start_transform = Transform::from_xyz(10.0, 10.0, 10.0).looking_at(Vec3::ZERO, Vec3::Y);
 
-    let pers = Camera3dBundle {
-        projection: PerspectiveProjection {
-            ..Default::default()
-        }
-        .into(),
-        transform: Transform::from_xyz(10.0, 10.0, 10.0).looking_at(Vec3::ZERO, Vec3::Y),
-        camera: Camera {
-            is_active: false,
-            ..Default::default()
-        },
-        ..Default::default()
-    };
+    let orth = Projection::from(OrthographicProjection {
+        scaling_mode: ScalingMode::FixedVertical { viewport_height: 2.0 },
+        scale: 3.,
+        ..OrthographicProjection::default_3d()
+    });
+
+    let pers = Projection::from(PerspectiveProjection::default());
 
     if *startup_perspective == ProjectionType::Orthographic {
-        commands.spawn((MainCamera, orth));
-        commands.spawn((SecondCamera, pers));
+        commands.spawn((MainCamera, orth,start_transform));
+        commands.spawn((SecondCamera, pers,start_transform));
     } else {
-        commands.spawn((MainCamera, pers));
-        commands.spawn((SecondCamera, orth));
+        commands.spawn((MainCamera, pers,start_transform));
+        commands.spawn((SecondCamera, orth,start_transform));
     }
 
     // light
-    commands.spawn(PointLightBundle {
-        transform: Transform::from_xyz(4.0, 8.0, 4.0),
-        ..default()
-    });
+    commands.spawn((
+        PointLight::default(),
+        Transform::from_xyz(4.0, 8.0, 4.0)
+    ));
 
     info!("Use W, A, S, D for movement");
     info!("Use Space and Shift for going up and down");

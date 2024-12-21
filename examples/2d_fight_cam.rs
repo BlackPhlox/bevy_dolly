@@ -7,8 +7,9 @@ fn main() {
         .add_systems(Startup, setup)
         .add_systems(PreUpdate, sprite_movement)
         .add_systems(Update, update_camera)
-        .add_systems(Update, draw_gizmo)
         .add_systems(Update, Dolly::<MainCamera>::update_2d_active_continuous)
+        // So gizmo is drawn after update as to not jump during camera movement
+        .add_systems(PostUpdate, draw_gizmo)
         .run();
 }
 
@@ -28,60 +29,35 @@ enum Direction {
 }
 
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
-    commands
-        .spawn(SpriteBundle {
-            texture: asset_server.load("bevy_dolly.png"),
-            transform: Transform::from_xyz(100., 0., 0.1),
-            sprite: Sprite {
-                custom_size: Some(Vec2::new(128., 128.)),
-                ..Default::default()
-            },
-            ..Default::default()
-        })
-        .insert(Direction::Right)
-        .insert(PlayerOne);
+    let offset_transform = Transform::from_xyz(100., 0., 0.);
 
-    commands
-        .spawn(SpriteBundle {
-            texture: asset_server.load("bevy_dolly.png"),
-            transform: Transform::from_xyz(100., 0., 0.1),
-            sprite: Sprite {
-                custom_size: Some(Vec2::new(128., 128.)),
-                flip_x: true,
-                ..Default::default()
-            },
-            ..Default::default()
-        })
-        .insert(PlayerTwo);
+    let mut dolly = Sprite::from_image(asset_server.load("bevy_dolly.png"));
+    dolly.custom_size = Some(Vec2::new(128., 128.));
 
-    commands.spawn(SpriteBundle {
-        texture: asset_server.load("room.png"),
-        transform: Transform::from_xyz(100., 200., 0.),
-        sprite: Sprite {
-            custom_size: Some(Vec2::new(2.6 * 800., 800.)),
-            ..Default::default()
-        },
-        ..Default::default()
-    });
+    commands.spawn((
+        dolly.clone(), 
+        offset_transform.with_translation(Vec3 { x: 0., y: 0., z: 1. }),
+        Direction::Right,
+        PlayerOne
+    ));
 
-    commands.spawn(SpriteBundle {
-        texture: asset_server.load("room_end.png"),
-        transform: Transform::from_xyz(1116., -104.5, 0.2),
-        sprite: Sprite {
-            ..Default::default()
-        },
-        ..Default::default()
-    });
+    dolly.flip_x = true;
+    commands.spawn((
+        dolly, 
+        offset_transform.with_translation(Vec3 { x: 0., y: 0., z: 1. }),
+        PlayerTwo
+    ));
 
-    commands.spawn(SpriteBundle {
-        texture: asset_server.load("room_end.png"),
-        transform: Transform::from_xyz(-916., -104.5, 0.2),
-        sprite: Sprite {
-            flip_x: true,
-            ..Default::default()
-        },
-        ..Default::default()
-    });
+    let mut room = Sprite::from_image(asset_server.load("room.png"));
+    room.custom_size = Some(Vec2::new(2.6 * 800., 800.));
+    commands.spawn((room, offset_transform.with_translation(Vec3 { x: 0., y: 200., z: 0. })));
+
+    let mut room_end = Sprite::from_image(asset_server.load("room_end.png"));
+    commands.spawn((room_end.clone(), Transform::from_xyz(1016., -104.5, 2.0)));
+
+    room_end.flip_x = true;
+    commands.spawn((room_end, Transform::from_xyz(-1016., -104.5, 2.0)));
+
 
     commands.spawn((
         MainCamera,
@@ -89,7 +65,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
             .with(Position::new(Vec3::new(0., 0., 0.)))
             .with(Smooth::new_position(1.2))
             .build(),
-        Camera2dBundle::default(),
+        Camera2d::default(),
     ));
 }
 
@@ -97,7 +73,6 @@ fn draw_gizmo(mut gizmos: Gizmos, q0: Query<&Transform, With<MainCamera>>) {
     for a in &q0 {
         gizmos.rect_2d(
             a.translation.truncate(),
-            0.,
             Vec2::splat(300.),
             Color::BLACK,
         );
@@ -109,8 +84,8 @@ fn draw_gizmo(mut gizmos: Gizmos, q0: Query<&Transform, With<MainCamera>>) {
 fn sprite_movement(time: Res<Time>, mut sprite_position: Query<(&mut Direction, &mut Transform)>) {
     for (mut logo, mut transform) in &mut sprite_position {
         match *logo {
-            Direction::Right => transform.translation.x += 400. * time.delta_seconds(),
-            Direction::Left => transform.translation.x -= 400. * time.delta_seconds(),
+            Direction::Right => transform.translation.x += 400. * time.delta_secs(),
+            Direction::Left => transform.translation.x -= 400. * time.delta_secs(),
         }
 
         if transform.translation.x > 1200. {
