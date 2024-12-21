@@ -35,7 +35,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     ));
 
     commands.spawn((
-        Camera2d::default(),
+        Camera2d,
         MainCamera,
         Rig::builder()
             .with(Position::default())

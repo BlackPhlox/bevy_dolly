@@ -63,7 +63,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
             .with(Position::new(Vec3::new(0., 0., 0.)))
             .with(Smooth::new_position(1.2))
             .build(),
-        Camera2d::default(),
+        Camera2d,
     ));
 }
 
