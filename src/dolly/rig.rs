@@ -7,21 +7,16 @@ use core::fmt::Debug;
 /// A chain of drivers, calculating displacements, and animating in succession.
 #[derive(Debug)]
 pub struct CameraRig {
-    ///
     pub drivers: Vec<Box<dyn RigDriverTraits>>,
 
-    ///
     pub final_transform: Transform,
 }
 
 // Prevents user calls to `RigDriver::update`. All updates must come from `CameraRig::update`.
 struct RigUpdateToken;
 
-///
 pub struct RigUpdateParams<'a> {
-    ///
     pub parent: &'a Transform,
-    ///
     pub delta_time_seconds: f32,
 
     _token: RigUpdateToken,
@@ -63,7 +58,6 @@ impl CameraRig {
     }
 
     /// Runs all the drivers in sequence, animating the rig, and producing a final transform of the camera.
-    ///
     /// Camera rigs are approximately framerate independent, so `update` can be called at any frequency.
     pub fn update(&mut self, delta_time_seconds: f32) -> Transform {
         let mut parent_transform = Transform::IDENTITY;
@@ -90,19 +84,16 @@ impl CameraRig {
     }
 }
 
-///
 pub struct CameraRigBuilder {
     drivers: Vec<Box<dyn RigDriverTraits>>,
 }
 
 impl CameraRigBuilder {
-    ///
     pub fn with(mut self, driver: impl RigDriverTraits) -> Self {
         self.drivers.push(Box::new(driver));
         self
     }
 
-    ///
     pub fn build(self) -> CameraRig {
         let mut rig = CameraRig {
             drivers: self.drivers,

@@ -14,8 +14,7 @@ pub struct Transform<H: Handedness> {
 }
 
 impl<H: Handedness> Transform<H> {
-    ///
-    pub fn from_position_rotation(position: Vec3, rotation: Quat) -> Self {
+     pub fn from_position_rotation(position: Vec3, rotation: Quat) -> Self {
         Self {
             position,
             rotation,
@@ -23,8 +22,7 @@ impl<H: Handedness> Transform<H> {
         }
     }
 
-    ///
-    pub fn into_position_rotation(self) -> (Vec3, Quat) {
+     pub fn into_position_rotation(self) -> (Vec3, Quat) {
         (self.position, self.rotation)
     }
 
@@ -43,8 +41,7 @@ impl<H: Handedness> Transform<H> {
         self.rotation * H::FORWARD
     }
 
-    ///
-    pub const IDENTITY: Transform<H> = Transform {
+     pub const IDENTITY: Transform<H> = Transform {
         position: Vec3::ZERO,
         rotation: Quat::IDENTITY,
         phantom: PhantomData,

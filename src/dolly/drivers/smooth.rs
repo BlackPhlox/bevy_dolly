@@ -69,10 +69,8 @@ impl Smooth {
     }
 
     /// Reverse the smoothing, causing the camera to look ahead of the parent transform
-    ///
     /// This can be useful on top of [`Position`], and before another `Smooth`
     /// in the chain to create a soft yet responsive follower camera.
-    ///
     /// [`Position`]: struct.Position.html
     /// [`Smooth`]: struct.Smooth.html
     pub fn predictive(mut self, predictive: bool) -> Self {
