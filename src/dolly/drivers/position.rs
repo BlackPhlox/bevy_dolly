@@ -19,7 +19,6 @@ pub struct Position {
 }
 
 impl Position {
-    ///
     pub fn new(position: Vec3) -> Self {
         Self { position }
     }

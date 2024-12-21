@@ -13,7 +13,6 @@ enum MovementType {
 
 fn main() {
     App::new()
-        .insert_resource(Msaa::default())
         .add_plugins((DefaultPlugins, DollyCursorGrab))
         .init_state::<MovementType>()
         .add_systems(Startup, setup)
@@ -36,20 +35,14 @@ fn setup(
     asset_server: Res<AssetServer>,
 ) {
     // plane
-    commands.spawn(PbrBundle {
-        mesh: meshes.add(Plane3d::default().mesh().size(5., 5.)),
-        material: materials.add(Color::srgb(0.3, 0.5, 0.3)),
-        ..default()
-    });
+    commands.spawn((
+        Mesh3d(meshes.add(Plane3d::default().mesh().size(5., 5.))),
+        MeshMaterial3d(materials.add(Color::srgb(0.3, 0.5, 0.3))),
+    ));
 
-    commands.spawn(SceneBundle {
-        scene: asset_server.load("poly_dolly.gltf#Scene0"),
-        transform: Transform {
-            translation: Vec3::new(0., 0.2, 0.),
-            ..default()
-        },
-        ..default()
-    });
+    let poly_dolly = asset_server.load(GltfAssetLabel::Scene(0).from_asset("poly_dolly.gltf"));
+
+    commands.spawn((SceneRoot(poly_dolly), Transform::from_xyz(0., 0.2, 0.)));
 
     let translation = [2.0f32, 2.0f32, 5.0f32];
     let transform =
@@ -60,19 +53,15 @@ fn setup(
         Rig::builder()
             .with(Fpv::from_position_target(transform))
             .build(),
-        Camera3dBundle {
-            transform,
-            ..default()
-        },
+        Camera3d::default(),
+        transform,
     ));
 
     // light
-    commands.spawn(PointLightBundle {
-        transform: Transform::from_xyz(4.0, 8.0, 4.0),
-        ..default()
-    });
+    commands.spawn((PointLight::default(), Transform::from_xyz(4.0, 8.0, 4.0)));
 
     info!("Use W, A, S, D for movement");
+    info!("Use Space/E and Ctrl/Q for going up and down");
     info!("Use Shift to go fast");
     info!("Use F to switch between Fps or Free camera");
     info!("Press Esc to toggle cursor focus");
@@ -103,7 +92,7 @@ fn update_camera(
     mut mouse_motion_events: EventReader<MouseMotion>,
     mut rig_q: Query<&mut Rig>,
 ) {
-    let time_delta_seconds: f32 = time.delta_seconds();
+    let time_delta_seconds: f32 = time.delta_secs();
     let boost_mult = 5.0f32;
     let sensitivity = Vec2::splat(1.0);
 
@@ -125,7 +114,7 @@ fn update_camera(
     if keys.pressed(KeyCode::KeyE) || keys.pressed(KeyCode::Space) {
         move_vec.y += 1.0;
     }
-    if keys.pressed(KeyCode::KeyQ) {
+    if keys.pressed(KeyCode::KeyQ) || keys.pressed(KeyCode::ControlLeft) {
         move_vec.y -= 1.0;
     }
 
@@ -145,7 +134,7 @@ fn update_camera(
     let mut rig = rig_q.single_mut();
 
     if let Ok(window) = windows.get_single() {
-        if !window.cursor.visible {
+        if !window.cursor_options.visible {
             rig.driver_mut::<Fpv>().update_pos_rot(
                 move_vec,
                 delta,

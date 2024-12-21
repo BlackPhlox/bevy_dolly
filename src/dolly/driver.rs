@@ -1,6 +1,6 @@
 use bevy_transform::prelude::Transform;
 
-//use crate::dolly::{handedness::Handedness, rig::RigUpdateParams, transform::Transform};
+//use crate::dolly::dolly::{handedness::Handedness, rig::RigUpdateParams, transform::Transform};
 use crate::dolly::rig::RigUpdateParams;
 
 pub trait RigDriverTraits: RigDriver + Sync + Send + std::any::Any + std::fmt::Debug {

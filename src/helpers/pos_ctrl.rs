@@ -1,6 +1,5 @@
 use bevy::prelude::*;
 use leafwing_input_manager::prelude::*;
-use std::fmt::Display;
 
 use super::cone::Cone;
 
@@ -119,13 +118,13 @@ struct DollyPosCtrlInputBundle {
     input_manager: InputManagerBundle<MoveAction>,
 }
 
-impl Display for DollyPosCtrlInputBundle {
+/* impl Display for DollyPosCtrlInputBundle {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let input_map = &self.input_manager.input_map;
-        for (ma, v) in input_map.iter() {
+        for (ma, v) in input_map.iter_buttonlike() {
             let _ = write!(f, "Action: {ma:?} -> ");
-            for (i, b) in v.iter().enumerate() {
-                let str = match b {
+            for (i, b.) in v.iter().enumerate() {
+                let str = match b.value(input_store, gamepad) {
                     UserInput::Single(x) => {
                         format!("Press {}", &x)
                     }
@@ -153,58 +152,60 @@ impl Display for DollyPosCtrlInputBundle {
         }
         Ok(())
     }
-}
+} */
 
 impl Default for DollyPosCtrlInputBundle {
     fn default() -> Self {
         use MoveAction::*;
-        let mut input_map = InputMap::default();
+        let input_map = InputMap::default()
         //TODO: Impl. when added to input-manager
         //input_map.assign_gamepad(Gamepad(0));
 
-        input_map.insert(Forward, KeyCode::KeyW);
-        input_map.insert(Forward, KeyCode::ArrowUp);
+        .with(Forward, KeyCode::KeyW)
+        .with(Forward, KeyCode::ArrowUp)
 
-        input_map.insert(Forward, GamepadButtonType::DPadUp);
-        //input_map.insert(Forward, SingleAxis::symmetric(GamepadAxisType::LeftStickY, 0.1)); // + Y / - Y
+        .with(Forward, GamepadButton::DPadUp)
+        //.with(Forward, SingleAxis::symmetric(GamepadAxisType::LeftStickY, 0.1)) // + Y / - Y
 
-        input_map.insert(Backward, KeyCode::KeyS);
-        input_map.insert(Backward, KeyCode::ArrowDown);
-        input_map.insert(Backward, GamepadButtonType::DPadDown);
+        .with(Backward, KeyCode::KeyS)
+        .with(Backward, KeyCode::ArrowDown)
+        .with(Backward, GamepadButton::DPadDown)
 
-        input_map.insert(StrafeLeft, KeyCode::KeyA);
-        input_map.insert(StrafeLeft, KeyCode::ArrowLeft);
-        input_map.insert(StrafeLeft, GamepadButtonType::DPadLeft);
+        .with(StrafeLeft, KeyCode::KeyA)
+        .with(StrafeLeft, KeyCode::ArrowLeft)
+        .with(StrafeLeft, GamepadButton::DPadLeft)
 
-        input_map.insert(StrafeRight, KeyCode::KeyD);
-        input_map.insert(StrafeRight, KeyCode::ArrowRight);
-        input_map.insert(StrafeRight, GamepadButtonType::DPadRight);
+        .with(StrafeRight, KeyCode::KeyD)
+        .with(StrafeRight, KeyCode::ArrowRight)
+        .with(StrafeRight, GamepadButton::DPadRight)
 
-        //input_map.insert(StrafeRight, SingleAxis::symmetric(GamepadAxisType::LeftStickX, 0.1)); // + X / - X
+        //.with(StrafeRight, SingleAxis::symmetric(GamepadAxisType::LeftStickX, 0.1)) // + X / - X
 
-        input_map.insert(Up, KeyCode::Space);
-        input_map.insert(
+        /* 
+        .with(Up, KeyCode::Space)
+        .with_axis(
             Up,
-            SingleAxis::positive_only(GamepadAxisType::LeftStickY, 0.1),
-        );
+           
+              GamepadControlAxis::LEFT_Y.only_positive(0.1)
+        )
 
-        input_map.insert(Down, KeyCode::ShiftLeft);
-        input_map.insert(
+        .with(Down, KeyCode::ShiftLeft)
+        .with_axis(
             Down,
-            SingleAxis::negative_only(GamepadAxisType::LeftStickY, 0.1),
-        );
-
-        input_map.insert(RotateLeft, KeyCode::Comma);
-        input_map.insert(
-            RotateLeft,
-            SingleAxis::negative_only(GamepadAxisType::LeftStickX, 0.1),
-        );
-
-        input_map.insert(RotateRight, KeyCode::Period);
-        input_map.insert(
+          
+              GamepadControlAxis::LEFT_Y.only_negative(0.1)
+        )
+        .with(RotateLeft, KeyCode::Comma)
+        .with_axis(
+            RotateLeft, 
+            GamepadControlAxis::LEFT_X.only_negative(0.1)
+        )
+        .with(RotateRight, KeyCode::Period)
+        .with_axis(
             RotateRight,
-            SingleAxis::positive_only(GamepadAxisType::LeftStickX, 0.1),
+            GamepadControlAxis::LEFT_X.only_positive(0.1)
         );
+        */;
 
         let input_manager = InputManagerBundle {
             input_map,
@@ -234,16 +235,13 @@ fn spawn_default_player(
     });
 
     commands
-        .spawn(SpatialBundle::from_transform(config.transform))
+        .spawn(config.transform)
         .with_children(|cell| {
-            cell.spawn(PbrBundle {
-                mesh: cone_mesh.clone(),
-                material: player_mat.clone(),
-                transform: Transform::from_rotation(Quat::from_rotation_x(
-                    std::f32::consts::FRAC_PI_2,
-                )),
-                ..default()
-            });
+            cell.spawn((
+                Mesh3d(cone_mesh.clone()),
+                MeshMaterial3d(player_mat.clone()),
+                Transform::from_rotation(Quat::from_rotation_x(std::f32::consts::FRAC_PI_2)),
+            ));
         })
         .insert(DollyPosCtrlMove);
 }
@@ -314,7 +312,7 @@ fn dolly_pos_ctrl_move_update(
         velocity = velocity.normalize();
 
         if !velocity.is_nan() {
-            transform.translation += velocity * time.delta_seconds() * config.move_speed;
+            transform.translation += velocity * time.delta_secs() * config.move_speed;
         }
     }
 }

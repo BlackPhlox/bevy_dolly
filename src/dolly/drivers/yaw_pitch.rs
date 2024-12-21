@@ -12,7 +12,7 @@ use bevy_transform::prelude::Transform;
 use crate::dolly::{driver::RigDriver, rig::RigUpdateParams};
 
 /*
-use crate::dolly::{
+use crate::dolly::dolly::{
     driver::RigDriver, handedness::Handedness, rig::RigUpdateParams, transform::Transform,
 };
 */
@@ -28,7 +28,6 @@ use crate::dolly::{
 #[derive(Debug)]
 pub struct YawPitch {
     /// [0..720)
-    ///
     /// Note: Quaternions can encode 720 degrees of rotation, causing a slerp from 350 to 0 degrees
     /// to happen counter-intuitively in the negative direction; the positive direction would go through 720,
     /// thus being farther. By encoding rotation here in the 0..720 range, we reduce the risk of this happening.

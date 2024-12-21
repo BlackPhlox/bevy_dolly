@@ -8,7 +8,6 @@ struct MainCamera;
 
 fn main() {
     App::new()
-        .insert_resource(Msaa::default())
         .add_plugins(DefaultPlugins)
         .add_systems(Startup, setup)
         .add_systems(
@@ -30,24 +29,19 @@ fn setup(
     asset_server: Res<AssetServer>,
 ) {
     // plane
-    commands.spawn(PbrBundle {
-        mesh: meshes.add(Plane3d::default().mesh().size(5., 5.)),
-        material: materials.add(Color::srgb(0.3, 0.5, 0.3)),
-        ..default()
-    });
+    commands.spawn((
+        Mesh3d(meshes.add(Plane3d::default().mesh().size(5., 5.))),
+        MeshMaterial3d(materials.add(Color::srgb(0.3, 0.5, 0.3))),
+    ));
 
     let start_pos = Vec3::new(0., 0., 0.);
 
+    let poly_dolly = asset_server.load(GltfAssetLabel::Scene(0).from_asset("poly_dolly.gltf"));
+
     commands.spawn((
+        SceneRoot(poly_dolly),
+        Transform::from_xyz(0., 0.2, 0.),
         Rotates,
-        SceneBundle {
-            scene: asset_server.load("poly_dolly.gltf#Scene0"),
-            transform: Transform {
-                translation: Vec3::new(0., 0.2, 0.),
-                ..default()
-            },
-            ..default()
-        },
     ));
 
     commands.spawn((
@@ -55,17 +49,12 @@ fn setup(
         Rig::builder()
             .with(MovableLookAt::from_position_target(start_pos))
             .build(),
-        Camera3dBundle {
-            transform: Transform::from_xyz(-2.0, 1., 5.0).looking_at(Vec3::ZERO, Vec3::Y),
-            ..default()
-        },
+        Camera3d::default(),
+        Transform::from_xyz(-2.0, 1., 5.0).looking_at(Vec3::ZERO, Vec3::Y),
     ));
 
     // light
-    commands.spawn(PointLightBundle {
-        transform: Transform::from_xyz(4.0, 8.0, 4.0),
-        ..default()
-    });
+    commands.spawn((PointLight::default(), Transform::from_xyz(4.0, 8.0, 4.0)));
 }
 
 fn update_camera(q0: Query<&Transform, With<Rotates>>, mut q1: Query<&mut Rig>) {
@@ -81,8 +70,8 @@ struct Rotates;
 
 fn rotator_system(time: Res<Time>, mut query: Query<&mut Transform, With<Rotates>>) {
     for mut transform in query.iter_mut() {
-        *transform = Transform::from_rotation(Quat::from_rotation_y(
-            (4.0 * PI / 20.0) * time.delta_seconds(),
-        )) * *transform;
+        *transform =
+            Transform::from_rotation(Quat::from_rotation_y((4.0 * PI / 20.0) * time.delta_secs()))
+                * *transform;
     }
 }

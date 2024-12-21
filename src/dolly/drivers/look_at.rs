@@ -34,7 +34,6 @@ pub struct LookAt {
 }
 
 impl LookAt {
-    ///
     pub fn new(target: Vec3) -> Self {
         Self {
             smoothness: 0.0,
@@ -53,7 +52,6 @@ impl LookAt {
     /// Reverse target position smoothing, causing the camera to look ahead of it.
     /// This can then be chained with [`Smooth`], to create
     /// a camera that smoothly follows an object, but doesn't lag far behind it.
-    ///
     /// [`Smooth`]: struct.Smooth.html
     pub fn tracking_predictive(mut self, predictive: bool) -> Self {
         self.output_offset_scale = if predictive { -1.0 } else { 1.0 };

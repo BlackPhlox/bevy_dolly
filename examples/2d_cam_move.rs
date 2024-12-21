@@ -8,7 +8,6 @@ const SPEED: f32 = 4.5;
 
 fn main() {
     App::new()
-        .insert_resource(Msaa::default())
         .add_plugins(DefaultPlugins)
         .add_systems(Startup, setup)
         //If large amount of smoothing is used, where camera movement is expected beyond the time of input
@@ -22,18 +21,21 @@ fn main() {
 
 /// set up a simple 3D scene
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
-    commands.spawn(SpriteBundle {
-        texture: asset_server.load("bevy_dolly.png"),
-        transform: Transform::from_xyz(100., 0., 0.),
-        sprite: Sprite {
-            custom_size: Some(Vec2::new(128., 128.)),
-            ..Default::default()
-        },
-        ..Default::default()
-    });
+    let offset_transform = Transform::from_xyz(100., 0., 0.);
+
+    let mut dolly = Sprite::from_image(asset_server.load("bevy_dolly.png"));
+    dolly.custom_size = Some(Vec2::new(128., 128.));
+    commands.spawn((
+        dolly,
+        offset_transform.with_translation(Vec3 {
+            x: 0.,
+            y: 0.,
+            z: 1.,
+        }),
+    ));
 
     commands.spawn((
-        Camera2dBundle::default(),
+        Camera2d,
         MainCamera,
         Rig::builder()
             .with(Position::default())
@@ -41,15 +43,10 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
             .build(),
     ));
 
-    commands.spawn(SpriteBundle {
-        texture: asset_server.load("room.png"),
-        transform: Transform::from_xyz(100., 0., 0.),
-        sprite: Sprite {
-            custom_size: Some(Vec2::new(2.6 * 800., 800.)),
-            ..Default::default()
-        },
-        ..Default::default()
-    });
+    let mut room = Sprite::from_image(asset_server.load("room.png"));
+    room.custom_size = Some(Vec2::new(2.6 * 800., 800.));
+
+    commands.spawn((room, offset_transform));
 
     info!("Use W, A, S, D for movement");
     info!("Use Z & X zooming in and out");

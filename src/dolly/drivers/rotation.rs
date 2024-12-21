@@ -7,7 +7,7 @@ use bevy_transform::prelude::Transform;
 use crate::dolly::{driver::RigDriver, rig::RigUpdateParams};
 
 /*
-use crate::dolly::{
+use crate::dolly::dolly::{
     driver::RigDriver, handedness::Handedness, rig::RigUpdateParams, transform::Transform,
 };
 */
