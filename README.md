@@ -48,7 +48,7 @@ In your `Cargo.toml`:
 ```toml
 [dependencies]
 # Your bevy dependency here ... 
-# bevy = "0.14"
+# bevy = "0.15"
 bevy_dolly = { version = "0.0.5" }
 ```
 
