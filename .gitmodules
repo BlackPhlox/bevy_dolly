@@ -1,4 +1,0 @@
-[submodule "dolly"]
-	path = dolly
-	url = https://github.com/BlackPhlox/dolly
-    branch = bevy_0.14
