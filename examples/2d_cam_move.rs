@@ -48,8 +48,8 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
 
     commands.spawn((room, offset_transform));
 
-    info!("Use W, A, S, D for movement");
-    info!("Use Z & X zooming in and out");
+    println!("Use W, A, S, D for movement");
+    println!("Use Z & X zooming in and out");
 }
 
 fn update_camera(keys: Res<ButtonInput<KeyCode>>, mut query: Query<&mut Rig>) {
