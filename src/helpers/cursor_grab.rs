@@ -2,7 +2,7 @@ use bevy::{
     prelude::*,
     window::{CursorGrabMode, PrimaryWindow},
 };
-use leafwing_input_manager::prelude::*;
+use bevy_enhanced_input::prelude::*;
 
 pub struct DollyCursorGrab;
 impl Plugin for DollyCursorGrab {
@@ -12,7 +12,8 @@ impl Plugin for DollyCursorGrab {
                 Startup,
                 (initial_grab_cursor, dolly_cursor_grab_input_setup),
             )
-            .add_systems(Update, cursor_grab.run_if(use_grab));
+            //.add_systems(Update, cursor_grab.run_if(use_grab));
+            ;
     }
 }
 
@@ -39,13 +40,18 @@ fn use_grab(config: Res<DollyCursorGrabConfig>) -> bool {
 struct DollyCursorGrabAction;
 
 fn dolly_cursor_grab_input_setup(mut commands: Commands) {
-    commands.spawn((DollyCursorGrabInputBundle::default(), DollyCursorGrabAction));
+    //commands.spawn((DollyCursorGrabInputBundle::default(), DollyCursorGrabAction));
 }
 
+#[derive(InputContext)]
+struct CursorGrab;
+
+/*
 #[derive(Actionlike, PartialEq, Eq, Clone, Copy, Hash, Debug, Reflect)]
 enum GrabAction {
     Exit,
 }
+
 
 #[derive(Bundle)]
 struct DollyCursorGrabInputBundle {
@@ -67,6 +73,7 @@ impl Default for DollyCursorGrabInputBundle {
         Self { input_manager }
     }
 }
+*/
 
 /// Grabs/ungrabs mouse cursor
 fn toggle_grab_cursor(window: &mut Window) -> bool {
@@ -90,15 +97,15 @@ fn initial_grab_cursor(
     mut config: ResMut<DollyCursorGrabConfig>,
 ) {
     config.visible = if !config.enabled {
-        if let Ok(window) = &mut windows.get_single_mut() {
+        if let Ok(window) = &mut windows.single_mut() {
             toggle_grab_cursor(window)
         } else {
             false
         }
-    } else if let Ok(window) = &mut windows.get_single_mut() {
+    } else if let Ok(window) = &mut windows.single_mut() {
         toggle_grab_cursor(window)
     } else {
-        warn!("Primary window not found for `initial_grab_cursor`!");
+        println!("Primary window not found for `initial_grab_cursor`!");
         false
     };
 }
@@ -109,7 +116,7 @@ fn cursor_grab(
     //act_query: Query<&ActionState<GrabAction>, With<DollyCursorGrabAction>>,
     mut config: ResMut<DollyCursorGrabConfig>,
 ) {
-    if let Ok(window) = &mut windows.get_single_mut() {
+    if let Ok(window) = &mut windows.single_mut() {
         //if let Ok(grab_action) = act_query.get_single() {
         if keys.just_pressed(KeyCode::Escape) {
             config.visible = toggle_grab_cursor(window);

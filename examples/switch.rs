@@ -87,14 +87,14 @@ fn setup(
     // light
     commands.spawn((PointLight::default(), Transform::from_xyz(4.0, 8.0, 4.0)));
 
-    //info!(" Use 1, 2, 3, 4 to target different sheep");
-    //info!(" Use Q and E to turn the sheep");
-    info!("Press C to toggle between the default player and the sheep");
+    //println!(" Use 1, 2, 3, 4 to target different sheep");
+    //println!(" Use Q and E to turn the sheep");
+    println!("Press C to toggle between the default player and the sheep");
 }
 
 fn follow_player(query: Query<&Transform, With<DollyPosCtrlMove>>, mut q: Query<&mut Rig>) {
-    if let Ok(p) = query.get_single() {
-        let mut rig = q.single_mut();
+    if let Ok(p) = query.single() {
+        let mut rig = q.single_mut().unwrap();
         rig.driver_mut::<Position>().position = p.translation;
         rig.driver_mut::<Rotation>().rotation = p.rotation;
         rig.driver_mut::<LookAt>().target = p.translation + Vec3::Y + Vec3::new(0., -1., 0.);
@@ -102,8 +102,8 @@ fn follow_player(query: Query<&Transform, With<DollyPosCtrlMove>>, mut q: Query<
 }
 
 fn follow_sheep(query: Query<&Transform, With<Rotates>>, mut rig_q: Query<&mut Rig>) {
-    if let Ok(p) = query.get_single() {
-        let mut rig = rig_q.single_mut();
+    if let Ok(p) = query.single() {
+        let mut rig = rig_q.single_mut().unwrap();
         rig.driver_mut::<Position>().position = p.translation;
         rig.driver_mut::<Rotation>().rotation = p.rotation;
         rig.driver_mut::<LookAt>().target = p.translation + Vec3::Y;

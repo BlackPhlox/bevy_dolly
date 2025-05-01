@@ -60,11 +60,11 @@ fn setup(
     // light
     commands.spawn((PointLight::default(), Transform::from_xyz(4.0, 8.0, 4.0)));
 
-    info!("Use W, A, S, D for movement");
-    info!("Use Space/E and Ctrl/Q for going up and down");
-    info!("Use Shift to go fast");
-    info!("Use F to switch between Fps or Free camera");
-    info!("Press Esc to toggle cursor focus");
+    println!("Use W, A, S, D for movement");
+    println!("Use Space/E and Ctrl/Q for going up and down");
+    println!("Use Shift to go fast");
+    println!("Use F to switch between Fps or Free camera");
+    println!("Press Esc to toggle cursor focus");
 }
 
 fn update_fpvtype(
@@ -131,9 +131,9 @@ fn update_camera(
     delta.x *= sensitivity.x;
     delta.y *= sensitivity.y;
 
-    let mut rig = rig_q.single_mut();
+    let mut rig = rig_q.single_mut().unwrap();
 
-    if let Ok(window) = windows.get_single() {
+    if let Ok(window) = windows.single() {
         if !window.cursor_options.visible {
             rig.driver_mut::<Fpv>().update_pos_rot(
                 move_vec,
