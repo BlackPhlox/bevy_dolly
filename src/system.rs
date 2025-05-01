@@ -78,7 +78,8 @@ where
                     if !(transform.translation.z < Self::RANGE_SCALE_2D
                         && transform.translation.z > -Self::RANGE_SCALE_2D)
                     {
-                        if let Projection::Orthographic(orthographic_projection) = orth.into_inner() {
+                        if let Projection::Orthographic(orthographic_projection) = orth.into_inner()
+                        {
                             orthographic_projection.scale =
                                 (transform.translation.z + 1.) * Self::SCALE_INCR_THRESHOLD;
                         }
@@ -147,7 +148,8 @@ where
                     if !(transform.translation.z < Self::RANGE_SCALE_2D
                         && transform.translation.z > -Self::RANGE_SCALE_2D)
                     {
-                        if let Projection::Orthographic(orthographic_projection) = orth.into_inner() {
+                        if let Projection::Orthographic(orthographic_projection) = orth.into_inner()
+                        {
                             orthographic_projection.scale =
                                 (transform.translation.z + 1.) * Self::SCALE_INCR_THRESHOLD;
                         }
