@@ -107,7 +107,7 @@ fn use_dolly_pos_ctrl_config(config: Res<DollyPosCtrlConfig>) -> bool {
 #[derive(Component)]
 struct DollyPosCtrlAction;
 
-fn dolly_pos_ctrl_config_input_setup(mut commands: Commands) {
+fn dolly_pos_ctrl_config_input_setup(commands: Commands) {
     //commands.spawn((DollyPosCtrlAction, DollyPosCtrlInputBundle::default()));
 }
 
@@ -279,7 +279,7 @@ fn dolly_pos_ctrl_move_update(
     //let action_state = act_query.single();
 
     for mut transform in transforms.iter_mut() {
-        let (_, mut rotation) = transform.rotation.to_axis_angle();
+        let (_, rotation) = transform.rotation.to_axis_angle();
         let mut velocity = Vec3::ZERO;
         let local_z = transform.local_z();
         let forward = Vec3::new(local_z.x, 0., local_z.z);
@@ -314,7 +314,7 @@ fn dolly_pos_ctrl_move_update(
         }
         */
 
-        transform.rotation = Quat::from_rotation_y(rotation * -1.);
+        transform.rotation = Quat::from_rotation_y(-rotation);
 
         //Normalize vel vector
         velocity = velocity.normalize();

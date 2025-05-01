@@ -72,18 +72,15 @@ where
     ) {
         for mut rig in &mut query {
             let mut transform = rig.update(time.delta_secs());
-            cameras.iter_mut().for_each(|(mut t, mut orth, camera)| {
+            cameras.iter_mut().for_each(|(mut t, orth, camera)| {
                 if camera.is_active {
                     //Bind camera's Z axis to scale, if used for init state check to prevent scale of 0
                     if !(transform.translation.z < Self::RANGE_SCALE_2D
                         && transform.translation.z > -Self::RANGE_SCALE_2D)
                     {
-                        match orth.into_inner() {
-                            Projection::Orthographic(orthographic_projection) => {
-                                orthographic_projection.scale =
-                                    (transform.translation.z + 1.) * Self::SCALE_INCR_THRESHOLD;
-                            }
-                            _ => {}
+                        if let Projection::Orthographic(orthographic_projection) = orth.into_inner() {
+                            orthographic_projection.scale =
+                                (transform.translation.z + 1.) * Self::SCALE_INCR_THRESHOLD;
                         }
                     }
                     //Drop Z from camera's transform calculations and keep original
@@ -144,18 +141,15 @@ where
     ) {
         for mut rig in &mut query {
             let mut transform = rig.update(time.delta_secs());
-            cameras.iter_mut().for_each(|(mut t, mut orth, camera)| {
+            cameras.iter_mut().for_each(|(mut t, orth, camera)| {
                 if camera.is_active {
                     //Bind camera's Z axis to scale, if used for init state check to prevent scale of 0
                     if !(transform.translation.z < Self::RANGE_SCALE_2D
                         && transform.translation.z > -Self::RANGE_SCALE_2D)
                     {
-                        match orth.into_inner() {
-                            Projection::Orthographic(orthographic_projection) => {
-                                orthographic_projection.scale =
-                                    (transform.translation.z + 1.) * Self::SCALE_INCR_THRESHOLD;
-                            }
-                            _ => {}
+                        if let Projection::Orthographic(orthographic_projection) = orth.into_inner() {
+                            orthographic_projection.scale =
+                                (transform.translation.z + 1.) * Self::SCALE_INCR_THRESHOLD;
                         }
                     }
                     //Drop Z from camera's transform calculations and keep original

@@ -39,7 +39,7 @@ fn use_grab(config: Res<DollyCursorGrabConfig>) -> bool {
 #[derive(Component)]
 struct DollyCursorGrabAction;
 
-fn dolly_cursor_grab_input_setup(mut commands: Commands) {
+fn dolly_cursor_grab_input_setup(commands: Commands) {
     //commands.spawn((DollyCursorGrabInputBundle::default(), DollyCursorGrabAction));
 }
 

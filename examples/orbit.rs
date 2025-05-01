@@ -152,7 +152,7 @@ fn swap_camera(
                     ProjectionType::Orthographic
                 });
 
-                println!("Perspective: {:?}", perspective);
+                println!("Perspective: {perspective:?}");
             }
         }
     } else if keys.just_pressed(KeyCode::KeyG) {
@@ -164,7 +164,7 @@ fn swap_camera(
                 ZoomType::Arm
             },
         );
-        println!("ZoomType: {:?}", zoom);
+        println!("ZoomType: {zoom:?}");
     }
 }
 
