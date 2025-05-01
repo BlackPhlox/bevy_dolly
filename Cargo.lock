@@ -1001,7 +1001,7 @@ version = "0.16.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "75e0258423c689f764556e36b5d9eebdbf624b29a1fd5b33cd9f6c42dcc4d5f3"
 dependencies = [
- "glam",
+ "glam 0.29.2",
 ]
 
 [[package]]
@@ -2012,9 +2012,10 @@ dependencies = [
 [[package]]
 name = "dolly"
 version = "0.6.0"
+version = "0.6.0"
 dependencies = [
- "bevy_math",
- "bevy_transform",
+ "glam 0.28.0",
+ "mint",
 ]
 
 [[package]]
@@ -2984,6 +2985,12 @@ dependencies = [
  "adler2",
  "simd-adler32",
 ]
+
+[[package]]
+name = "mint"
+version = "0.5.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e53debba6bda7a793e5f99b8dacf19e626084f525f7829104ba9898f367d85ff"
 
 [[package]]
 name = "naga"
