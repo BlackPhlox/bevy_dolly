@@ -1,5 +1,4 @@
 use bevy::prelude::*;
-use leafwing_input_manager::prelude::*;
 
 use super::cone::Cone;
 
@@ -36,7 +35,7 @@ pub struct DollyPosCtrlEntitySetupSet;
 pub struct DollyPosCtrl;
 impl Plugin for DollyPosCtrl {
     fn build(&self, app: &mut App) {
-        app.add_plugins(InputManagerPlugin::<MoveAction>::default());
+        //app.add_plugins(InputManagerPlugin::<MoveAction>::default());
         app.init_resource::<DollyPosCtrlConfig>();
         app.add_systems(
             Startup,
@@ -54,6 +53,7 @@ impl Plugin for DollyPosCtrl {
     }
 }
 
+/*
 #[derive(Actionlike, PartialEq, Eq, Clone, Copy, Hash, Debug, Reflect)]
 pub enum MoveAction {
     Forward,
@@ -66,6 +66,7 @@ pub enum MoveAction {
     RotateRight,
     None,
 }
+*/
 
 #[derive(Resource)]
 pub struct DollyPosCtrlConfig {
@@ -106,17 +107,19 @@ fn use_dolly_pos_ctrl_config(config: Res<DollyPosCtrlConfig>) -> bool {
 #[derive(Component)]
 struct DollyPosCtrlAction;
 
-fn dolly_pos_ctrl_config_input_setup(mut commands: Commands) {
-    commands.spawn((DollyPosCtrlAction, DollyPosCtrlInputBundle::default()));
+fn dolly_pos_ctrl_config_input_setup(commands: Commands) {
+    //commands.spawn((DollyPosCtrlAction, DollyPosCtrlInputBundle::default()));
 }
 
 #[derive(Component)]
 pub struct DollyPosCtrlMove;
 
+/*
 #[derive(Bundle)]
 struct DollyPosCtrlInputBundle {
     input_manager: InputManagerBundle<MoveAction>,
 }
+*/
 
 /* impl Display for DollyPosCtrlInputBundle {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -154,67 +157,70 @@ struct DollyPosCtrlInputBundle {
     }
 } */
 
+/*
 impl Default for DollyPosCtrlInputBundle {
     fn default() -> Self {
-        use MoveAction::*;
-        let input_map = InputMap::default()
-        //TODO: Impl. when added to input-manager
-        //input_map.assign_gamepad(Gamepad(0));
 
-        .with(Forward, KeyCode::KeyW)
-        .with(Forward, KeyCode::ArrowUp)
+    use MoveAction::*;
+    let input_map = InputMap::default()
+    //TODO: Impl. when added to input-manager
+    //input_map.assign_gamepad(Gamepad(0));
 
-        .with(Forward, GamepadButton::DPadUp)
-        //.with(Forward, SingleAxis::symmetric(GamepadAxisType::LeftStickY, 0.1)) // + Y / - Y
+    .with(Forward, KeyCode::KeyW)
+    .with(Forward, KeyCode::ArrowUp)
 
-        .with(Backward, KeyCode::KeyS)
-        .with(Backward, KeyCode::ArrowDown)
-        .with(Backward, GamepadButton::DPadDown)
+    .with(Forward, GamepadButton::DPadUp)
+    //.with(Forward, SingleAxis::symmetric(GamepadAxisType::LeftStickY, 0.1)) // + Y / - Y
 
-        .with(StrafeLeft, KeyCode::KeyA)
-        .with(StrafeLeft, KeyCode::ArrowLeft)
-        .with(StrafeLeft, GamepadButton::DPadLeft)
+    .with(Backward, KeyCode::KeyS)
+    .with(Backward, KeyCode::ArrowDown)
+    .with(Backward, GamepadButton::DPadDown)
 
-        .with(StrafeRight, KeyCode::KeyD)
-        .with(StrafeRight, KeyCode::ArrowRight)
-        .with(StrafeRight, GamepadButton::DPadRight)
+    .with(StrafeLeft, KeyCode::KeyA)
+    .with(StrafeLeft, KeyCode::ArrowLeft)
+    .with(StrafeLeft, GamepadButton::DPadLeft)
 
-        //.with(StrafeRight, SingleAxis::symmetric(GamepadAxisType::LeftStickX, 0.1)) // + X / - X
+    .with(StrafeRight, KeyCode::KeyD)
+    .with(StrafeRight, KeyCode::ArrowRight)
+    .with(StrafeRight, GamepadButton::DPadRight)
 
-        /* 
-        .with(Up, KeyCode::Space)
-        .with_axis(
-            Up,
-           
-              GamepadControlAxis::LEFT_Y.only_positive(0.1)
+    //.with(StrafeRight, SingleAxis::symmetric(GamepadAxisType::LeftStickX, 0.1)) // + X / - X
+
+    /*
+    .with(Up, KeyCode::Space)
+    .with_axis(
+        Up,
+
+        GamepadControlAxis::LEFT_Y.only_positive(0.1)
         )
 
         .with(Down, KeyCode::ShiftLeft)
         .with_axis(
             Down,
-          
-              GamepadControlAxis::LEFT_Y.only_negative(0.1)
-        )
-        .with(RotateLeft, KeyCode::Comma)
-        .with_axis(
-            RotateLeft, 
-            GamepadControlAxis::LEFT_X.only_negative(0.1)
-        )
-        .with(RotateRight, KeyCode::Period)
-        .with_axis(
-            RotateRight,
-            GamepadControlAxis::LEFT_X.only_positive(0.1)
-        );
-        */;
 
-        let input_manager = InputManagerBundle {
-            input_map,
-            action_state: ActionState::default(),
-        };
+            GamepadControlAxis::LEFT_Y.only_negative(0.1)
+            )
+            .with(RotateLeft, KeyCode::Comma)
+            .with_axis(
+                RotateLeft,
+                GamepadControlAxis::LEFT_X.only_negative(0.1)
+                )
+                .with(RotateRight, KeyCode::Period)
+                .with_axis(
+                    RotateRight,
+                    GamepadControlAxis::LEFT_X.only_positive(0.1)
+                    );
+                    */;
 
-        Self { input_manager }
-    }
-}
+                    let input_manager = InputManagerBundle {
+                        input_map,
+                        action_state: ActionState::default(),
+                    };
+
+                    Self { input_manager }
+                }
+            }
+            */
 
 fn spawn_default_player(
     mut commands: Commands,
@@ -268,17 +274,18 @@ fn dolly_pos_ctrl_move_update(
     time: Res<Time>,
     config: Res<DollyPosCtrlConfig>,
     mut transforms: Query<&mut Transform, With<DollyPosCtrlMove>>,
-    act_query: Query<&ActionState<MoveAction>, With<DollyPosCtrlAction>>,
+    //act_query: Query<&ActionState<MoveAction>, With<DollyPosCtrlAction>>,
 ) {
-    let action_state = act_query.single();
+    //let action_state = act_query.single();
 
     for mut transform in transforms.iter_mut() {
-        let (_, mut rotation) = transform.rotation.to_axis_angle();
+        let (_, rotation) = transform.rotation.to_axis_angle();
         let mut velocity = Vec3::ZERO;
         let local_z = transform.local_z();
         let forward = Vec3::new(local_z.x, 0., local_z.z);
         let right = transform.rotation * -Vec3::X;
 
+        /*
         velocity += forward * action_state.clamped_value(&MoveAction::Forward);
         velocity += forward * -action_state.clamped_value(&MoveAction::Backward);
 
@@ -305,8 +312,9 @@ fn dolly_pos_ctrl_move_update(
             }
             rotation += delta_value * config.rot_speed;
         }
+        */
 
-        transform.rotation = Quat::from_rotation_y(rotation * -1.);
+        transform.rotation = Quat::from_rotation_y(-rotation);
 
         //Normalize vel vector
         velocity = velocity.normalize();

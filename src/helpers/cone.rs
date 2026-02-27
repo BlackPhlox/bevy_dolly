@@ -1,6 +1,8 @@
 use bevy::{
     prelude::*,
-    render::{mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology},
+    render::render_resource::PrimitiveTopology,
+    mesh::Indices,
+    asset::RenderAssetUsages,
 };
 
 /// A cone shape.

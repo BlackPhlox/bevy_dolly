@@ -3,7 +3,7 @@
 
 use bevy::{
     prelude::*,
-    render::camera::Viewport,
+    camera::Viewport,
     window::{PrimaryWindow, WindowResized},
 };
 use bevy_dolly::prelude::*;
@@ -106,14 +106,14 @@ fn setup(
 
 fn set_camera_viewports(
     windows: Query<(Entity, &Window), With<PrimaryWindow>>,
-    mut resize_events: EventReader<WindowResized>,
+    mut resize_events: MessageReader<WindowResized>,
     mut left_camera: Query<&mut Camera, (With<LeftCamera>, Without<RightCamera>)>,
     mut right_camera: Query<&mut Camera, With<RightCamera>>,
 ) {
     for resize_event in resize_events.read() {
-        if let Ok((entity, window)) = windows.get_single() {
+        if let Ok((entity, window)) = windows.single() {
             if resize_event.window == entity {
-                let mut left_camera = left_camera.single_mut();
+                let mut left_camera = left_camera.single_mut().unwrap();
                 left_camera.viewport = Some(Viewport {
                     physical_position: UVec2::new(0, 0),
                     physical_size: UVec2::new(
@@ -123,7 +123,7 @@ fn set_camera_viewports(
                     depth: 0.0..1.0,
                 });
 
-                let mut right_camera = right_camera.single_mut();
+                let mut right_camera = right_camera.single_mut().unwrap();
                 right_camera.viewport = Some(Viewport {
                     physical_position: UVec2::new(window.physical_width() / 2, 0),
                     physical_size: UVec2::new(
@@ -138,7 +138,7 @@ fn set_camera_viewports(
 }
 
 fn update_camera_1(mut query: Query<&mut Rig, (With<LeftCamera>, Without<RightCamera>)>) {
-    let mut rig = query.single_mut();
+    let mut rig = query.single_mut().unwrap();
     let camera_driver = rig.driver_mut::<YawPitch>();
 
     camera_driver.rotate_yaw_pitch(1.0, 0.0);
@@ -148,7 +148,7 @@ fn update_camera_2(
     time: Res<Time>,
     mut query: Query<&mut Rig, (With<RightCamera>, Without<LeftCamera>)>,
 ) {
-    let mut rig = query.single_mut();
+    let mut rig = query.single_mut().unwrap();
     let camera_driver = rig.driver_mut::<YawPitch>();
 
     camera_driver.rotate_yaw_pitch(-1.0, 0.0);
