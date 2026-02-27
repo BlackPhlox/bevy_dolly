@@ -169,7 +169,7 @@ fn swap_camera(
 }
 
 fn handle_mouse_scroll(
-    mut mouse_wheel_events: EventReader<MouseWheel>,
+    mut mouse_wheel_events: MessageReader<MouseWheel>,
     mut q_main: Query<&mut Projection, With<MainCamera>>,
     zoom: Res<State<ZoomType>>,
     mut rig_q: Query<&mut Rig>,
@@ -202,7 +202,7 @@ fn update_camera(
     keys: Res<ButtonInput<KeyCode>>,
     pan: Res<State<Pan>>,
     mut next_pan: ResMut<NextState<Pan>>,
-    mut mouse_motion_events: EventReader<MouseMotion>,
+    mut mouse_motion_events: MessageReader<MouseMotion>,
     mut rig_q: Query<&mut Rig>,
     trans: Query<&Transform, With<DollyPosCtrlMove>>,
     mut config: ResMut<DollyPosCtrlConfig>,

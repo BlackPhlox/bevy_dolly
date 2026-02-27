@@ -25,18 +25,18 @@ helpers = ["dep:bevy_enhanced_input", "bevy/bevy_pbr"]
 
 [dependencies]
 dolly = { path = "dolly", default-features = false }
-bevy_enhanced_input = { version = "0.20.0", optional = true } 
+bevy_enhanced_input = { version = "0.24.0", optional = true } 
 
 [dependencies.bevy]
-version = "0.17.3"
+version = "0.18.0"
 #features = ["bevy_render", "bevy_asset", "bevy_window", "default_font", "bevy_text", "png"]
 default-features = true
 
 [dev-dependencies]
-bevy-inspector-egui = "0.35"
+bevy-inspector-egui = "0.36"
 
 [dev-dependencies.bevy]
-version = "0.17.3"
+version = "0.18.0"
 #features = [
 #    "bevy_text",
 #    "default_font",
@@ -58,6 +58,6 @@ version = "0.17.3"
 default-features = true
 
 [target.'cfg(target_os = "linux")'.dev-dependencies.bevy]
-version = "0.17.3"
+version = "0.18.0"
 #features = ["x11", "wayland", "default_font", "bevy_text", "png"]
 default-features = true
