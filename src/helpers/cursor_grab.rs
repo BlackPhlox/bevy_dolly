@@ -1,18 +1,21 @@
 use bevy::{
     prelude::*,
-    window::{CursorGrabMode, PrimaryWindow},
+    window::{CursorGrabMode, CursorOptions, PrimaryWindow},
 };
-use leafwing_input_manager::prelude::*;
+use bevy_enhanced_input::prelude::*;
 
 pub struct DollyCursorGrab;
 impl Plugin for DollyCursorGrab {
     fn build(&self, app: &mut App) {
         app.init_resource::<DollyCursorGrabConfig>()
+            .add_plugins(EnhancedInputPlugin)
             .add_systems(
                 Startup,
                 (initial_grab_cursor, dolly_cursor_grab_input_setup),
             )
-            .add_systems(Update, cursor_grab.run_if(use_grab));
+            .add_input_context::<CursorGrab>()
+            //.add_systems(Update, cursor_grab.run_if(use_grab));
+            ;
     }
 }
 
@@ -38,14 +41,19 @@ fn use_grab(config: Res<DollyCursorGrabConfig>) -> bool {
 #[derive(Component)]
 struct DollyCursorGrabAction;
 
-fn dolly_cursor_grab_input_setup(mut commands: Commands) {
-    commands.spawn((DollyCursorGrabInputBundle::default(), DollyCursorGrabAction));
+fn dolly_cursor_grab_input_setup(commands: Commands) {
+    //commands.spawn((DollyCursorGrabInputBundle::default(), DollyCursorGrabAction));
 }
 
+#[derive(Component)]
+struct CursorGrab;
+
+/*
 #[derive(Actionlike, PartialEq, Eq, Clone, Copy, Hash, Debug, Reflect)]
 enum GrabAction {
     Exit,
 }
+
 
 #[derive(Bundle)]
 struct DollyCursorGrabInputBundle {
@@ -67,18 +75,19 @@ impl Default for DollyCursorGrabInputBundle {
         Self { input_manager }
     }
 }
+*/
 
 /// Grabs/ungrabs mouse cursor
-fn toggle_grab_cursor(window: &mut Window) -> bool {
-    match window.cursor_options.grab_mode {
+fn toggle_grab_cursor(cursor_options: &mut CursorOptions) -> bool {
+    match cursor_options.grab_mode {
         CursorGrabMode::None => {
-            window.cursor_options.grab_mode = CursorGrabMode::Confined;
-            window.cursor_options.visible = false;
+            cursor_options.grab_mode = CursorGrabMode::Confined;
+            cursor_options.visible = false;
             false
         }
         _ => {
-            window.cursor_options.grab_mode = CursorGrabMode::None;
-            window.cursor_options.visible = true;
+            cursor_options.grab_mode = CursorGrabMode::None;
+            cursor_options.visible = true;
             true
         }
     }
@@ -86,33 +95,33 @@ fn toggle_grab_cursor(window: &mut Window) -> bool {
 
 /// Grabs the cursor when game first starts
 fn initial_grab_cursor(
-    mut windows: Query<&mut Window, With<PrimaryWindow>>,
+    mut cursor_options: Query<&mut CursorOptions, With<PrimaryWindow>>,
     mut config: ResMut<DollyCursorGrabConfig>,
 ) {
     config.visible = if !config.enabled {
-        if let Ok(window) = &mut windows.get_single_mut() {
-            toggle_grab_cursor(window)
+        if let Ok(cursor_options) = &mut cursor_options.single_mut() {
+            toggle_grab_cursor(cursor_options)
         } else {
             false
         }
-    } else if let Ok(window) = &mut windows.get_single_mut() {
-        toggle_grab_cursor(window)
+    } else if let Ok(cursor_options) = &mut cursor_options.single_mut() {
+        toggle_grab_cursor(cursor_options)
     } else {
-        warn!("Primary window not found for `initial_grab_cursor`!");
+        println!("Primary window not found for `initial_grab_cursor`!");
         false
     };
 }
 
 fn cursor_grab(
-    mut windows: Query<&mut Window, With<PrimaryWindow>>,
+    mut cursor_options: Query<&mut CursorOptions, With<PrimaryWindow>>,
     keys: Res<ButtonInput<KeyCode>>,
     //act_query: Query<&ActionState<GrabAction>, With<DollyCursorGrabAction>>,
     mut config: ResMut<DollyCursorGrabConfig>,
 ) {
-    if let Ok(window) = &mut windows.get_single_mut() {
+    if let Ok(cursor_options) = &mut cursor_options.single_mut() {
         //if let Ok(grab_action) = act_query.get_single() {
         if keys.just_pressed(KeyCode::Escape) {
-            config.visible = toggle_grab_cursor(window);
+            config.visible = toggle_grab_cursor(cursor_options);
         }
         // This doesn't work:
         /*

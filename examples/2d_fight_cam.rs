@@ -107,7 +107,7 @@ fn sprite_movement(time: Res<Time>, mut sprite_position: Query<(&mut Direction, 
 }
 
 fn update_camera(sprite_position: Query<(&Direction, &Transform)>, mut q0: Query<&mut Rig>) {
-    let mut rig = q0.single_mut();
+    let mut rig = q0.single_mut().unwrap();
     let camera_driver = rig.driver_mut::<Position>();
 
     for (_dir, pos) in &sprite_position {

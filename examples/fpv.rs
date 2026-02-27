@@ -1,5 +1,6 @@
-use bevy::{input::mouse::MouseMotion, prelude::*, window::PrimaryWindow};
+use bevy::{input::mouse::MouseMotion, prelude::*, window::{CursorOptions, PrimaryWindow}};
 use bevy_dolly::prelude::*;
+use bevy_enhanced_input::{EnhancedInputPlugin, prelude::InputContextAppExt};
 
 #[derive(Component)]
 struct MainCamera;
@@ -15,6 +16,7 @@ fn main() {
     App::new()
         .add_plugins((DefaultPlugins, DollyCursorGrab))
         .init_state::<MovementType>()
+        .add_input_context::<MainCamera>()
         .add_systems(Startup, setup)
         .add_systems(
             Update,
@@ -60,11 +62,11 @@ fn setup(
     // light
     commands.spawn((PointLight::default(), Transform::from_xyz(4.0, 8.0, 4.0)));
 
-    info!("Use W, A, S, D for movement");
-    info!("Use Space/E and Ctrl/Q for going up and down");
-    info!("Use Shift to go fast");
-    info!("Use F to switch between Fps or Free camera");
-    info!("Press Esc to toggle cursor focus");
+    println!("Use W, A, S, D for movement");
+    println!("Use Space/E and Ctrl/Q for going up and down");
+    println!("Use Shift to go fast");
+    println!("Use F to switch between Fps or Free camera");
+    println!("Press Esc to toggle cursor focus");
 }
 
 fn update_fpvtype(
@@ -87,9 +89,9 @@ fn update_fpvtype(
 fn update_camera(
     time: Res<Time>,
     keys: Res<ButtonInput<KeyCode>>,
-    windows: Query<&Window, With<PrimaryWindow>>,
+    cursor_options: Query<&CursorOptions, With<PrimaryWindow>>,
     fps_state: Res<State<MovementType>>,
-    mut mouse_motion_events: EventReader<MouseMotion>,
+    mut mouse_motion_events: MessageReader<MouseMotion>,
     mut rig_q: Query<&mut Rig>,
 ) {
     let time_delta_seconds: f32 = time.delta_secs();
@@ -131,10 +133,10 @@ fn update_camera(
     delta.x *= sensitivity.x;
     delta.y *= sensitivity.y;
 
-    let mut rig = rig_q.single_mut();
+    let mut rig = rig_q.single_mut().unwrap();
 
-    if let Ok(window) = windows.get_single() {
-        if !window.cursor_options.visible {
+    if let Ok(cursor_options) = cursor_options.single() {
+        if !cursor_options.visible {
             rig.driver_mut::<Fpv>().update_pos_rot(
                 move_vec,
                 delta,

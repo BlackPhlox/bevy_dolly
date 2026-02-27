@@ -1,10 +1,11 @@
 use bevy::prelude::*;
 use bevy_dolly::prelude::*;
-use bevy_inspector_egui::quick::WorldInspectorPlugin;
+use bevy_inspector_egui::{bevy_egui::EguiPlugin, quick::WorldInspectorPlugin};
 
 fn main() {
     App::new()
         .add_plugins((DefaultPlugins, DollyPosCtrl))
+        .add_plugins(EguiPlugin::default())
         .add_plugins(WorldInspectorPlugin::new())
         .add_systems(Startup, setup)
         .add_systems(Update, (Dolly::<MainCamera>::update_active, update_camera))
@@ -38,9 +39,9 @@ fn setup(
     // light
     commands.spawn((PointLight::default(), Transform::from_xyz(4.0, 8.0, 4.0)));
 
-    info!("Use W, A, S, D for movement");
-    info!("Use Space and Shift for going up and down");
-    info!("Use , (Comma) and . (Period) to rotate Left or Right");
+    println!("Use W, A, S, D for movement");
+    println!("Use Space and Shift for going up and down");
+    println!("Use , (Comma) and . (Period) to rotate Left or Right");
 }
 
 #[allow(clippy::type_complexity)]
@@ -51,6 +52,11 @@ fn update_camera(
     )>,
 ) {
     let mut p0 = query.p0();
-    let player = p0.single_mut();
-    query.p1().single_mut().driver_mut::<LookAt>().target = player.translation;
+    let player = p0.single_mut().unwrap();
+    query
+        .p1()
+        .single_mut()
+        .unwrap()
+        .driver_mut::<LookAt>()
+        .target = player.translation;
 }
