@@ -47,7 +47,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     room.custom_size = Some(Vec2::new(2.6 * 800., 800.));
 
     commands.spawn((room, offset_transform));
-
+    
     println!("Use W, A, S, D for movement");
     println!("Use Z & X zooming in and out");
 }

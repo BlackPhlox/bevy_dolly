@@ -1,10 +1,11 @@
 use bevy::prelude::*;
 use bevy_dolly::prelude::*;
-use bevy_inspector_egui::quick::WorldInspectorPlugin;
+use bevy_inspector_egui::{bevy_egui::EguiPlugin, quick::WorldInspectorPlugin};
 
 fn main() {
     App::new()
         .add_plugins((DefaultPlugins, DollyPosCtrl))
+        .add_plugins(EguiPlugin::default())
         .add_plugins(WorldInspectorPlugin::new())
         .add_systems(Startup, setup)
         .add_systems(Update, (Dolly::<MainCamera>::update_active, update_camera))

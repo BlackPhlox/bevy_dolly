@@ -3,7 +3,7 @@
 
 use bevy::{
     prelude::*,
-    render::camera::Viewport,
+    camera::Viewport,
     window::{PrimaryWindow, WindowResized},
 };
 use bevy_dolly::prelude::*;

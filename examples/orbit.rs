@@ -1,7 +1,7 @@
 #![allow(clippy::type_complexity)]
 use bevy::input::mouse::{MouseMotion, MouseWheel};
 use bevy::prelude::*;
-use bevy::render::camera::ScalingMode;
+use bevy::camera::ScalingMode;
 use bevy_dolly::prelude::*;
 
 #[derive(Component)]
